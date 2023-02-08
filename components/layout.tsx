@@ -25,6 +25,7 @@ export default function Layout(props: LayoutProps) {
   useEffect(() => {
     try{
       user = LoginService.getUser()
+      if (!user) window.location.href = "/login";
     }catch(err){
       if (!user) window.location.href = "/login";
     }
