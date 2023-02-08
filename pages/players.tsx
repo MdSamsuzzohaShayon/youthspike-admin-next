@@ -4,6 +4,7 @@ import { gql, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
 import AddUpdatePlayer from "@/components/players/add-update-player";
 import AddPlayers from "@/components/players/add-players";
+import { v4 as uuidv4 } from 'uuid';
 
 const LEAGUES = gql`
   query GetPlayers {
@@ -132,8 +133,10 @@ export default function PlayersPage() {
 
         {addUpdatePlayer && (
           <AddUpdatePlayer
+            key={uuidv4()}
             onSuccess={onAddUpdatePlayer}
             player={updatePlayer}
+            onClose={onAddUpdatePlayerClose}
           ></AddUpdatePlayer>
         )}
 

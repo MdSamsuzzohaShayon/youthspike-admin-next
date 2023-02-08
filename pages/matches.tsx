@@ -5,7 +5,8 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
 import { format } from "date-fns";
 import { MatchLink } from "@/components/matches/link";
-
+import { v4 as uuidv4 } from 'uuid';
+import { IMatch } from "@/types/match";
 const MATCHES = gql`
   query GetMatches {
     getMatches {
@@ -84,7 +85,7 @@ const MATCHES = gql`
 
 export default function MatchesPage() {
   const [addUpdateMatch, setAddUpdateMatch] = useState(false);
-  const [updateMatch, setUpdateMatch] = useState(null);
+  const [updateMatch, setUpdateMatch] = useState<any>(null);
   const { data, error, loading, refetch } = useQuery(MATCHES);
 
   const onAddUpdateMatch = () => {
@@ -174,8 +175,10 @@ export default function MatchesPage() {
 
         {addUpdateMatch && (
           <AddUpdateMatch
+            key={uuidv4()}
             onSuccess={onAddUpdateMatch}
             match={updateMatch}
+            onClose={onAddUpdateMatchClose}
           ></AddUpdateMatch>
         )}
       </>
@@ -258,48 +261,35 @@ interface AddUpdateMatchOnClose {
 }
 
 interface AddUpdateMatchProps {
-  match?: any;
+  match?:IMatch|undefined;
   onSuccess?: AddUpdateMatchOnSuccess;
   onClose?: AddUpdateMatchOnClose;
 }
 
 function AddUpdateMatch(props: AddUpdateMatchProps) {
   const [leagueId, setLeagueId] = useState(props?.match?.leagueId || "");
+  
   const { data: leagues } = useQuery(LEAGUES);
   const { data: teams } = useQuery(TEAMS, { variables: leagueId });
-
+  
   const now = new Date();
-  const [minDate, setMinDate] = useState(format(now, "yyyy-MM-dd"));
-  const [maxDate, setMaxDate] = useState(format(now, "yyyy-MM-dd"));
-
-  const [numberOfNets, setNumberOfNets] = useState(
-    props?.match ? props?.match?.nets : 1
-  );
-
-  const [numberOfRounds, setNumberOfRounds] = useState(
-    props?.match ? props?.match?.rounds : 1
-  );
-
+  const uperLimit = new Date();
+  const lowerLimit = new Date();
+  uperLimit.setDate(now.getDate()+60);
+  lowerLimit.setDate(now.getDate()-60);
+  const [minDate, setMinDate] = useState(format(lowerLimit, "yyyy-MM-dd"));
+  const [maxDate, setMaxDate] = useState(format(uperLimit, "yyyy-MM-dd"));
+  
   const [teamAId, setTeamAId] = useState(props?.match?.teamAId || "");
   const [teamBId, setTeamBId] = useState(props?.match?.teamBId || "");
+  const [numberOfNets, setNumberOfNets] = useState(props?.match?.numberOfNets ?? 1);
+  const [numberOfRounds, setNumberOfRounds] = useState(props?.match?.numberOfRounds ?? 1);
   const [location, setLocation] = useState(props?.match?.location || "");
-
-  const [date, setDate] = useState(
-    props?.match ? format(new Date(props?.match.date), "yyy-MM-dd") : minDate
-  );
-
-  const [netRange, setNetRange] = useState(
-    props?.match ? props?.match?.netRange : 1
-  );
-
-  const [pairLimit, setPairLimit] = useState(
-    props?.match ? props?.match?.pairLimit : 1
-  );
-
-  const [active, setActive] = useState(
-    props?.match ? props?.match?.active + "" : "true"
-  );
-
+  const [netRange, setNetRange] = useState(props?.match?.netRange ?? 1);
+  const [pairLimit, setPairLimit] = useState(props.match?.pairLimit??1);
+  const [active, setActive] = useState(props.match?.active.toString()??"true");
+  const matchDate = props.match?.date.toString().slice(0,10);
+  const [date, setDate] = useState(matchDate??format((now),"yyyy-mm-dd"));
   const [addUpdateMatch, { data, error, loading }] = useMutation(
     ADD_UPDATE_MATCHE,
     {

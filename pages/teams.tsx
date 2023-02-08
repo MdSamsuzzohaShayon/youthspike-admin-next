@@ -3,6 +3,8 @@ import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
+import { v4 as uuidv4 } from 'uuid';
+import { ITeam } from "@/types/team";
 
 const TEAMS = gql`
   query GetTeams {
@@ -32,7 +34,7 @@ const TEAMS = gql`
 
 export default function TeamsPage() {
   const [addUpdateTeam, setAddUpdateTeam] = useState(false);
-  const [updateTeam, setUpdateTeam] = useState(null);
+  const [updateTeam, setUpdateTeam] = useState<any>(null);
   const { data, error, loading, refetch } = useQuery(TEAMS);
 
   const onAddUpdateTeam = () => {
@@ -104,6 +106,8 @@ export default function TeamsPage() {
 
         {addUpdateTeam && (
           <AddUpdateTeam
+            key={uuidv4()}
+            onClose={onAddUpdateTeamClose}
             onSuccess={onAddUpdateTeam}
             team={updateTeam}
           ></AddUpdateTeam>
@@ -176,18 +180,17 @@ interface AddUpdateTeamOnClose {
 }
 
 interface AddUpdateTeamProps {
-  team?: any;
+  team?: ITeam;
   onSuccess?: AddUpdateTeamOnSuccess;
   onClose?: AddUpdateTeamOnClose;
 }
 
 function AddUpdateTeam(props: AddUpdateTeamProps) {
   const leaguesQuery = useQuery(LEAGUE_DROPDOWN);
-  const coachesQuery = useQuery(COACH_DROPDOWN);
-
-  const [name, setName] = useState(props?.team?.name || "");
-  const [leagueId, setLeagueId] = useState(props?.team?.leagueId || "");
-  const [coachId, setCoachId] = useState(props?.team?.coachId || "");
+  const coachesQuery = useQuery(COACH_DROPDOWN);  
+  const [name, setName] = useState(props.team?.name || "");
+  const [leagueId, setLeagueId] = useState(props.team?.league?._id || "");
+  const [coachId, setCoachId] = useState(props.team?.coach?._id || "");
 
   const [active, setActive] = useState(
     props?.team ? props?.team?.active + "" : "true"
