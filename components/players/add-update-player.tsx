@@ -127,7 +127,7 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
     })
 
     if (isPresent && props?.player?.login?.email !== email) {
-      toast('Email id is already registered', { toastId: 'blockuser', hideProgressBar: false, autoClose: 7000, type: 'info' });
+      toast('Email id is already registered', { toastId: 'blockuser', hideProgressBar: false, autoClose: 7000, type: 'error' });
     }
     else {
       addUpdatePlayer();
