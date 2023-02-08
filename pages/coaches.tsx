@@ -3,6 +3,8 @@ import Layout, { LayoutPages } from "@/components/layout";
 import { gql, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
 import AddUpdateCoach from "@/components/coaches/add-update-coach";
+import { v4 as uuidv4 } from 'uuid';
+
 
 const COACHES = gql`
   query GetCoaches {
@@ -113,6 +115,8 @@ export default function CoachesPage() {
           <AddUpdateCoach
             onSuccess={onAddUpdateCoach}
             coach={updateCoach}
+            key={uuidv4()}
+            onClose={onAddUpdateCoachClose}
           ></AddUpdateCoach>
         )}
       </>

@@ -2,6 +2,8 @@ import Head from "next/head";
 import { useContext, useEffect } from "react";
 import { UserContext } from "@/config/auth";
 import Link from "next/link";
+import { LoginService } from "@/utils/login";
+
 
 export enum LayoutPages {
   "leagues" = "leagues",
@@ -18,11 +20,16 @@ export interface LayoutProps {
 }
 
 export default function Layout(props: LayoutProps) {
-  const user: any = useContext(UserContext);
+  let user: any = useContext(UserContext);
 
   useEffect(() => {
-    // if (!user) window.location.href = "/login";
+    try{
+      user = LoginService.getUser()
+    }catch(err){
+      if (!user) window.location.href = "/login";
+    }
   });
+
 
   return (
     <>
