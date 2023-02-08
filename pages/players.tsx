@@ -137,6 +137,7 @@ export default function PlayersPage() {
             onSuccess={onAddUpdatePlayer}
             player={updatePlayer}
             onClose={onAddUpdatePlayerClose}
+            data={data?.getPlayers?.data}
           ></AddUpdatePlayer>
         )}
 
@@ -144,6 +145,7 @@ export default function PlayersPage() {
           <AddPlayers
             onSuccess={onAddUpdatePlayer}
             onClose={() => setAddPlayers(false)}
+            data={data?.getPlayers?.data}
           ></AddPlayers>
         )}
       </>

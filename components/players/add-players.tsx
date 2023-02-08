@@ -39,6 +39,7 @@ interface AddPlayersOnClose {
 interface AddPlayersProps {
   onSuccess?: AddPlayersOnSuccess;
   onClose?: AddPlayersOnClose;
+  data?: any,
 }
 
 export default function AddPlayers(props: AddPlayersProps) {
