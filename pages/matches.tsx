@@ -261,35 +261,33 @@ interface AddUpdateMatchOnClose {
 }
 
 interface AddUpdateMatchProps {
-  match?:IMatch|undefined;
+  match?: IMatch | undefined;
   onSuccess?: AddUpdateMatchOnSuccess;
   onClose?: AddUpdateMatchOnClose;
 }
 
 function AddUpdateMatch(props: AddUpdateMatchProps) {
-  const [leagueId, setLeagueId] = useState(props?.match?.leagueId || "");
-  
   const { data: leagues } = useQuery(LEAGUES);
-  const { data: teams } = useQuery(TEAMS, { variables: leagueId });
-  
+  const { data: teams } = useQuery(TEAMS, { variables: props?.match?.leagueId || "" });
+
   const now = new Date();
   const uperLimit = new Date();
   const lowerLimit = new Date();
-  uperLimit.setDate(now.getDate()+60);
-  lowerLimit.setDate(now.getDate()-60);
+  uperLimit.setDate(now.getDate() + 60);
+  lowerLimit.setDate(now.getDate() - 60);
   const [minDate, setMinDate] = useState(format(lowerLimit, "yyyy-MM-dd"));
   const [maxDate, setMaxDate] = useState(format(uperLimit, "yyyy-MM-dd"));
-  
   const [teamAId, setTeamAId] = useState(props?.match?.teamAId || "");
   const [teamBId, setTeamBId] = useState(props?.match?.teamBId || "");
-  const [numberOfNets, setNumberOfNets] = useState(props?.match?.numberOfNets ?? 1);
-  const [numberOfRounds, setNumberOfRounds] = useState(props?.match?.numberOfRounds ?? 1);
+  const [numberOfNets, setNumberOfNets] = useState(props?.match?.numberOfNets ?? 3);
+  const [numberOfRounds, setNumberOfRounds] = useState(props?.match?.numberOfRounds ?? 2);
   const [location, setLocation] = useState(props?.match?.location || "");
-  const [netRange, setNetRange] = useState(props?.match?.netRange ?? 1);
-  const [pairLimit, setPairLimit] = useState(props.match?.pairLimit??1);
-  const [active, setActive] = useState(props.match?.active.toString()??"true");
-  const matchDate = props.match?.date.toString().slice(0,10);
-  const [date, setDate] = useState(matchDate??format((now),"yyyy-mm-dd"));
+  const [netRange, setNetRange] = useState(props?.match?.netRange ?? 3);
+  const [pairLimit, setPairLimit] = useState(props.match?.pairLimit ?? 2);
+  const [active, setActive] = useState(props.match?.active.toString() ?? "true");
+  const matchDate = props.match?.date.toString().slice(0, 10);
+  const [date, setDate] = useState(matchDate ?? format((now), "yyyy-mm-dd"));
+  const [leagueId, setLeagueId] = useState(props?.match?.leagueId || "");
   const [addUpdateMatch, { data, error, loading }] = useMutation(
     ADD_UPDATE_MATCHE,
     {
@@ -311,16 +309,11 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
   );
 
   useEffect(() => {
-    console.log(data, error);
 
     if (data?.createOrUpdateMatch?.code === 200) {
       props?.onSuccess && props.onSuccess(data?.createOrUpdateMatch?.data?._id);
     }
   }, [data, error]);
-
-  useEffect(() => {
-    console.log(leagues, teams);
-  });
 
   return (
     <Modal showModal={true} onClose={() => props.onClose && props.onClose()}>
@@ -338,17 +331,6 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
                 value={leagueId}
                 onChange={(e) => {
                   setLeagueId(e.target.value);
-
-                  const league = leagues?.getLeagues?.data?.find(
-                    (i: any) => i._id == e?.target?.value
-                  );
-
-                  league &&
-                    setMinDate(
-                      format(new Date(league?.startDate), "yyyy-MM-dd")
-                    );
-                  league &&
-                    setMaxDate(format(new Date(league?.endDate), "yyyy-MM-dd"));
                 }}
               >
                 <option>Select a league</option>

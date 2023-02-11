@@ -77,8 +77,8 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
   );
 
   useEffect(() => {
-    if (data?.createOrUpdateCoach?.code === 200) {
-      props?.onSuccess && props.onSuccess(data?.createOrUpdateCoach?.data?._id);
+    if (data?.signupCoach?.code === 200) {
+      props?.onSuccess && props.onSuccess(data?.signupCoach?.data?._id);
     } else if (error) {
       console.log(JSON.parse(JSON.stringify(error)));
     }
