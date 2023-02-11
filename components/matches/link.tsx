@@ -27,6 +27,7 @@ export const MatchLink = (props: {
   const onLinkClick = (ev: any) => {
     ev.preventDefault();
     if (data) {
+      window.open(data?.getMatchLink?.data, "_blank");
       copyTextToClipboard(data?.getMatchLink?.data);
     }
   };

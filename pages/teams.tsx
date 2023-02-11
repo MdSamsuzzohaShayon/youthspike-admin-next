@@ -5,6 +5,9 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
 import { v4 as uuidv4 } from 'uuid';
 import { ITeam } from "@/types/team";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 const TEAMS = gql`
   query GetTeams {
@@ -47,8 +50,6 @@ export default function TeamsPage() {
     setUpdateTeam(null);
     setAddUpdateTeam(false);
   };
-
-  useEffect(() => console.log(data), [data]);
 
   return (
     <Layout title="Teams" page={LayoutPages.teams}>
@@ -110,6 +111,7 @@ export default function TeamsPage() {
             onClose={onAddUpdateTeamClose}
             onSuccess={onAddUpdateTeam}
             team={updateTeam}
+            data={data?.getTeams?.data}
           ></AddUpdateTeam>
         )}
       </>
@@ -183,15 +185,15 @@ interface AddUpdateTeamProps {
   team?: ITeam;
   onSuccess?: AddUpdateTeamOnSuccess;
   onClose?: AddUpdateTeamOnClose;
+  data?: any;
 }
 
 function AddUpdateTeam(props: AddUpdateTeamProps) {
   const leaguesQuery = useQuery(LEAGUE_DROPDOWN);
-  const coachesQuery = useQuery(COACH_DROPDOWN);  
+  const coachesQuery = useQuery(COACH_DROPDOWN);
   const [name, setName] = useState(props.team?.name || "");
   const [leagueId, setLeagueId] = useState(props.team?.league?._id || "");
   const [coachId, setCoachId] = useState(props.team?.coach?._id || "");
-
   const [active, setActive] = useState(
     props?.team ? props?.team?.active + "" : "true"
   );
@@ -218,121 +220,166 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
   }, [data, error]);
 
   return (
-    <Modal showModal={true} onClose={() => props.onClose && props.onClose()}>
-      <form className="form w-100">
-        <div className="flex flex-row flex-wrap">
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="name" className="font-bold">
-              Name
-            </label>
-
-            <div>
-              <input
-                type="text"
-                name="name"
-                id="name"
-                placeholder="Team Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="leagueId" className="font-bold">
-              League
-            </label>
-
-            <div>
-              <select
-                name="leagueId"
-                id="leagueId"
-                value={leagueId}
-                onChange={(e) => setLeagueId(e.target.value)}
-              >
-                <option>Select a league</option>
-                {leaguesQuery?.data?.getLeagues?.code === 200 &&
-                  leaguesQuery?.data?.getLeagues?.data?.map((league: any) => (
-                    <option key={league?._id} value={league?._id}>
-                      {league?.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="coachId" className="font-bold">
-              Coach
-            </label>
-
-            <div>
-              <select
-                name="coachId"
-                id="coachId"
-                value={coachId}
-                onChange={(e) => setCoachId(e.target.value)}
-              >
-                <option>Select a coach</option>
-                {coachesQuery?.data?.getCoaches?.code === 200 &&
-                  coachesQuery?.data?.getCoaches?.data?.map((coach: any) => (
-                    <option key={coach?._id} value={coach?._id}>
-                      <>
-                        {coach?.firstName}&nbsp;{coach?.lastName}
-                      </>
-                    </option>
-                  ))}
-              </select>
-            </div>
-          </div>
-
-          {props?.team && (
+    <>
+      <Modal showModal={true} onClose={() => props.onClose && props.onClose()}>
+        <form className="form w-100">
+          <div className="flex flex-row flex-wrap">
             <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-              <label htmlFor="active" className="font-bold">
-                Active
+              <label htmlFor="name" className="font-bold">
+                Name
+              </label>
+
+              <div>
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  placeholder="Team Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="leagueId" className="font-bold">
+                League
               </label>
 
               <div>
                 <select
-                  name="active"
-                  id="active"
-                  value={active}
-                  onChange={(e) => setActive(e.target.value)}
+                  name="leagueId"
+                  id="leagueId"
+                  value={leagueId}
+                  onChange={(e) => setLeagueId(e.target.value)}
                 >
-                  <option value={"true"}>Yes</option>
-                  <option value={"false"}>No</option>
+                  <option>Select a league</option>
+                  {leaguesQuery?.data?.getLeagues?.code === 200 &&
+                    leaguesQuery?.data?.getLeagues?.data?.map((league: any) => (
+                      <option key={league?._id} value={league?._id}>
+                        {league?.name}
+                      </option>
+                    ))}
                 </select>
               </div>
             </div>
-          )}
-        </div>
 
-        <hr />
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="coachId" className="font-bold">
+                Coach
+              </label>
 
-        <div className="my-2">
-          {props?.team ? (
-            <button
-              className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
-              type="button"
-              onClick={() => addUpdateTeam()}
-            >
-              Update Team
+              <div>
+                <select
+                  name="coachId"
+                  id="coachId"
+                  value={coachId}
+                  onChange={(e) => setCoachId(e.target.value)}
+                >
+                  <option>Select a coach</option>
+                  {coachesQuery?.data?.getCoaches?.code === 200 &&
+                    coachesQuery?.data?.getCoaches?.data?.map((coach: any) => (
+                      <option key={coach?._id} value={coach?._id}>
+                        <>
+                          {coach?.firstName}&nbsp;{coach?.lastName}
+                        </>
+                      </option>
+                    ))}
+                </select>
+              </div>
+            </div>
+
+            {props?.team && (
+              <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+                <label htmlFor="active" className="font-bold">
+                  Active
+                </label>
+
+                <div>
+                  <select
+                    name="active"
+                    id="active"
+                    value={active}
+                    onChange={(e) => setActive(e.target.value)}
+                  >
+                    <option value={"true"}>Yes</option>
+                    <option value={"false"}>No</option>
+                  </select>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <hr />
+
+          <div className="my-2">
+            {props?.team ? (
+              <button
+                className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+                type="button"
+                onClick={() => {
+                  let isNameError = false;
+                  let isSameCoachError = false;
+                  if (props?.team?.leagueId !== leagueId) {
+                    props?.data?.forEach((current: { name: string; coach: { _id: string; }; }) => {
+
+                      if (name !== props?.team?.name && current?.name === name && !isNameError) {
+                        isNameError = true;
+                      }
+                      if (coachId !== props?.team?.coach?._id && !isSameCoachError && current?.coach?._id === coachId) {
+                        isSameCoachError = true
+                      }
+                    });
+                  }
+                  if (isNameError) {
+                    toast('Team name is already registred in the league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+                  } else if (isSameCoachError) {
+                    toast('This coach is already assign to another team in the league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+                  } else {
+                    addUpdateTeam();
+                  }
+                }}
+              >
+                Update Team
+              </button>
+            ) : (
+              <button
+                className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+                type="button"
+                onClick={() => {
+                  let isNameError = false;
+                  let isSameCoachError = false;
+                  if (props?.team?.leagueId !== leagueId) {
+                    props?.data?.forEach((current: { name: string; coach: { _id: string; }; }) => {
+
+                      if (current?.name === name && !isNameError) {
+                        isNameError = true;
+                      }
+                      if (!isSameCoachError && current?.coach?._id === coachId) {
+                        isSameCoachError = true
+                      }
+                    })
+                  }
+                  if (isNameError) {
+                    toast('Team name is already registred in the league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+                  } else if (isSameCoachError) {
+                    toast('This coach is already assign to another team in the league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+                  } else {
+                    addUpdateTeam();
+                  }
+                }}
+              >
+                Add Team
+              </button>
+            )}
+
+            <button className="bg-red-100 font-bold rounded p-4 mx-2">
+              Cancel
             </button>
-          ) : (
-            <button
-              className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
-              type="button"
-              onClick={() => addUpdateTeam()}
-            >
-              Add Team
-            </button>
-          )}
-
-          <button className="bg-red-100 font-bold rounded p-4 mx-2">
-            Cancel
-          </button>
-        </div>
-      </form>
-    </Modal>
+          </div>
+        </form>
+      </Modal>
+      <ToastContainer />
+    </>
   );
 }
