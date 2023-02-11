@@ -16,7 +16,7 @@ function fallbackCopyTextToClipboard(text: string) {
   textArea.select();
 
   try {
-    document.execCommand("copy");
+    window.navigator.clipboard.writeText(text);
   } catch {}
 
   document.body.removeChild(textArea);
