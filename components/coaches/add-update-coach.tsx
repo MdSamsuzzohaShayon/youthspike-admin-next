@@ -1,6 +1,9 @@
 import { gql /* , useQuery */, useMutation } from "@apollo/client";
 import { useState, useEffect } from "react";
 import { Modal } from "../model";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 const TEAM_DROPDOWN = gql`
   query GetTeams {
@@ -85,80 +88,81 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
   }, [props, data, error]);
 
   return (
-    <Modal showModal={true} onClose={() => props.onClose && props.onClose()}>
-      <form className="form w-100">
-        <div className="flex flex-row flex-wrap">
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="firstName" className="font-bold">
-              First Name
-            </label>
+    <>
+      <Modal showModal={true} onClose={() => props.onClose && props.onClose()}>
+        <form className="form w-100">
+          <div className="flex flex-row flex-wrap">
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="firstName" className="font-bold">
+                First Name
+              </label>
 
-            <div>
-              <input
-                type="text"
-                name="firstName"
-                id="firstName"
-                placeholder="First Name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
+              <div>
+                <input
+                  type="text"
+                  name="firstName"
+                  id="firstName"
+                  placeholder="First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="lastName" className="font-bold">
-              Last Name
-            </label>
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="lastName" className="font-bold">
+                Last Name
+              </label>
 
-            <div>
-              <input
-                type="text"
-                name="lastName"
-                id="lastName"
-                placeholder="Last Name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
+              <div>
+                <input
+                  type="text"
+                  name="lastName"
+                  id="lastName"
+                  placeholder="Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="email" className="font-bold">
-              Email
-            </label>
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="email" className="font-bold">
+                Email
+              </label>
 
-            <div>
-              <input
-                type="email"
-                name="email"
-                id="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <div>
+                <input
+                  type="email"
+                  name="email"
+                  id="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
             </div>
-          </div>
 
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="password" className="font-bold">
-              Password
-            </label>
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="password" className="font-bold">
+                Password
+              </label>
 
-            <div>
-              <input
-                type="password"
-                name="password"
-                id="password"
-                placeholder="Password"
-                value={password}
-                minLength={6}
-                maxLength={16}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div>
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                  placeholder="Password"
+                  value={password}
+                  minLength={6}
+                  maxLength={16}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
             </div>
-          </div>
 
-          {/* <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+            {/* <div className="w-full md:w-1/2 lg:w-1/3 my-2">
             <label htmlFor="teamId" className="font-bold">
               Team
             </label>
@@ -181,53 +185,67 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
             </div>
           </div> */}
 
-          {props?.coach && (
-            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-              <label htmlFor="active" className="font-bold">
-                Active
-              </label>
+            {props?.coach && (
+              <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+                <label htmlFor="active" className="font-bold">
+                  Active
+                </label>
 
-              <div>
-                <select
-                  name="active"
-                  id="active"
-                  value={active}
-                  onChange={(e) => setActive(e.target.value)}
-                >
-                  <option value={"true"}>Yes</option>
-                  <option value={"false"}>No</option>
-                </select>
+                <div>
+                  <select
+                    name="active"
+                    id="active"
+                    value={active}
+                    onChange={(e) => setActive(e.target.value)}
+                  >
+                    <option value={"true"}>Yes</option>
+                    <option value={"false"}>No</option>
+                  </select>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        <hr />
+          <hr />
 
-        <div className="my-2">
-          {props?.coach ? (
-            <button
-              className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
-              type="button"
-              onClick={() => addUpdateCoach()}
-            >
-              Update Coach
+          <div className="my-2">
+            {props?.coach ? (
+              <button
+                className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+                type="button"
+                onClick={() => {
+                  if (password?.length < 6) {
+                    toast('Password can not be less than 6 characters.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+                  } else {
+                    addUpdateCoach();
+                  }
+                }}
+              >
+                Update Coach
+              </button>
+            ) : (
+              <button
+                className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+                type="button"
+                onClick={() => {
+                  if (password?.length < 6) {
+                    toast('Password can not be less than 6 characters.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+                  } else {
+                    addUpdateCoach();
+                  }
+                }}
+              >
+                Add Coach
+              </button>
+            )}
+
+            <button className="bg-red-100 font-bold rounded p-4 mx-2">
+              Cancel
             </button>
-          ) : (
-            <button
-              className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
-              type="button"
-              onClick={() => addUpdateCoach()}
-            >
-              Add Coach
-            </button>
-          )}
-
-          <button className="bg-red-100 font-bold rounded p-4 mx-2">
-            Cancel
-          </button>
-        </div>
-      </form>
-    </Modal>
+          </div>
+        </form>
+      </Modal>
+      <ToastContainer />
+    </>
   );
 }
