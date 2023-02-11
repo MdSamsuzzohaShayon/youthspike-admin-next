@@ -52,6 +52,7 @@ interface AddUpdateCoachProps {
   coach?: any;
   onSuccess?: AddUpdateCoachOnSuccess;
   onClose?: AddUpdateCoachOnClose;
+  data?: any;
 }
 
 export default function AddUpdateCoach(props: AddUpdateCoachProps) {
@@ -214,10 +215,23 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
                 className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
                 type="button"
                 onClick={() => {
-                  if (password?.length < 6) {
-                    toast('Password can not be less than 6 characters.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+                  let isAlreadyAvailable = false;
+                  if (email !== props?.coach?.login?.email) {
+                    props?.data?.forEach((current: { login: { email: any; }; }) => {
+                      if (!isAlreadyAvailable) {
+                        isAlreadyAvailable = current?.login?.email === email;
+                      }
+                    })
+                  }
+
+                  if (isAlreadyAvailable) {
+                    toast('Email is already registered.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
                   } else {
-                    addUpdateCoach();
+                    if (password?.length < 6) {
+                      toast('Password can not be less than 6 characters.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+                    } else {
+                      addUpdateCoach();
+                    }
                   }
                 }}
               >
@@ -228,10 +242,21 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
                 className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
                 type="button"
                 onClick={() => {
-                  if (password?.length < 6) {
-                    toast('Password can not be less than 6 characters.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+                  let isAlreadyAvailable = false;
+                  props?.data?.forEach((current: { login: { email: any; }; }) => {
+                    if (!isAlreadyAvailable) {
+                      isAlreadyAvailable = current?.login?.email === email;
+                    }
+                  })
+
+                  if (isAlreadyAvailable) {
+                    toast('Email is already registered.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
                   } else {
-                    addUpdateCoach();
+                    if (password?.length < 6) {
+                      toast('Password can not be less than 6 characters.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+                    } else {
+                      addUpdateCoach();
+                    }
                   }
                 }}
               >

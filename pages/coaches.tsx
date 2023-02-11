@@ -113,6 +113,7 @@ export default function CoachesPage() {
 
         {addUpdateCoach && (
           <AddUpdateCoach
+            data={data?.getCoaches?.data}
             onSuccess={onAddUpdateCoach}
             coach={updateCoach}
             key={uuidv4()}

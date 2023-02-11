@@ -280,7 +280,7 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
   const [teamAId, setTeamAId] = useState(props?.match?.teamAId || "");
   const [teamBId, setTeamBId] = useState(props?.match?.teamBId || "");
   const [numberOfNets, setNumberOfNets] = useState(props?.match?.numberOfNets ?? 3);
-  const [numberOfRounds, setNumberOfRounds] = useState(props?.match?.numberOfRounds ?? 2);
+  const [numberOfRounds, setNumberOfRounds] = useState(props?.match?.numberOfRounds ?? 4);
   const [location, setLocation] = useState(props?.match?.location || "");
   const [netRange, setNetRange] = useState(props?.match?.netRange ?? 3);
   const [pairLimit, setPairLimit] = useState(props.match?.pairLimit ?? 2);
@@ -331,6 +331,16 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
                 value={leagueId}
                 onChange={(e) => {
                   setLeagueId(e.target.value);
+                  const league = leagues?.getLeagues?.data?.find(
+                    (i: any) => i._id == e?.target?.value
+                  );
+
+                  league &&
+                    setMinDate(
+                      format(new Date(league?.startDate), "yyyy-MM-dd")
+                    );
+                  league &&
+                    setMaxDate(format(new Date(league?.endDate), "yyyy-MM-dd"));
                 }}
               >
                 <option>Select a league</option>
@@ -556,6 +566,6 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
           </button>
         </div>
       </form>
-    </Modal>
+    </Modal >
   );
 }
