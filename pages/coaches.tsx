@@ -37,11 +37,77 @@ const COACHES = gql`
   }
 `;
 
+const TEAMS = gql`
+  query GetTeams {
+    getTeams {
+      code
+      success
+      data {
+        _id
+        name
+        active
+        coach {
+          _id
+          firstName
+          lastName
+          login {
+            email
+          }
+        }
+        league {
+          _id
+          name
+        }
+      }
+    }
+  }
+`;
+
 export default function CoachesPage() {
   const [addUpdateCoach, setAddUpdateCoach] = useState(false);
   const [updateCoach, setUpdateCoach] = useState(null);
+  const [allCoachData, setAllCoachData] = useState<{ coach: { team: { name: any; _id: any; league: any; }; }; _id: any; firstName: any; lastName: any; }[]>([]);
   const { data, error, loading, refetch } = useQuery(COACHES);
+  const { data: teamsData, error: teamError, loading: teamLoading, refetch: teamRefetch } = useQuery(TEAMS);
 
+
+  useEffect(() => {
+    const coachData = data?.getCoaches?.data;
+    const teamsQueryData = teamsData?.getTeams?.data;
+    if (coachData && teamsQueryData) {
+      const coachesData: ((prevState: never[]) => never[]) | { coach: { team: { name: any; _id: any; league: any; }; }; _id: any; firstName: any; lastName: any; }[] = [];
+      coachData?.forEach((current: {
+        coach: { team: { name: any; _id: any; league: any; }; }; _id: any; firstName: any; lastName: any;
+      }) => {
+        let count = 0;
+        teamsQueryData?.forEach((cur: {
+          name: any;
+          _id: any;
+          league: any; coach: { _id: any; };
+        }) => {
+          if (cur?.coach?._id === current?._id) {
+            count++;
+            coachesData.push({
+              ...current,
+              coach: {
+                team: {
+                  name: cur?.name,
+                  _id: cur?._id,
+                  league: cur?.league,
+                },
+              }
+            })
+          }
+        });
+        if (count === 0) {
+          coachesData.push({
+            ...current,
+          });
+        }
+      })
+      setAllCoachData(coachesData)
+    }
+  }, [data, teamsData])
   const onAddUpdateCoach = () => {
     setUpdateCoach(null);
     setAddUpdateCoach(false);
@@ -52,8 +118,6 @@ export default function CoachesPage() {
     setUpdateCoach(null);
     setAddUpdateCoach(false);
   };
-
-  useEffect(() => console.log(data), [data]);
 
   return (
     <Layout title="Coaches" page={LayoutPages.coaches}>
@@ -82,7 +146,7 @@ export default function CoachesPage() {
           </thead>
 
           <tbody className="w-full">
-            {data?.getCoaches?.data?.map((coach: any) => (
+            {allCoachData?.map((coach: any) => (
               <TDR key={coach?._id}>
                 <>
                   <TD>

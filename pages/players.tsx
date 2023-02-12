@@ -54,6 +54,7 @@ export default function PlayersPage() {
   const onAddUpdatePlayer = () => {
     setUpdatePlayer(null);
     setAddUpdatePlayer(false);
+    setAddPlayers(false);
     refetch();
   };
 
@@ -62,7 +63,6 @@ export default function PlayersPage() {
     setAddUpdatePlayer(false);
   };
 
-  useEffect(() => console.log(data), [data]);
 
   return (
     <Layout title="Players" page={LayoutPages.players}>

@@ -149,7 +149,6 @@ interface AddUpdateLeagueProps {
 }
 
 function AddUpdateLeague(props: AddUpdateLeagueProps) {
-  console.log(props);
   const date = format(new Date(), "yyy-MM-dd");
   const [name, setName] = useState(props?.league?.name || "");
 
@@ -186,7 +185,6 @@ function AddUpdateLeague(props: AddUpdateLeagueProps) {
   );
 
   useEffect(() => {
-    console.log(data, error);
 
     if (data?.createOrUpdateLeague?.code === 200) {
       props?.onSuccess &&

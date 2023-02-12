@@ -1,6 +1,6 @@
 import { readCSVFile } from "@/utils/csv";
 import { gql, useQuery, useMutation } from "@apollo/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal } from "../model";
 
 const LEAGUE_DROPDOWN = gql`
@@ -46,8 +46,13 @@ export default function AddPlayers(props: AddPlayersProps) {
   const [leagueId, setLeagueId] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const { data: leagues } = useQuery(LEAGUE_DROPDOWN);
-  const [importPlayers] = useMutation(IMPORT_PLAYERS);
-  let count = 0;
+  const [importPlayers, { data }] = useMutation(IMPORT_PLAYERS);
+
+  useEffect(() => {
+    if (data?.importPlayers?.data) {
+      props?.onSuccess && props?.onSuccess();
+    }
+  }, [data])
 
   const addPlayers = async () => {
     try {
@@ -59,15 +64,9 @@ export default function AddPlayers(props: AddPlayersProps) {
           data: fileText,
         },
       });
-      window.location.href = "/players";
     } catch (err) {
       console.log(JSON.parse(JSON.stringify(err)));
     }
-  };
-
-  const done = () => {
-    count++;
-    // if (count >= records?.length) window.location.href = "/players";
   };
 
   return (

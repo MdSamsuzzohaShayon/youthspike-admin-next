@@ -212,7 +212,6 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
   );
 
   useEffect(() => {
-    console.log(leaguesQuery.data, coachesQuery.data);
 
     if (data?.createOrUpdateTeam?.code === 200) {
       props?.onSuccess && props.onSuccess(data?.createOrUpdateTeam?.data?._id);
@@ -320,17 +319,19 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
                 onClick={() => {
                   let isNameError = false;
                   let isSameCoachError = false;
-                  if (props?.team?.leagueId !== leagueId) {
-                    props?.data?.forEach((current: { name: string; coach: { _id: string; }; }) => {
-
+                  props?.data?.forEach((current: {
+                    league: any; name: string; coach: { _id: string; };
+                  }) => {
+                    if (current?.league?._id === leagueId) {
                       if (name !== props?.team?.name && current?.name === name && !isNameError) {
                         isNameError = true;
                       }
                       if (coachId !== props?.team?.coach?._id && !isSameCoachError && current?.coach?._id === coachId) {
                         isSameCoachError = true
                       }
-                    });
-                  }
+                    }
+                  });
+
                   if (isNameError) {
                     toast('Team name is already registred in the league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
                   } else if (isSameCoachError) {
@@ -349,8 +350,10 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
                 onClick={() => {
                   let isNameError = false;
                   let isSameCoachError = false;
-                  if (props?.team?.leagueId !== leagueId) {
-                    props?.data?.forEach((current: { name: string; coach: { _id: string; }; }) => {
+                  props?.data?.forEach((current: {
+                    league: any; name: string; coach: { _id: string; };
+                  }) => {
+                    if (current?.league?._id === leagueId) {
 
                       if (current?.name === name && !isNameError) {
                         isNameError = true;
@@ -358,8 +361,8 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
                       if (!isSameCoachError && current?.coach?._id === coachId) {
                         isSameCoachError = true
                       }
-                    })
-                  }
+                    }
+                  })
                   if (isNameError) {
                     toast('Team name is already registred in the league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
                   } else if (isSameCoachError) {
