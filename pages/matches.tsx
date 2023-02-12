@@ -271,6 +271,9 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
   const { data: teams } = useQuery(TEAMS, { variables: props?.match?.leagueId || "" });
 
   const now = new Date();
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, '0'); // add leading zero to single-digit months
+  const day = now.getDate().toString().padStart(2, '0'); // add leading zero to single-digit days
   const uperLimit = new Date();
   const lowerLimit = new Date();
   uperLimit.setDate(now.getDate() + 60);
@@ -286,7 +289,7 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
   const [pairLimit, setPairLimit] = useState(props.match?.pairLimit ?? 2);
   const [active, setActive] = useState(props.match?.active.toString() ?? "true");
   const matchDate = props.match?.date.toString().slice(0, 10);
-  const [date, setDate] = useState(matchDate ?? format((now), "yyyy-mm-dd"));
+  const [date, setDate] = useState(matchDate?? `${year}-${month}-${day}`);
   const [leagueId, setLeagueId] = useState(props?.match?.leagueId || "");
   const [addUpdateMatch, { data, error, loading }] = useMutation(
     ADD_UPDATE_MATCHE,
@@ -335,12 +338,12 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
                     (i: any) => i._id == e?.target?.value
                   );
 
-                  league &&
-                    setMinDate(
-                      format(new Date(league?.startDate), "yyyy-MM-dd")
-                    );
-                  league &&
-                    setMaxDate(format(new Date(league?.endDate), "yyyy-MM-dd"));
+                  // league &&
+                  //   setMinDate(
+                  //     format(new Date(league?.startDate), "yyyy-MM-dd")
+                  //   );
+                  // league &&
+                  //   setMaxDate(format(new Date(league?.endDate), "yyyy-MM-dd"));
                 }}
               >
                 <option>Select a league</option>
