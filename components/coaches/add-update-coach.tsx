@@ -59,7 +59,7 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
   // const teamsQuery = useQuery(TEAM_DROPDOWN);
 
   const [email, setEmail] = useState(props?.coach?.login?.email || "");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState(props?.coach?.login?.password || "");
   const [firstName, setFirstName] = useState(props?.coach?.firstName || "");
   const [lastName, setLastName] = useState(props?.coach?.lastName || "");
 
