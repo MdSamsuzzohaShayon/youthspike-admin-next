@@ -120,16 +120,24 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
 
   const handleAddPlayer = () => {
     let isPresent = false;
-    props?.data?.forEach((current: { login: { email: any; }; }) => {
+    let alreadyPresentInTheLeague = false;
+    props?.data?.forEach((current: {
+      _id: any;
+      player: any; login: { email: any; };
+    }) => {
       if (current?.login?.email === email) {
         isPresent = true
+      }
+      if (props?.player?._id !== current?._id && props?.player?.player?.league?.leagueId === current?.player?.leagueId) {
+        alreadyPresentInTheLeague = current?.player?.teamId === teamId;
       }
     })
 
     if (isPresent && props?.player?.login?.email !== email) {
-      toast('Email id is already registered', { toastId: 'blockuser', hideProgressBar: false, autoClose: 7000, type: 'error' });
-    }
-    else {
+      toast('Email id is already registered.', { toastId: 'blockuser', hideProgressBar: false, autoClose: 7000, type: 'error' });
+    } else if (alreadyPresentInTheLeague) {
+      toast('Player is already present in the league in another team.', { toastId: 'blockuser', hideProgressBar: false, autoClose: 7000, type: 'error' });
+    } else {
       addUpdatePlayer();
     }
   }
