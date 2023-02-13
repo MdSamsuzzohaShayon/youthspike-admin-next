@@ -23,10 +23,10 @@ export default function Layout(props: LayoutProps) {
   let user: any = useContext(UserContext);
 
   useEffect(() => {
-    try{
+    try {
       user = LoginService.getUser()
       if (!user) window.location.href = "/login";
-    }catch(err){
+    } catch (err) {
       if (!user) window.location.href = "/login";
     }
   });
@@ -62,7 +62,8 @@ export default function Layout(props: LayoutProps) {
           {user && (
             <div>
               <b>
-                {user?.firstName}&nbsp;{user?.lastName}
+                Admin
+                {/* {user?.firstName}&nbsp;{user?.lastName} */}
               </b>
             </div>
           )}
@@ -72,9 +73,8 @@ export default function Layout(props: LayoutProps) {
           <div className="w-1/5 bg-blue-100">
             <Link href="/leagues">
               <button
-                className={`text-xl text-left p-2 bg-blue-900 hover:bg-blue-800 text-white w-full font-bold ${
-                  props?.page == LayoutPages.leagues ? "bg-blue-700" : ""
-                }`}
+                className={`text-xl text-left p-2 bg-blue-900 hover:bg-blue-800 text-white w-full font-bold ${props?.page == LayoutPages.leagues ? "bg-blue-700" : ""
+                  }`}
               >
                 Leagues
               </button>
@@ -82,9 +82,8 @@ export default function Layout(props: LayoutProps) {
 
             <Link href="/teams">
               <button
-                className={`text-xl text-left p-2 bg-blue-900 hover:bg-blue-800 text-white w-full font-bold ${
-                  props?.page == LayoutPages.teams ? "bg-blue-700" : ""
-                }`}
+                className={`text-xl text-left p-2 bg-blue-900 hover:bg-blue-800 text-white w-full font-bold ${props?.page == LayoutPages.teams ? "bg-blue-700" : ""
+                  }`}
               >
                 Teams
               </button>
@@ -92,9 +91,8 @@ export default function Layout(props: LayoutProps) {
 
             <Link href="/coaches">
               <button
-                className={`text-xl text-left p-2 bg-blue-900 hover:bg-blue-800 text-white w-full font-bold ${
-                  props?.page == LayoutPages.coaches ? "bg-blue-700" : ""
-                }`}
+                className={`text-xl text-left p-2 bg-blue-900 hover:bg-blue-800 text-white w-full font-bold ${props?.page == LayoutPages.coaches ? "bg-blue-700" : ""
+                  }`}
               >
                 Coaches
               </button>
@@ -102,9 +100,8 @@ export default function Layout(props: LayoutProps) {
 
             <Link href="/players">
               <button
-                className={`text-xl text-left p-2 bg-blue-900 hover:bg-blue-800 text-white w-full font-bold ${
-                  props?.page == LayoutPages.players ? "bg-blue-700" : ""
-                }`}
+                className={`text-xl text-left p-2 bg-blue-900 hover:bg-blue-800 text-white w-full font-bold ${props?.page == LayoutPages.players ? "bg-blue-700" : ""
+                  }`}
               >
                 Players
               </button>
@@ -112,9 +109,8 @@ export default function Layout(props: LayoutProps) {
 
             <Link href={"/matches"}>
               <button
-                className={`text-xl text-left p-2 bg-blue-900 hover:bg-blue-800 text-white w-full font-bold ${
-                  props?.page == LayoutPages.matches ? "bg-blue-700" : ""
-                }`}
+                className={`text-xl text-left p-2 bg-blue-900 hover:bg-blue-800 text-white w-full font-bold ${props?.page == LayoutPages.matches ? "bg-blue-700" : ""
+                  }`}
               >
                 Matches
               </button>
