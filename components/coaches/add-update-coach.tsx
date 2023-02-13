@@ -19,18 +19,20 @@ const TEAM_DROPDOWN = gql`
   }
 `;
 
-const ADD_UPDATE_LEAGUE = gql`
+const ADD_UPDATE_COACH = gql`
   mutation SignupCoach(
     $firstName: String!
     $lastName: String!
     $email: String!
     $password: String!
+    $id: String
   ) {
     signupCoach(
       firstName: $firstName
       lastName: $lastName
       email: $email
       password: $password
+      id: $id
     ) {
       code
       data {
@@ -68,7 +70,7 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
   );
 
   const [addUpdateCoach, { data, error, loading }] = useMutation(
-    ADD_UPDATE_LEAGUE,
+    ADD_UPDATE_COACH,
     {
       variables: {
         firstName,
