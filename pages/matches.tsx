@@ -7,6 +7,10 @@ import { format } from "date-fns";
 import { MatchLink } from "@/components/matches/link";
 import { v4 as uuidv4 } from 'uuid';
 import { IMatch } from "@/types/match";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+
 const MATCHES = gql`
   query GetMatches {
     getMatches {
@@ -210,6 +214,7 @@ const TEAMS = gql`
       data {
         _id
         name
+        coachId
       }
     }
   }
@@ -318,257 +323,276 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
     }
   }, [data, error]);
 
+  function addOrUpdateMatch() {
+    const allTeams: Array<any> = teams?.getTeams?.data ?? [];
+    const isTeamACoachExist = allTeams.find((cur) => cur._id == teamAId && cur?.coachId?.trim()?.length > 0);
+    const isTeamBCoachExist = allTeams.find((cur) => cur._id == teamBId && cur?.coachId?.trim()?.length > 0);
+    const teamAName = allTeams.find((cur) => cur._id == teamAId).name;
+    const teamBName = allTeams.find((cur) => cur._id == teamBId).name;
+
+    if (!isTeamACoachExist) {
+      toast(`Coach is not Assigned to ${teamAName}`, { toastId: 'coachNotExist', hideProgressBar: false, autoClose: 7000, type: 'error' });
+    } else if (!isTeamBCoachExist) {
+      toast(`Coach is not Assigned to ${teamBName}`, { toastId: 'coachNotExist', hideProgressBar: false, autoClose: 7000, type: 'error' });
+    } else {
+      addUpdateMatch();
+    }
+  }
+
   return (
-    <Modal showModal={true} onClose={() => props.onClose && props.onClose()}>
-      <form className="form w-100">
-        <div className="flex flex-row flex-wrap">
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="leagueId" className="font-bold">
-              League
-            </label>
-
-            <div>
-              <select
-                name="leagueId"
-                id="leagueId"
-                value={leagueId}
-                onChange={(e) => {
-                  setLeagueId(e.target.value);
-                  const league = leagues?.getLeagues?.data?.find(
-                    (i: any) => i._id == e?.target?.value
-                  );
-
-                  // league &&
-                  //   setMinDate(
-                  //     format(new Date(league?.startDate), "yyyy-MM-dd")
-                  //   );
-                  // league &&
-                  //   setMaxDate(format(new Date(league?.endDate), "yyyy-MM-dd"));
-                }}
-              >
-                <option>Select a league</option>
-                {leagues?.getLeagues?.code === 200 &&
-                  leagues?.getLeagues?.data?.map((league: any) => (
-                    <option key={league?._id} value={league?._id}>
-                      {league?.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="teamAId" className="font-bold">
-              Team A
-            </label>
-
-            <div>
-              <select
-                name="teamAId"
-                id="teamAId"
-                value={teamAId}
-                onChange={(e) => setTeamAId(e.target.value)}
-              >
-                <option>Select Team A</option>
-                {teams?.getTeams?.code === 200 &&
-                  teams?.getTeams?.data?.map((team: any) =>
-                    team._id != teamBId ? (
-                      <option key={team?._id} value={team?._id}>
-                        {team?.name}
-                      </option>
-                    ) : (
-                      <></>
-                    )
-                  )}
-              </select>
-            </div>
-          </div>
-
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="teamBId" className="font-bold">
-              Team B
-            </label>
-
-            <div>
-              <select
-                name="teamBId"
-                id="teamBId"
-                value={teamBId}
-                onChange={(e) => setTeamBId(e.target.value)}
-              >
-                <option>Select Team B</option>
-                {teams?.getTeams?.code === 200 &&
-                  teams?.getTeams?.data?.map((team: any) =>
-                    team._id != teamAId ? (
-                      <option key={team?._id} value={team?._id}>
-                        {team?.name}
-                      </option>
-                    ) : (
-                      <></>
-                    )
-                  )}
-              </select>
-            </div>
-          </div>
-
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="startDate" className="font-bold">
-              Start Date
-            </label>
-
-            <div>
-              <input
-                type="date"
-                name="startDate"
-                id="startDate"
-                placeholder="Start Date"
-                value={date}
-                min={minDate}
-                max={maxDate}
-                onChange={(e) => {
-                  setDate(e.target.value);
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="nets" className="font-bold">
-              Nets
-            </label>
-
-            <div>
-              <input
-                type="number"
-                name="nets"
-                id="nets"
-                min={1}
-                placeholder="Number of Nets"
-                value={numberOfNets}
-                onChange={(e) => setNumberOfNets(Number(e.target.value))}
-              />
-            </div>
-          </div>
-
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="rounds" className="font-bold">
-              Rounds
-            </label>
-
-            <div>
-              <input
-                type="number"
-                name="rounds"
-                id="rounds"
-                min={1}
-                placeholder="Number of Rounds"
-                value={numberOfRounds}
-                onChange={(e) => setNumberOfRounds(Number(e.target.value))}
-              />
-            </div>
-          </div>
-
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="pairLimit" className="font-bold">
-              Pair Limit
-            </label>
-
-            <div>
-              <input
-                type="number"
-                name="pairLimit"
-                id="pairLimit"
-                min={1}
-                placeholder="Pair Limit"
-                value={pairLimit}
-                onChange={(e) => setPairLimit(Number(e.target.value))}
-              />
-            </div>
-          </div>
-
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="netRange" className="font-bold">
-              Net Range
-            </label>
-
-            <div>
-              <input
-                type="number"
-                name="netRange"
-                id="netRange"
-                min={1}
-                placeholder="Number of Net Range"
-                value={netRange}
-                onChange={(e) => setNetRange(Number(e.target.value))}
-              />
-            </div>
-          </div>
-
-          <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="location" className="font-bold">
-              Location
-            </label>
-
-            <div>
-              <input
-                type="text"
-                name="location"
-                id="location"
-                maxLength={255}
-                placeholder="Location of the match"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {props?.match && (
+    <>
+      <Modal showModal={true} onClose={() => props.onClose && props.onClose()}>
+        <form className="form w-100">
+          <div className="flex flex-row flex-wrap">
             <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-              <label htmlFor="playerLimit" className="font-bold">
-                Active
+              <label htmlFor="leagueId" className="font-bold">
+                League
               </label>
 
               <div>
                 <select
-                  name="active"
-                  id="active"
-                  value={active}
-                  onChange={(e) => setActive(e.target.value)}
+                  name="leagueId"
+                  id="leagueId"
+                  value={leagueId}
+                  onChange={(e) => {
+                    setLeagueId(e.target.value);
+                    const league = leagues?.getLeagues?.data?.find(
+                      (i: any) => i._id == e?.target?.value
+                    );
+
+                    // league &&
+                    //   setMinDate(
+                    //     format(new Date(league?.startDate), "yyyy-MM-dd")
+                    //   );
+                    // league &&
+                    //   setMaxDate(format(new Date(league?.endDate), "yyyy-MM-dd"));
+                  }}
                 >
-                  <option value={"true"}>Yes</option>
-                  <option value={"false"}>No</option>
+                  <option>Select a league</option>
+                  {leagues?.getLeagues?.code === 200 &&
+                    leagues?.getLeagues?.data?.map((league: any) => (
+                      <option key={league?._id} value={league?._id}>
+                        {league?.name}
+                      </option>
+                    ))}
                 </select>
               </div>
             </div>
-          )}
-        </div>
 
-        <hr />
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="teamAId" className="font-bold">
+                Team A
+              </label>
 
-        <div className="my-2">
-          {props?.match ? (
-            <button
-              className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
-              type="button"
-              onClick={() => addUpdateMatch()}
-            >
-              Update Match
+              <div>
+                <select
+                  name="teamAId"
+                  id="teamAId"
+                  value={teamAId}
+                  onChange={(e) => setTeamAId(e.target.value)}
+                >
+                  <option>Select Team A</option>
+                  {teams?.getTeams?.code === 200 &&
+                    teams?.getTeams?.data?.map((team: any) =>
+                      team._id != teamBId ? (
+                        <option key={team?._id} value={team?._id}>
+                          {team?.name}
+                        </option>
+                      ) : (
+                        <></>
+                      )
+                    )}
+                </select>
+              </div>
+            </div>
+
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="teamBId" className="font-bold">
+                Team B
+              </label>
+
+              <div>
+                <select
+                  name="teamBId"
+                  id="teamBId"
+                  value={teamBId}
+                  onChange={(e) => setTeamBId(e.target.value)}
+                >
+                  <option>Select Team B</option>
+                  {teams?.getTeams?.code === 200 &&
+                    teams?.getTeams?.data?.map((team: any) =>
+                      team._id != teamAId ? (
+                        <option key={team?._id} value={team?._id}>
+                          {team?.name}
+                        </option>
+                      ) : (
+                        <></>
+                      )
+                    )}
+                </select>
+              </div>
+            </div>
+
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="startDate" className="font-bold">
+                Start Date
+              </label>
+
+              <div>
+                <input
+                  type="date"
+                  name="startDate"
+                  id="startDate"
+                  placeholder="Start Date"
+                  value={date}
+                  min={minDate}
+                  max={maxDate}
+                  onChange={(e) => {
+                    setDate(e.target.value);
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="nets" className="font-bold">
+                Nets
+              </label>
+
+              <div>
+                <input
+                  type="number"
+                  name="nets"
+                  id="nets"
+                  min={1}
+                  placeholder="Number of Nets"
+                  value={numberOfNets}
+                  onChange={(e) => setNumberOfNets(Number(e.target.value))}
+                />
+              </div>
+            </div>
+
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="rounds" className="font-bold">
+                Rounds
+              </label>
+
+              <div>
+                <input
+                  type="number"
+                  name="rounds"
+                  id="rounds"
+                  min={1}
+                  placeholder="Number of Rounds"
+                  value={numberOfRounds}
+                  onChange={(e) => setNumberOfRounds(Number(e.target.value))}
+                />
+              </div>
+            </div>
+
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="pairLimit" className="font-bold">
+                Pair Limit
+              </label>
+
+              <div>
+                <input
+                  type="number"
+                  name="pairLimit"
+                  id="pairLimit"
+                  min={1}
+                  placeholder="Pair Limit"
+                  value={pairLimit}
+                  onChange={(e) => setPairLimit(Number(e.target.value))}
+                />
+              </div>
+            </div>
+
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="netRange" className="font-bold">
+                Net Range
+              </label>
+
+              <div>
+                <input
+                  type="number"
+                  name="netRange"
+                  id="netRange"
+                  min={1}
+                  placeholder="Number of Net Range"
+                  value={netRange}
+                  onChange={(e) => setNetRange(Number(e.target.value))}
+                />
+              </div>
+            </div>
+
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="location" className="font-bold">
+                Location
+              </label>
+
+              <div>
+                <input
+                  type="text"
+                  name="location"
+                  id="location"
+                  maxLength={255}
+                  placeholder="Location of the match"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {props?.match && (
+              <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+                <label htmlFor="playerLimit" className="font-bold">
+                  Active
+                </label>
+
+                <div>
+                  <select
+                    name="active"
+                    id="active"
+                    value={active}
+                    onChange={(e) => setActive(e.target.value)}
+                  >
+                    <option value={"true"}>Yes</option>
+                    <option value={"false"}>No</option>
+                  </select>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <hr />
+
+          <div className="my-2">
+            {props?.match ? (
+              <button
+                className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+                type="button"
+                onClick={() => addOrUpdateMatch()}
+              >
+                Update Match
+              </button>
+            ) : (
+              <button
+                className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+                type="button"
+                onClick={() => addOrUpdateMatch()}
+              >
+                Add Match
+              </button>
+            )}
+
+            <button onClick={() => props?.onClose && props.onClose()} className="bg-red-100 font-bold rounded p-4 mx-2">
+              Cancel
             </button>
-          ) : (
-            <button
-              className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
-              type="button"
-              onClick={() => addUpdateMatch()}
-            >
-              Add Match
-            </button>
-          )}
-
-          <button onClick={() => props?.onClose && props?.onClose()} className="bg-red-100 font-bold rounded p-4 mx-2">
-            Cancel
-          </button>
-        </div>
-      </form>
-    </Modal >
+          </div>
+        </form>
+      </Modal>
+      <ToastContainer />
+    </>
   );
 }
