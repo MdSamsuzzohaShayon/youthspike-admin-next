@@ -289,7 +289,7 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
   const [pairLimit, setPairLimit] = useState(props.match?.pairLimit ?? 2);
   const [active, setActive] = useState(props.match?.active.toString() ?? "true");
   const matchDate = props.match?.date.toString().slice(0, 10);
-  const [date, setDate] = useState(matchDate?? `${year}-${month}-${day}`);
+  const [date, setDate] = useState(matchDate ?? `${year}-${month}-${day}`);
   const [leagueId, setLeagueId] = useState(props?.match?.leagueId || "");
   const [addUpdateMatch, { data, error, loading }] = useMutation(
     ADD_UPDATE_MATCHE,
@@ -564,7 +564,7 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
             </button>
           )}
 
-          <button className="bg-red-100 font-bold rounded p-4 mx-2">
+          <button onClick={() => props?.onClose && props?.onClose()} className="bg-red-100 font-bold rounded p-4 mx-2">
             Cancel
           </button>
         </div>
