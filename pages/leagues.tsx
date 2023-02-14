@@ -4,6 +4,7 @@ import { Modal } from "@/components/model";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
 import { format } from "date-fns";
+import { useRouter } from "next/router";
 
 const LEAGUES = gql`
   query GetLeagues {
@@ -27,12 +28,17 @@ export default function LeaguesPage() {
   const [addUpdateLeague, setAddUpdateLeague] = useState(false);
   const [updateLeague, setUpdateLeague] = useState(null);
   const { data, error, loading, refetch } = useQuery(LEAGUES);
-
+  const router = useRouter();
   const onAddUpdateLeague = () => {
     setUpdateLeague(null);
     setAddUpdateLeague(false);
     refetch();
   };
+
+  useEffect(() => {
+    console.log({ router });
+    refetch();
+  }, [router.asPath])
 
   const onAddUpdateLeagueClose = () => {
     setUpdateLeague(null);

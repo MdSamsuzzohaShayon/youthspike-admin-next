@@ -8,6 +8,7 @@ import { ITeam } from "@/types/team";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import { useRouter } from "next/router";
 
 const TEAMS = gql`
   query GetTeams {
@@ -39,7 +40,11 @@ export default function TeamsPage() {
   const [addUpdateTeam, setAddUpdateTeam] = useState(false);
   const [updateTeam, setUpdateTeam] = useState<any>(null);
   const { data, error, loading, refetch } = useQuery(TEAMS);
+  const router = useRouter();
 
+  useEffect(() => {
+    refetch();
+  }, [router.asPath])
   const onAddUpdateTeam = () => {
     setUpdateTeam(null);
     setAddUpdateTeam(false);

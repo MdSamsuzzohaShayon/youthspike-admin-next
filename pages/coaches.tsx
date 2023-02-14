@@ -4,6 +4,7 @@ import { gql, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
 import AddUpdateCoach from "@/components/coaches/add-update-coach";
 import { v4 as uuidv4 } from 'uuid';
+import { useRouter } from "next/router";
 
 
 const COACHES = gql`
@@ -69,8 +70,12 @@ export default function CoachesPage() {
   const [allCoachData, setAllCoachData] = useState<{ coach: { team: { name: any; _id: any; league: any; }; }; _id: any; firstName: any; lastName: any; }[]>([]);
   const { data, error, loading, refetch } = useQuery(COACHES);
   const { data: teamsData, error: teamError, loading: teamLoading, refetch: teamRefetch } = useQuery(TEAMS);
+  const router = useRouter();
 
-
+  useEffect(() => {
+    refetch();
+    teamRefetch();
+  }, [router.asPath])
   useEffect(() => {
     const coachData = data?.getCoaches?.data;
     const teamsQueryData = teamsData?.getTeams?.data;

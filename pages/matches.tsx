@@ -10,6 +10,7 @@ import { IMatch } from "@/types/match";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
+import { useRouter } from "next/router";
 
 const MATCHES = gql`
   query GetMatches {
@@ -91,7 +92,11 @@ export default function MatchesPage() {
   const [addUpdateMatch, setAddUpdateMatch] = useState(false);
   const [updateMatch, setUpdateMatch] = useState<any>(null);
   const { data, error, loading, refetch } = useQuery(MATCHES);
+  const router = useRouter();
 
+  useEffect(() => {
+    refetch();
+  }, [router.asPath])
   const onAddUpdateMatch = () => {
     setUpdateMatch(null);
     setAddUpdateMatch(false);

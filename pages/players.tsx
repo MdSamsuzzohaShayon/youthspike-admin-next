@@ -5,6 +5,7 @@ import { TD, TDR, TH, THR } from "@/components/table";
 import AddUpdatePlayer from "@/components/players/add-update-player";
 import AddPlayers from "@/components/players/add-players";
 import { v4 as uuidv4 } from 'uuid';
+import { useRouter } from "next/router";
 
 const LEAGUES = gql`
   query GetPlayers {
@@ -50,7 +51,11 @@ export default function PlayersPage() {
   const [addPlayers, setAddPlayers] = useState(false);
   const [updatePlayer, setUpdatePlayer] = useState(null);
   const { data, refetch } = useQuery(LEAGUES);
+  const router = useRouter();
 
+  useEffect(() => {
+    refetch();
+  }, [router.asPath])
   const onAddUpdatePlayer = () => {
     setUpdatePlayer(null);
     setAddUpdatePlayer(false);
