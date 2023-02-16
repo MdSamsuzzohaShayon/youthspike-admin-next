@@ -24,8 +24,11 @@ export default function Layout(props: LayoutProps) {
 
   useEffect(() => {
     try {
-      user = LoginService.getUser()
-      if (!user) window.location.href = "/login";
+      user = LoginService.getUser();
+      const timeStamp = new Date(user?.timeStamp).getTime();
+      const currentTime = new Date().getTime();
+      const dateDiffInMinutes = (currentTime - timeStamp) / (60 * 1000);
+      if (!user || dateDiffInMinutes < 720) window.location.href = "/login";
     } catch (err) {
       if (!user) window.location.href = "/login";
     }
