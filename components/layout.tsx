@@ -28,7 +28,9 @@ export default function Layout(props: LayoutProps) {
       const timeStamp = new Date(user?.timeStamp).getTime();
       const currentTime = new Date().getTime();
       const dateDiffInMinutes = (currentTime - timeStamp) / (60 * 1000);
-      if (!user || dateDiffInMinutes < 720) window.location.href = "/login";
+      if (!user || dateDiffInMinutes > 720) {
+        window.location.href = "/login";
+      }
     } catch (err) {
       if (!user) window.location.href = "/login";
     }
