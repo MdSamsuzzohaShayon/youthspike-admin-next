@@ -42,7 +42,7 @@ export default function LoginPage() {
 
     if (data?.login?.code == 200) {
       const loginData = data?.login?.data;
-      LoginService.saveUser(loginData.user);
+      LoginService.saveUser({ ...loginData.user, timeStamp: new Date() });
       LoginService.saveToken(loginData.token);
       window.location.href = "/";
     }
