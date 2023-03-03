@@ -46,28 +46,56 @@ const LEAGUES = gql`
   }
 `;
 
+const TEAM_DROPDOWN = gql`
+  query GetTeams {
+    getTeams {
+      code
+      success
+      message
+      data {
+        _id
+        name
+      }
+    }
+  }
+`;
+
 export default function PlayersPage() {
+  const teamsQuery = useQuery(TEAM_DROPDOWN);
+  const [teamId, setTeamId] = useState('');
   const [addUpdatePlayer, setAddUpdatePlayer] = useState(false);
   const [addPlayers, setAddPlayers] = useState(false);
   const [updatePlayer, setUpdatePlayer] = useState(null);
   const { data, refetch } = useQuery(LEAGUES);
+  const [updatedPlayers, setUpdatedPlayers] = useState([]);
+
   const router = useRouter();
 
   useEffect(() => {
     refetch();
   }, [router.asPath])
+
+  useEffect(() => {
+    if (data?.getPlayers?.data) {
+      let updatedPlayers = data?.getPlayers?.data;
+      if (teamId && (teamId !== 'Select a team')) {
+        updatedPlayers = data?.getPlayers?.data?.filter((current: { player: { teamId: string; }; }) => current?.player?.teamId === teamId);
+      }
+      setUpdatedPlayers(updatedPlayers)
+    }
+  }, [data, teamId, refetch])
+
   const onAddUpdatePlayer = () => {
     setUpdatePlayer(null);
     setAddUpdatePlayer(false);
     setAddPlayers(false);
-    refetch();
+    refetch()
   };
 
   const onAddUpdatePlayerClose = () => {
     setUpdatePlayer(null);
     setAddUpdatePlayer(false);
   };
-
 
   return (
     <Layout title="Players" page={LayoutPages.players}>
@@ -86,6 +114,31 @@ export default function PlayersPage() {
           >
             Add a Player
           </button>
+          <div style={{
+            marginRight: 'auto',
+            border: '2px solid #3b82f6',
+            borderRadius: '8px'
+          }}>
+            <select
+              name="teamId"
+              id="teamId"
+              value={teamId}
+              onChange={(e) => setTeamId(e.target.value)}
+              style={{
+                height: '100%',
+                borderRadius: '8px',
+                padding: '8px'
+              }}
+            >
+              <option>Select a team</option>
+              {teamsQuery?.data?.getTeams?.code === 200 &&
+                teamsQuery?.data?.getTeams?.data?.map((team: any) => (
+                  <option key={team?._id} value={team?._id}>
+                    {team?.name}
+                  </option>
+                ))}
+            </select>
+          </div>
         </div>
 
         <table className="app-table w-full">
@@ -105,7 +158,7 @@ export default function PlayersPage() {
           </thead>
 
           <tbody className="w-full">
-            {data?.getPlayers?.data?.map((player: any) => (
+            {updatedPlayers?.map((player: any) => (
               <TDR key={player?._id}>
                 <>
                   <TD>
@@ -143,7 +196,7 @@ export default function PlayersPage() {
             player={updatePlayer}
             onClose={onAddUpdatePlayerClose}
             data={data?.getPlayers?.data}
-          ></AddUpdatePlayer>
+          />
         )}
 
         {addPlayers && (
@@ -151,7 +204,7 @@ export default function PlayersPage() {
             onSuccess={onAddUpdatePlayer}
             onClose={() => setAddPlayers(false)}
             data={data?.getPlayers?.data}
-          ></AddPlayers>
+          />
         )}
       </>
     </Layout>
