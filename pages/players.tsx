@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { gql, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
@@ -63,6 +63,7 @@ const TEAM_DROPDOWN = gql`
 export default function PlayersPage() {
   const teamsQuery = useQuery(TEAM_DROPDOWN);
   const [teamId, setTeamId] = useState('');
+  const [searchKey, setSearchKey] = useState('');
   const [addUpdatePlayer, setAddUpdatePlayer] = useState(false);
   const [addPlayers, setAddPlayers] = useState(false);
   const [updatePlayer, setUpdatePlayer] = useState(null);
@@ -77,13 +78,17 @@ export default function PlayersPage() {
 
   useEffect(() => {
     if (data?.getPlayers?.data) {
-      let updatedPlayers = data?.getPlayers?.data;
-      if (teamId && (teamId !== 'Select a team')) {
-        updatedPlayers = data?.getPlayers?.data?.filter((current: { player: { teamId: string; }; }) => current?.player?.teamId === teamId);
-      }
-      setUpdatedPlayers(updatedPlayers)
+      getUpdatedPlayers();
     }
   }, [data, teamId, refetch])
+
+  const getUpdatedPlayers = () => {
+    let updatedPlayers = data?.getPlayers?.data;
+    if (teamId && (teamId !== 'Select a team')) {
+      updatedPlayers = data?.getPlayers?.data?.filter((current: { player: { teamId: string; }; }) => current?.player?.teamId === teamId);
+    }
+    setUpdatedPlayers(updatedPlayers)
+  }
 
   const onAddUpdatePlayer = () => {
     setUpdatePlayer(null);
@@ -97,47 +102,95 @@ export default function PlayersPage() {
     setAddUpdatePlayer(false);
   };
 
+  const onKeyPress = (event: { key: string; }) => {
+    if (event.key === "Enter") {
+      if (searchKey?.trim()?.length === 0) {
+        getUpdatedPlayers();
+        return
+      }
+      // Convert the query to lowercase for case-insensitive matching
+      let query = searchKey.toLowerCase();
+
+      // Filter the array to include only objects that match the query
+      const filteredArray = updatedPlayers.filter(obj =>
+        Object.values(obj).some(val =>
+          typeof val === 'string' && val.toLowerCase().indexOf(query) !== -1
+        )
+      );
+      setUpdatedPlayers(filteredArray);
+    }
+  }
+
+  const onDelete = () => {
+    console.log('call');
+  }
+
+  const onSearch = (event: { target: { value: SetStateAction<string>; }; }) => {
+    setSearchKey(event.target.value)
+  }
+
   return (
     <Layout title="Players" page={LayoutPages.players}>
       <>
-        <div className="flex flex-row-reverse p-4">
-          <button
-            className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
-            onClick={() => setAddPlayers(true)}
-          >
-            Import Players
-          </button>
-
-          <button
-            className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
-            onClick={() => setAddUpdatePlayer(true)}
-          >
-            Add a Player
-          </button>
-          <div style={{
-            marginRight: 'auto',
-            border: '2px solid #3b82f6',
-            borderRadius: '8px'
-          }}>
-            <select
-              name="teamId"
-              id="teamId"
-              value={teamId}
-              onChange={(e) => setTeamId(e.target.value)}
-              style={{
-                height: '100%',
-                borderRadius: '8px',
-                padding: '8px'
-              }}
+        <div>
+          <div className="flex flex-row-reverse p-4">
+            <button
+              className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+              onClick={() => setAddPlayers(true)}
             >
-              <option>Select a team</option>
-              {teamsQuery?.data?.getTeams?.code === 200 &&
-                teamsQuery?.data?.getTeams?.data?.map((team: any) => (
-                  <option key={team?._id} value={team?._id}>
-                    {team?.name}
-                  </option>
-                ))}
-            </select>
+              Import Players
+            </button>
+
+            <button
+              className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+              onClick={() => setAddUpdatePlayer(true)}
+            >
+              Add a Player
+            </button>
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="relative w-1/2 m-2">
+              <input
+                type="text"
+                className="block w-full py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
+                placeholder="Search"
+                onChange={onSearch}
+                value={searchKey}
+                onKeyDown={onKeyPress}
+              />
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.873-4.873M14.828 10.897a4.999 4.999 0 1 1-7.072 0 4.999 4.999 0 0 1 7.072 0z"></path>
+                </svg>
+              </div>
+            </div>
+            <div
+              className="border border-gray-30"
+
+              style={{
+                borderRadius: '8px',
+                height: '42px',
+                color: 'grey',
+              }}>
+              <select
+                name="teamId"
+                id="teamId"
+                value={teamId}
+                onChange={(e) => setTeamId(e.target.value)}
+                style={{
+                  borderRadius: '8px',
+                  padding: '8px',
+                }}
+              >
+                <option>Select a team</option>
+                {teamsQuery?.data?.getTeams?.code === 200 &&
+                  teamsQuery?.data?.getTeams?.data?.map((team: any) => (
+                    <option key={team?._id} value={team?._id}>
+                      {team?.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -173,15 +226,27 @@ export default function PlayersPage() {
                   <TD>{player?.player?.league?.name}</TD>
                   <TD>{player?.active ? "Yes" : "No"}</TD>
                   <TD>
-                    <button
-                      className="btn btn-sm bg-blue-200 p-2 rounded"
-                      onClick={() => {
-                        setUpdatePlayer(player);
-                        setAddUpdatePlayer(true);
-                      }}
-                    >
-                      Edit
-                    </button>
+                    <div className="flex item-center">
+                      <button
+                        className="btn btn-sm bg-blue-200 p-2 rounded"
+                        onClick={() => {
+                          setUpdatePlayer(player);
+                          setAddUpdatePlayer(true);
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="flex items-center text-red-500 hover:text-red-600 focus:outline-none"
+                        onClick={onDelete}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24">
+                          <path fill="none" d="M0 0h24v24H0V0z" />
+                          <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                        <span className="ml-1">Delete</span>
+                      </button>
+                    </div>
                   </TD>
                 </>
               </TDR>
