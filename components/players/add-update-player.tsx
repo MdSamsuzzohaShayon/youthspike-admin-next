@@ -86,7 +86,7 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
   const [email, setEmail] = useState(props?.player?.login?.email || "");
   const [firstName, setFirstName] = useState(props?.player?.firstName || "");
   const [lastName, setLastName] = useState(props?.player?.lastName || "");
-  const [teamId, setTeamId] = useState(props?.player?.player?.teamId || "");
+  const [teamId, setTeamId] = useState(props?.player?.player?.teamId || "UnAssigned");
   const [rank, setRank] = useState(props?.player?.player?.rank || 1);
 
   const [shirtNumber, setShirtNumber] = useState(
@@ -110,7 +110,7 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
         shirtNumber,
         rank,
         leagueId,
-        teamId,
+        teamId: teamId === 'Select a team' ? 'UnAssigned' : teamId,
         active: active === "true" ? true : false,
         email,
         id: props?.player?._id,

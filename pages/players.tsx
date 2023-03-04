@@ -1,6 +1,6 @@
 import { SetStateAction, useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
 import AddUpdatePlayer from "@/components/players/add-update-player";
 import AddPlayers from "@/components/players/add-players";
@@ -60,6 +60,37 @@ const TEAM_DROPDOWN = gql`
   }
 `;
 
+const ADD_UPDATE_LEAGUE = gql`
+  mutation CreateOrUpdatePlayer(
+    $firstName: String!
+    $lastName: String!
+    $shirtNumber: Int!
+    $rank: Int!
+    $leagueId: String!
+    $teamId: String!
+    $active: Boolean!
+    $email: String
+    $id: String
+  ) {
+    createOrUpdatePlayer(
+      firstName: $firstName
+      lastName: $lastName
+      shirtNumber: $shirtNumber
+      rank: $rank
+      leagueId: $leagueId
+      teamId: $teamId
+      active: $active
+      email: $email
+      id: $id
+    ) {
+      code
+      data {
+        _id
+      }
+    }
+  }
+`;
+
 export default function PlayersPage() {
   const teamsQuery = useQuery(TEAM_DROPDOWN);
   const [teamId, setTeamId] = useState('');
@@ -69,7 +100,7 @@ export default function PlayersPage() {
   const [updatePlayer, setUpdatePlayer] = useState(null);
   const { data, refetch } = useQuery(LEAGUES);
   const [updatedPlayers, setUpdatedPlayers] = useState([]);
-
+  const [addUpdatePlayerMutation, { data: updatedData }] = useMutation(ADD_UPDATE_LEAGUE);
   const router = useRouter();
 
   useEffect(() => {
@@ -81,6 +112,12 @@ export default function PlayersPage() {
       getUpdatedPlayers();
     }
   }, [data, teamId, refetch])
+
+  useEffect(() => {
+    if (updatedData?.createOrUpdatePlayer?.code === 200) {
+      refetch();
+    }
+  }, [updatedData])
 
   const getUpdatedPlayers = () => {
     let updatedPlayers = data?.getPlayers?.data;
@@ -121,14 +158,30 @@ export default function PlayersPage() {
     }
   }
 
-  const onDelete = () => {
+  const deletePlayerFunctionality = async (player: any) => {
+    await addUpdatePlayerMutation({
+      variables: {
+        firstName: player?.firstName,
+        lastName: player?.lastName,
+        shirtNumber: player?.player?.shirtNumber,
+        rank: player?.player?.rank,
+        leagueId: player?.player?.leagueId,
+        teamId: 'UnAssigned',
+        active: player?.active,
+        id: player?._id,
+      },
+    })
+  }
+
+  const onDelete = (player: any) => {
+    deletePlayerFunctionality(player)
     console.log('call');
   }
 
   const onSearch = (event: { target: { value: SetStateAction<string>; }; }) => {
     setSearchKey(event.target.value)
   }
-
+  console.log({ updatedPlayers });
   return (
     <Layout title="Players" page={LayoutPages.players}>
       <>
@@ -183,6 +236,7 @@ export default function PlayersPage() {
                 }}
               >
                 <option>Select a team</option>
+                <option>UnAssigned</option>
                 {teamsQuery?.data?.getTeams?.code === 200 &&
                   teamsQuery?.data?.getTeams?.data?.map((team: any) => (
                     <option key={team?._id} value={team?._id}>
@@ -238,7 +292,7 @@ export default function PlayersPage() {
                       </button>
                       <button
                         className="flex items-center text-red-500 hover:text-red-600 focus:outline-none"
-                        onClick={onDelete}
+                        onClick={() => onDelete(player)}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24">
                           <path fill="none" d="M0 0h24v24H0V0z" />
