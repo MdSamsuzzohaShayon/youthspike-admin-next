@@ -220,6 +220,7 @@ const TEAMS = gql`
         _id
         name
         coachId
+        leagueId
       }
     }
   }
@@ -344,6 +345,7 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
     }
   }
 
+  const updatedTeams = teams?.getTeams?.data?.filter((current: { leagueId: string; }) => current?.leagueId === leagueId)
   return (
     <>
       <Modal showModal={true} onClose={() => props.onClose && props.onClose()}>
@@ -398,7 +400,7 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
                 >
                   <option>Select Team A</option>
                   {teams?.getTeams?.code === 200 &&
-                    teams?.getTeams?.data?.map((team: any) =>
+                    updatedTeams?.map((team: any) =>
                       team._id != teamBId ? (
                         <option key={team?._id} value={team?._id}>
                           {team?.name}
@@ -425,7 +427,7 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
                 >
                   <option>Select Team B</option>
                   {teams?.getTeams?.code === 200 &&
-                    teams?.getTeams?.data?.map((team: any) =>
+                    updatedTeams?.map((team: any) =>
                       team._id != teamAId ? (
                         <option key={team?._id} value={team?._id}>
                           {team?.name}
