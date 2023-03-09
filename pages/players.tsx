@@ -6,6 +6,7 @@ import AddUpdatePlayer from "@/components/players/add-update-player";
 import AddPlayers from "@/components/players/add-players";
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from "next/router";
+import _ from 'lodash';
 
 const LEAGUES = gql`
   query GetPlayers {
@@ -181,7 +182,7 @@ export default function PlayersPage() {
   const onSearch = (event: { target: { value: SetStateAction<string>; }; }) => {
     setSearchKey(event.target.value)
   }
-  console.log({ updatedPlayers });
+  let sortedPlayers = _.orderBy(updatedPlayers, (item: any) => item.player.rank, ["asc"]);
   return (
     <Layout title="Players" page={LayoutPages.players}>
       <>
@@ -265,7 +266,7 @@ export default function PlayersPage() {
           </thead>
 
           <tbody className="w-full">
-            {updatedPlayers?.map((player: any) => (
+            {sortedPlayers?.map((player: any) => (
               <TDR key={player?._id}>
                 <>
                   <TD>
