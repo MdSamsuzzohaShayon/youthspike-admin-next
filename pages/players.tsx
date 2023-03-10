@@ -120,6 +120,14 @@ export default function PlayersPage() {
     }
   }, [updatedData])
 
+  const filteredData = () => {
+    let updatedPlayers = data?.getPlayers?.data;
+    if (teamId && (teamId !== 'Select a team')) {
+      updatedPlayers = data?.getPlayers?.data?.filter((current: { player: { teamId: string; }; }) => current?.player?.teamId === teamId);
+    }
+    return updatedPlayers;
+  }
+
   const getUpdatedPlayers = () => {
     let updatedPlayers = data?.getPlayers?.data;
     if (teamId && (teamId !== 'Select a team')) {
@@ -146,15 +154,15 @@ export default function PlayersPage() {
         getUpdatedPlayers();
         return
       }
+      const filterData = filteredData();
       // Convert the query to lowercase for case-insensitive matching
-      let query = searchKey.toLowerCase();
-
+      let query = searchKey.toLowerCase().replace(/\s+/g, "");
       // Filter the array to include only objects that match the query
-      const filteredArray = updatedPlayers.filter(obj =>
-        Object.values(obj).some(val =>
-          typeof val === 'string' && val.toLowerCase().indexOf(query) !== -1
-        )
+      const filteredArray = filterData.filter((obj: { firstName: any; lastName: any; }) =>
+        (obj?.firstName + obj?.lastName).toString().toLowerCase().replace(/\s+/g, "").includes(query)
+
       );
+
       setUpdatedPlayers(filteredArray);
     }
   }
