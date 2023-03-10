@@ -205,11 +205,11 @@ export default function PlayersPage() {
     if (!result.destination) {
       return;
     }
-    let newPlayers = Array.from(updatedPlayers);
+    let newPlayers: any[] = Array.from(updatedPlayers);
     const [reorderedRow] = newPlayers.splice(result.source.index, 1);
     newPlayers.splice(result.destination.index, 0, reorderedRow);
     if (['', 'Select a team', 'UnAssigned'].indexOf(teamId) === -1) {
-      newPlayers = newPlayers?.map((current, index) => {
+      newPlayers = newPlayers?.map((current: any, index: number) => {
         return {
           ...current,
           player: {
@@ -217,7 +217,7 @@ export default function PlayersPage() {
             rank: index + 1,
           }
         }
-      })
+      });
       setUpdatedPlayers(newPlayers);
       updateRank(newPlayers);
     } else {
