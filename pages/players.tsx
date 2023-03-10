@@ -7,7 +7,7 @@ import AddPlayers from "@/components/players/add-players";
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from "next/router";
 import _, { constant } from 'lodash';
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
 
 const LEAGUES = gql`
   query GetPlayers {
@@ -101,7 +101,7 @@ export default function PlayersPage() {
   const [addPlayers, setAddPlayers] = useState(false);
   const [updatePlayer, setUpdatePlayer] = useState(null);
   const { data, refetch } = useQuery(LEAGUES);
-  const [updatedPlayers, setUpdatedPlayers] = useState([]);
+  const [updatedPlayers, setUpdatedPlayers] = useState<any[]>([]);
   const [addUpdatePlayerMutation, { data: updatedData }] = useMutation(ADD_UPDATE_LEAGUE);
   const [rankUpdatePlayerMutation] = useMutation(ADD_UPDATE_LEAGUE);
   const router = useRouter();
@@ -201,13 +201,13 @@ export default function PlayersPage() {
     setSearchKey(event.target.value)
   }
 
-  const onDragEnd = (result: { destination: { index: number; }; source: { index: number; }; }) => {
+  const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
       return;
     }
     let newPlayers: any[] = [...updatedPlayers];
     const selectedIds: String[] = ['', 'Select a team', 'UnAssigned']
-    const [reorderedRow] = newPlayers.splice(result.source.index, 1);
+    const [reorderedRow]: any[] = newPlayers.splice(result.source.index, 1);
     newPlayers.splice(result.destination.index, 0, reorderedRow);
     if (selectedIds.indexOf(teamId) === -1) {
       setUpdatedPlayers(newPlayers);
