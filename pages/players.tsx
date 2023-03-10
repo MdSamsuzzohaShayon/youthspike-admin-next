@@ -6,7 +6,8 @@ import AddUpdatePlayer from "@/components/players/add-update-player";
 import AddPlayers from "@/components/players/add-players";
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from "next/router";
-import _ from 'lodash';
+import _, { constant } from 'lodash';
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const LEAGUES = gql`
   query GetPlayers {
@@ -102,11 +103,20 @@ export default function PlayersPage() {
   const { data, refetch } = useQuery(LEAGUES);
   const [updatedPlayers, setUpdatedPlayers] = useState([]);
   const [addUpdatePlayerMutation, { data: updatedData }] = useMutation(ADD_UPDATE_LEAGUE);
+  const [rankUpdatePlayerMutation] = useMutation(ADD_UPDATE_LEAGUE);
   const router = useRouter();
+  const [refetchAfterRankUpdate, setRefetchAfterRankUpdate] = useState(false);
 
   useEffect(() => {
     refetch();
   }, [router.asPath])
+
+  useEffect(() => {
+    if (refetchAfterRankUpdate) {
+      refetch();
+      setRefetchAfterRankUpdate(false);
+    }
+  }, [refetchAfterRankUpdate])
 
   useEffect(() => {
     if (data?.getPlayers?.data) {
@@ -133,6 +143,7 @@ export default function PlayersPage() {
     if (teamId && (teamId !== 'Select a team')) {
       updatedPlayers = data?.getPlayers?.data?.filter((current: { player: { teamId: string; }; }) => current?.player?.teamId === teamId);
     }
+    updatedPlayers = _.orderBy(updatedPlayers, (item: any) => item.player.rank, ["asc"]);
     setUpdatedPlayers(updatedPlayers)
   }
 
@@ -184,13 +195,59 @@ export default function PlayersPage() {
 
   const onDelete = (player: any) => {
     deletePlayerFunctionality(player)
-    console.log('call');
   }
 
   const onSearch = (event: { target: { value: SetStateAction<string>; }; }) => {
     setSearchKey(event.target.value)
   }
-  let sortedPlayers = _.orderBy(updatedPlayers, (item: any) => item.player.rank, ["asc"]);
+
+  const onDragEnd = (result: { destination: { index: number; }; source: { index: number; }; }) => {
+    if (!result.destination) {
+      return;
+    }
+    let newPlayers = Array.from(updatedPlayers);
+    const [reorderedRow] = newPlayers.splice(result.source.index, 1);
+    newPlayers.splice(result.destination.index, 0, reorderedRow);
+    if (['', 'Select a team', 'UnAssigned'].indexOf(teamId) === -1) {
+      newPlayers = newPlayers?.map((current, index) => {
+        return {
+          ...current,
+          player: {
+            ...current?.player,
+            rank: index + 1,
+          }
+        }
+      })
+      setUpdatedPlayers(newPlayers);
+      updateRank(newPlayers);
+    } else {
+      setUpdatedPlayers(newPlayers);
+    }
+  }
+
+  const updateRank = async (newPlayers: string | any[]) => {
+    let updateNeeded = false;
+    for (let i = 0; i < newPlayers?.length; i++) {
+      updateNeeded = true;
+      await rankUpdatePlayerMutation({
+        variables: {
+          firstName: newPlayers[i]?.firstName,
+          lastName: newPlayers[i]?.lastName,
+          shirtNumber: newPlayers[i]?.player?.shirtNumber,
+          rank: newPlayers[i]?.player?.rank,
+          leagueId: newPlayers[i]?.player?.leagueId,
+          teamId: newPlayers[i]?.player?.teamId,
+          active: newPlayers[i]?.active,
+          id: newPlayers[i]?._id,
+        },
+      })
+    }
+    if (updateNeeded) {
+      setRefetchAfterRankUpdate(true);
+    }
+  }
+
+  let sortedPlayers = [...updatedPlayers];
   return (
     <Layout title="Players" page={LayoutPages.players}>
       <>
@@ -272,49 +329,65 @@ export default function PlayersPage() {
               </>
             </THR>
           </thead>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="droppable">
+              {(provided) => (
+                <tbody className="w-full" ref={provided.innerRef} {...provided.droppableProps}>
+                  {sortedPlayers?.map((player: any, index) => (
+                    <Draggable key={player._id} draggableId={player._id} index={index}>
+                      {(provided, snapshot) => (
+                        <tr
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className={snapshot.isDragging ? 'dragging w-full even:bg-purple-100 hover:bg-purple-200' : 'w-full even:bg-purple-100 hover:bg-purple-200'}
+                        >
+                          <>
+                            <TD>
+                              <>
+                                {player?.firstName}&nbsp;{player?.lastName}
+                              </>
+                            </TD>
+                            <TD>{player?.login?.email}</TD>
+                            <TD>{player?.player?.shirtNumber}</TD>
+                            <TD>{player?.player?.rank}</TD>
+                            <TD>{player?.player?.team?.name}</TD>
+                            <TD>{player?.player?.league?.name}</TD>
+                            <TD>{player?.active ? "Yes" : "No"}</TD>
+                            <TD>
+                              <div className="flex item-center">
+                                <button
+                                  className="btn btn-sm bg-blue-200 p-2 rounded"
+                                  onClick={() => {
+                                    setUpdatePlayer(player);
+                                    setAddUpdatePlayer(true);
+                                  }}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  className="flex items-center text-red-500 hover:text-red-600 focus:outline-none"
+                                  onClick={() => onDelete(player)}
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24">
+                                    <path fill="none" d="M0 0h24v24H0V0z" />
+                                    <path d="M18 6L6 18M6 6l12 12" />
+                                  </svg>
+                                  <span className="ml-1">Delete</span>
+                                </button>
+                              </div>
+                            </TD>
+                          </>
+                        </tr>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </tbody>
+              )}
+            </Droppable>
+          </DragDropContext>
 
-          <tbody className="w-full">
-            {sortedPlayers?.map((player: any) => (
-              <TDR key={player?._id}>
-                <>
-                  <TD>
-                    <>
-                      {player?.firstName}&nbsp;{player?.lastName}
-                    </>
-                  </TD>
-                  <TD>{player?.login?.email}</TD>
-                  <TD>{player?.player?.shirtNumber}</TD>
-                  <TD>{player?.player?.rank}</TD>
-                  <TD>{player?.player?.team?.name}</TD>
-                  <TD>{player?.player?.league?.name}</TD>
-                  <TD>{player?.active ? "Yes" : "No"}</TD>
-                  <TD>
-                    <div className="flex item-center">
-                      <button
-                        className="btn btn-sm bg-blue-200 p-2 rounded"
-                        onClick={() => {
-                          setUpdatePlayer(player);
-                          setAddUpdatePlayer(true);
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="flex items-center text-red-500 hover:text-red-600 focus:outline-none"
-                        onClick={() => onDelete(player)}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24">
-                          <path fill="none" d="M0 0h24v24H0V0z" />
-                          <path d="M18 6L6 18M6 6l12 12" />
-                        </svg>
-                        <span className="ml-1">Delete</span>
-                      </button>
-                    </div>
-                  </TD>
-                </>
-              </TDR>
-            ))}
-          </tbody>
         </table>
 
         {addUpdatePlayer && (
