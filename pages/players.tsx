@@ -205,19 +205,11 @@ export default function PlayersPage() {
     if (!result.destination) {
       return;
     }
-    let newPlayers: any[] = Array.from(updatedPlayers);
+    let newPlayers: any[] = [...updatedPlayers];
+    const selectedIds: String[] = ['', 'Select a team', 'UnAssigned']
     const [reorderedRow] = newPlayers.splice(result.source.index, 1);
     newPlayers.splice(result.destination.index, 0, reorderedRow);
-    if (['', 'Select a team', 'UnAssigned'].indexOf(teamId) === -1) {
-      newPlayers = newPlayers?.map((current: any, index: number) => {
-        return {
-          ...current,
-          player: {
-            ...current?.player,
-            rank: index + 1,
-          }
-        }
-      });
+    if (selectedIds.indexOf(teamId) === -1) {
       setUpdatedPlayers(newPlayers);
       updateRank(newPlayers);
     } else {
@@ -234,7 +226,7 @@ export default function PlayersPage() {
           firstName: newPlayers[i]?.firstName,
           lastName: newPlayers[i]?.lastName,
           shirtNumber: newPlayers[i]?.player?.shirtNumber,
-          rank: newPlayers[i]?.player?.rank,
+          rank: i + 1,
           leagueId: newPlayers[i]?.player?.leagueId,
           teamId: newPlayers[i]?.player?.teamId,
           active: newPlayers[i]?.active,
@@ -247,7 +239,6 @@ export default function PlayersPage() {
     }
   }
 
-  let sortedPlayers = [...updatedPlayers];
   return (
     <Layout title="Players" page={LayoutPages.players}>
       <>
@@ -333,7 +324,7 @@ export default function PlayersPage() {
             <Droppable droppableId="droppable">
               {(provided) => (
                 <tbody className="w-full" ref={provided.innerRef} {...provided.droppableProps}>
-                  {sortedPlayers?.map((player: any, index) => (
+                  {updatedPlayers?.map((player: any, index) => (
                     <Draggable key={player._id} draggableId={player._id} index={index}>
                       {(provided, snapshot) => (
                         <tr
