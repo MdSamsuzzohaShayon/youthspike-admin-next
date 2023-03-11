@@ -193,8 +193,44 @@ export default function PlayersPage() {
     })
   }
 
-  const onDelete = (player: any) => {
-    deletePlayerFunctionality(player)
+  const onDelete = (player: any, index: number) => {
+    let newPlayers: any[] = [...updatedPlayers];
+    const previesIndexPlayer = newPlayers[index];
+    // Remove the object at the specified index
+    newPlayers.splice(index, 1);
+
+    // Insert the new object at the same index
+    newPlayers.splice(index, 0, {
+      ...previesIndexPlayer, player: {
+        ...previesIndexPlayer?.player,
+        teamId: 'UnAssigned',
+      }
+    });
+    const selectedIds: String[] = ['', 'Select a team', 'UnAssigned'];
+
+    if (selectedIds.indexOf(teamId) === -1) {
+      let isTraversed = false;
+      newPlayers = newPlayers?.map((current: any, indexKey: number) => {
+        if (!isTraversed) {
+          isTraversed = index === indexKey;
+        }
+        if (index === indexKey) {
+          return { ...current };
+        }
+        return {
+          ...current,
+          player: {
+            ...current?.player,
+            rank: isTraversed ? indexKey : indexKey + 1,
+          }
+        }
+      });
+      setUpdatedPlayers(newPlayers);
+      updateRank(newPlayers);
+    } else {
+      setUpdatedPlayers(newPlayers);
+      deletePlayerFunctionality(player);
+    }
   }
 
   const onSearch = (event: { target: { value: SetStateAction<string>; }; }) => {
@@ -206,7 +242,7 @@ export default function PlayersPage() {
       return;
     }
     let newPlayers: any[] = [...updatedPlayers];
-    const selectedIds: String[] = ['', 'Select a team', 'UnAssigned']
+    const selectedIds: String[] = ['', 'Select a team', 'UnAssigned'];
     const [reorderedRow]: any[] = newPlayers.splice(result.source.index, 1);
     newPlayers.splice(result.destination.index, 0, reorderedRow);
     if (selectedIds.indexOf(teamId) === -1) {
@@ -367,7 +403,7 @@ export default function PlayersPage() {
                                 </button>
                                 <button
                                   className="flex items-center text-red-500 hover:text-red-600 focus:outline-none"
-                                  onClick={() => onDelete(player)}
+                                  onClick={() => onDelete(player, index)}
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24">
                                     <path fill="none" d="M0 0h24v24H0V0z" />
