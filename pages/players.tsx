@@ -210,6 +210,15 @@ export default function PlayersPage() {
     const [reorderedRow]: any[] = newPlayers.splice(result.source.index, 1);
     newPlayers.splice(result.destination.index, 0, reorderedRow);
     if (selectedIds.indexOf(teamId) === -1) {
+      newPlayers = newPlayers?.map((current: any, index: number) => {
+        return {
+          ...current,
+          player: {
+            ...current?.player,
+            rank: index + 1,
+          }
+        }
+      });
       setUpdatedPlayers(newPlayers);
       updateRank(newPlayers);
     } else {
@@ -226,7 +235,7 @@ export default function PlayersPage() {
           firstName: newPlayers[i]?.firstName,
           lastName: newPlayers[i]?.lastName,
           shirtNumber: newPlayers[i]?.player?.shirtNumber,
-          rank: i + 1,
+          rank: newPlayers[i]?.player?.rank,
           leagueId: newPlayers[i]?.player?.leagueId,
           teamId: newPlayers[i]?.player?.teamId,
           active: newPlayers[i]?.active,
