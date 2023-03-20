@@ -166,13 +166,17 @@ export default function MatchesPage() {
                       <MatchLink
                         matchId={match?._id}
                         teamId={match?.teamAId}
-                        title="A Link"
+                        title={match?.teamA?.name}
+                        label="Team A: "
+                        marginEnable={false}
                       ></MatchLink>
 
                       <MatchLink
                         matchId={match?._id}
                         teamId={match?.teamBId}
-                        title="B Link"
+                        title={match?.teamB?.name}
+                        label="Team B: "
+                        marginEnable={true}
                       ></MatchLink>
                     </span>
                   </TD>

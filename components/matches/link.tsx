@@ -16,7 +16,10 @@ export const MatchLink = (props: {
   matchId: string;
   teamId: string;
   title: string;
+  label: string;
+  marginEnable: boolean;
 }) => {
+  console.log(props);
   const { data, error, loading } = useQuery(MATCH_LINK, {
     variables: {
       matchId: props.matchId,
@@ -34,11 +37,16 @@ export const MatchLink = (props: {
 
   return (
     <a
+      style={{
+        marginTop: props.marginEnable ? "10px" : "0px"
+      }}
       href="#"
       onClick={onLinkClick}
       className="mx-1 text-blue-500 hover:text-blue-900"
     >
-      {props.title}
+      <span style={{
+        color: 'black'
+      }}>{props.label}</span>{props.title}
     </a>
   );
 };
