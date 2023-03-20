@@ -284,6 +284,8 @@ export default function PlayersPage() {
     }
   }
 
+  const selectedIds: String[] = ['', 'Select a team', 'UnAssigned'];
+
   return (
     <Layout title="Players" page={LayoutPages.players}>
       <>
@@ -370,7 +372,12 @@ export default function PlayersPage() {
               {(provided) => (
                 <tbody className="w-full" ref={provided.innerRef} {...provided.droppableProps}>
                   {updatedPlayers?.map((player: any, index) => (
-                    <Draggable key={player._id} draggableId={player._id} index={index}>
+                    <Draggable
+                      key={player._id}
+                      draggableId={player._id}
+                      index={index}
+                      isDragDisabled={selectedIds.includes(teamId)}
+                    >
                       {(provided, snapshot) => (
                         <tr
                           ref={provided.innerRef}
