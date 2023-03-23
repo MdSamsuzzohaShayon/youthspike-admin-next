@@ -158,7 +158,7 @@ export default function PlayersPage() {
     if (data?.getPlayers?.data) {
       getUpdatedPlayers();
     }
-  }, [data, teamId, refetch])
+  }, [data, teamId, refetch, leagueId])
 
   useEffect(() => {
     if (updatedData?.createOrUpdatePlayer?.code === 200) {
@@ -168,8 +168,12 @@ export default function PlayersPage() {
 
   const filteredData = () => {
     let updatedPlayers = data?.getPlayers?.data;
-    if (teamId && (teamId !== 'Select a team')) {
-      updatedPlayers = data?.getPlayers?.data?.filter((current: { player: { teamId: string; }; }) => current?.player?.teamId === teamId);
+    if (teamId && (teamId !== 'Select a team' && teamId?.length > 0)) {
+      updatedPlayers = data?.getPlayers?.data?.filter((current: { player: { teamId: string; leagueId: string; }; }) => current?.player?.teamId === teamId && ((leagueId === 'Select a league' || leagueId?.length === 0) ? true : current?.player?.leagueId === leagueId));
+    } else {
+      if (leagueId && (leagueId !== 'Select a league' && leagueId?.length > 0)) {
+        updatedPlayers = data?.getPlayers?.data?.filter((current: { player: { teamId: string; leagueId: string; }; }) => current?.player?.leagueId === leagueId && ((teamId === 'Select a team' || teamId?.length === 0) ? true : current?.player?.teamId === teamId));
+      }
     }
 
     return updatedPlayers;
@@ -177,9 +181,13 @@ export default function PlayersPage() {
 
   const getUpdatedPlayers = () => {
     let updatedPlayers = data?.getPlayers?.data;
-
-    if (teamId && (teamId !== 'Select a team')) {
-      updatedPlayers = data?.getPlayers?.data?.filter((current: { player: { teamId: string; }; }) => current?.player?.teamId === teamId);
+    console.log({ teamId, leagueId })
+    if (teamId && (teamId !== 'Select a team' && teamId?.length > 0)) {
+      updatedPlayers = data?.getPlayers?.data?.filter((current: { player: { teamId: string; leagueId: string; }; }) => current?.player?.teamId === teamId && ((leagueId === 'Select a league' || leagueId?.length === 0) ? true : current?.player?.leagueId === leagueId));
+    } else {
+      if (leagueId && (leagueId !== 'Select a league' && leagueId?.length > 0)) {
+        updatedPlayers = data?.getPlayers?.data?.filter((current: { player: { teamId: string; leagueId: string; }; }) => current?.player?.leagueId === leagueId && ((teamId === 'Select a team' || teamId?.length === 0) ? true : current?.player?.teamId === teamId));
+      }
     }
 
     updatedPlayers = _.orderBy(updatedPlayers, (item: any) => item.player.rank, ["asc"]);
@@ -389,7 +397,7 @@ export default function PlayersPage() {
                     padding: '8px',
                   }}
                 >
-                  <option>Select a Leagues</option>
+                  <option>Select a league</option>
                   <option>UnAssigned</option>
                   {leaguesQuery.data?.getLeagues?.code === 200 &&
                     leaguesQuery.data?.getLeagues?.data?.map((league: any) => (
