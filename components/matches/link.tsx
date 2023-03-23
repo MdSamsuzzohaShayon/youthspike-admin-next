@@ -19,7 +19,6 @@ export const MatchLink = (props: {
   label: string;
   marginEnable: boolean;
 }) => {
-  console.log(props);
   const { data, error, loading } = useQuery(MATCH_LINK, {
     variables: {
       matchId: props.matchId,

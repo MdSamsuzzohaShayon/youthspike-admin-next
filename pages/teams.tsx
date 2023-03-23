@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
 import { gql, useMutation, useQuery } from "@apollo/client";
@@ -38,6 +38,7 @@ const TEAMS = gql`
 
 export default function TeamsPage() {
   const [addUpdateTeam, setAddUpdateTeam] = useState(false);
+  const [addInOtherLeague, setAddInOtherLeague] = useState(false);
   const [searchKey, setSearchKey] = useState('');
   const [isOpenAction, setIsOpenAction] = useState('');
   const [filteredTeams, setFilteredTeams] = useState<any[]>([]);
@@ -45,6 +46,25 @@ export default function TeamsPage() {
   const [updateTeam, setUpdateTeam] = useState<any>(null);
   const { data, error, loading, refetch } = useQuery(TEAMS);
   const router = useRouter();
+
+  const ref = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const checkIfClickedOutside = (e: { target: any; }) => {
+      // If the menu is open and the clicked target is not within the menu,
+      // then close the menu
+      if (isOpenAction?.length > 0 && ref.current && !ref.current.contains(e.target)) {
+        setIsOpenAction('')
+      }
+    }
+
+    document.addEventListener("mousedown", checkIfClickedOutside)
+
+    return () => {
+      // Cleanup the event listener
+      document.removeEventListener("mousedown", checkIfClickedOutside)
+    }
+  }, [isOpenAction])
 
   useEffect(() => {
     refetch();
@@ -55,10 +75,15 @@ export default function TeamsPage() {
     setAllTeamData(data?.getTeams?.data ?? []);
   }, [data]);
 
+  useEffect(() => {
+    setFilteredTeams(filteredData(searchKey))
+  }, [allTeamData]);
+
 
   const onAddUpdateTeam = () => {
     setUpdateTeam(null);
     setAddUpdateTeam(false);
+    setAddInOtherLeague(false);
     refetch();
   };
 
@@ -102,85 +127,93 @@ export default function TeamsPage() {
   return (
     <Layout title="Teams" page={LayoutPages.teams}>
       <>
-        <div className="flex flex-row-reverse p-4">
-          <button
-            className="bg-blue-500 text-white font-bold rounded p-4"
-            onClick={() => setAddUpdateTeam(true)}
-          >
-            Add a Team
-          </button>
-        </div>
-        <div className="flex justify-between items-center">
-          <div className="relative w-1/2 m-2">
-            <input
-              type="text"
-              className="block w-full py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
-              placeholder="Search"
-              onKeyDown={onKeyPress}
-            />
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.873-4.873M14.828 10.897a4.999 4.999 0 1 1-7.072 0 4.999 4.999 0 0 1 7.072 0z"></path>
-              </svg>
+        <div className="w-[calc((w-screen)-(w-1/5)) overflow-hidden">
+          <div className="flex flex-row-reverse p-4">
+            <button
+              className="bg-blue-500 text-white font-bold rounded p-4"
+              onClick={() => setAddUpdateTeam(true)}
+            >
+              Add a Team
+            </button>
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="relative w-1/2 m-2">
+              <input
+                type="text"
+                className="block w-full py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
+                placeholder="Search"
+                onKeyDown={onKeyPress}
+              />
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.873-4.873M14.828 10.897a4.999 4.999 0 1 1-7.072 0 4.999 4.999 0 0 1 7.072 0z"></path>
+                </svg>
+              </div>
             </div>
           </div>
         </div>
 
-        <table className="app-table w-full">
-          <thead className="w-full">
-            <THR>
-              <>
-                <TH>Name</TH>
-                <TH>League</TH>
-                <TH>Coach</TH>
-                <TH>Active</TH>
-                <TH>Actions</TH>
-              </>
-            </THR>
-          </thead>
-
-          <tbody className="w-full">
-            {getTeamsForDisplay().map((team: any) => (
-              <TDR key={team?._id}>
+        <div className="w-[calc((w-screen)-(w-1/5)) overflow-scroll max-h-screen">
+          <table className="app-table w-full">
+            <thead className="w-full sticky top-0 z-20">
+              <THR>
                 <>
-                  <TD>{team?.name}</TD>
-                  <TD>{team?.league?.name}</TD>
-                  <TD>
-                    <>
-                      {team?.coach?.firstName}&nbsp;{team?.coach?.lastName}
-                    </>
-                  </TD>
-                  <TD>{team?.active ? "Yes" : "No"}</TD>
-                  <TD>
-                    <div className="flex item-center">
-                      <div className="relative">
-                        <button
-                          className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                          onClick={() => toggleMenu(team?._id)}
-                        >
-                          <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                        </button>
-                        {(isOpenAction === team?._id) && (
-                          <div className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                            <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                              <a onClick={() => {
-                                setUpdateTeam(team);
-                                setAddUpdateTeam(true);
-                                setIsOpenAction('');
-                              }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                              <a onClick={() => {
-                              }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </TD>
+                  <TH>Name</TH>
+                  <TH>League</TH>
+                  <TH>Coach</TH>
+                  <TH>Active</TH>
+                  <TH>Actions</TH>
                 </>
-              </TDR>
-            ))}
-          </tbody>
-        </table>
+              </THR>
+            </thead>
+
+            <tbody className="w-full">
+              {getTeamsForDisplay().map((team: any) => (
+                <TDR key={team?._id}>
+                  <>
+                    <TD>{team?.name}</TD>
+                    <TD>{team?.league?.name}</TD>
+                    <TD>
+                      <>
+                        {team?.coach?.firstName}&nbsp;{team?.coach?.lastName}
+                      </>
+                    </TD>
+                    <TD>{team?.active ? "Yes" : "No"}</TD>
+                    <TD>
+                      <div className="flex item-center">
+                        <div className="relative">
+                          <button
+                            className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            onClick={() => toggleMenu(team?._id)}
+                          >
+                            <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                          </button>
+                          {(isOpenAction === team?._id) && (
+                            <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                              <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                <a onClick={() => {
+                                  setUpdateTeam(team);
+                                  setAddUpdateTeam(true);
+                                  setIsOpenAction('');
+                                }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
+                                <a onClick={() => {
+                                  setUpdateTeam(team);
+                                  setAddUpdateTeam(true);
+                                  setIsOpenAction('');
+                                  setAddInOtherLeague(true);
+                                }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in other league</a>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </TD>
+                  </>
+                </TDR>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {addUpdateTeam && (
           <AddUpdateTeam
@@ -189,6 +222,7 @@ export default function TeamsPage() {
             onSuccess={onAddUpdateTeam}
             team={updateTeam}
             data={data?.getTeams?.data}
+            addInOtherLeague={addInOtherLeague}
           ></AddUpdateTeam>
         )}
       </>
@@ -263,6 +297,7 @@ interface AddUpdateTeamProps {
   onSuccess?: AddUpdateTeamOnSuccess;
   onClose?: AddUpdateTeamOnClose;
   data?: any;
+  addInOtherLeague?: Boolean;
 }
 
 function AddUpdateTeam(props: AddUpdateTeamProps) {
@@ -283,7 +318,7 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
         leagueId,
         coachId,
         active: active === "true" ? true : false,
-        id: props?.team?._id,
+        id: props.addInOtherLeague ? null : props?.team?._id,
       },
     }
   );
@@ -396,9 +431,15 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
                 onClick={() => {
                   let isNameError = false;
                   let isSameCoachError = false;
+                  let alreadyRegister = false;
                   props?.data?.forEach((current: {
                     league: any; name: string; coach: { _id: string; };
                   }) => {
+                    if (props?.addInOtherLeague) {
+                      if (!alreadyRegister && current?.league?._id === leagueId && current?.name === props?.team?.name) {
+                        alreadyRegister = true;
+                      }
+                    }
                     if (current?.league?._id === leagueId) {
                       if (name !== props?.team?.name && current?.name === name && !isNameError) {
                         isNameError = true;
@@ -414,7 +455,15 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
                   } else if (isSameCoachError) {
                     toast('This coach is already assign to another team in the league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
                   } else {
-                    addUpdateTeam();
+                    if (props?.addInOtherLeague) {
+                      if (alreadyRegister) {
+                        toast('This team already register for same league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+                      } else {
+                        addUpdateTeam();
+                      }
+                    } else {
+                      addUpdateTeam();
+                    }
                   }
                 }}
               >
@@ -428,7 +477,7 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
                   let isNameError = false;
                   let isSameCoachError = false;
                   props?.data?.forEach((current: {
-                    league: any; name: string; coach: { _id: string; };
+                    _id: string; league: any; name: string; coach: { _id: string; };
                   }) => {
                     if (current?.league?._id === leagueId) {
 

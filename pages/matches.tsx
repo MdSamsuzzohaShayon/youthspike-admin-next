@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
 import { gql, useMutation, useQuery } from "@apollo/client";
@@ -93,12 +93,38 @@ export default function MatchesPage() {
   const [updateMatch, setUpdateMatch] = useState<any>(null);
   const [searchKey, setSearchKey] = useState('');
   const [isOpenAction, setIsOpenAction] = useState('');
+  const [filteredMatchs, setFilteredMatchs] = useState<any[]>([]);
+  const [allMatchsData, setAllMatchsData] = useState<any[]>([]);
   const { data, error, loading, refetch } = useQuery(MATCHES);
   const router = useRouter();
+
+  const ref = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const checkIfClickedOutside = (e: { target: any; }) => {
+      // If the menu is open and the clicked target is not within the menu,
+      // then close the menu
+      if (isOpenAction?.length > 0 && ref.current && !ref.current.contains(e.target)) {
+        setIsOpenAction('')
+      }
+    }
+
+    document.addEventListener("mousedown", checkIfClickedOutside)
+
+    return () => {
+      // Cleanup the event listener
+      document.removeEventListener("mousedown", checkIfClickedOutside)
+    }
+  }, [isOpenAction])
 
   useEffect(() => {
     refetch();
   }, [router.asPath])
+
+  useEffect(() => {
+    setAllMatchsData(data?.getMatches?.data ?? []);
+  }, [data]);
+
   const onAddUpdateMatch = () => {
     setUpdateMatch(null);
     setAddUpdateMatch(false);
@@ -110,8 +136,27 @@ export default function MatchesPage() {
     setAddUpdateMatch(false);
   };
 
-  const onSearch = (event: { target: { value: SetStateAction<string>; }; }) => {
-    setSearchKey(event.target.value)
+  const filteredData = (key: string) => {
+
+    const filteredMatchs = allMatchsData.filter((match: any) => {
+      const MatchName = `${match.league.name}`.toLocaleLowerCase();
+      return MatchName.includes(key.toLocaleLowerCase());
+    });
+    return filteredMatchs;
+  }
+
+  const onKeyPress = (event: any) => {
+    if (event.key === "Enter") {
+      setSearchKey(event.target.value)
+      setFilteredMatchs(filteredData(event.target.value));
+    }
+  }
+  const getMatchsForDisplay = () => {
+    if (searchKey !== "") {
+      return filteredMatchs;
+    } else {
+      return allMatchsData;
+    }
   }
 
   const toggleMenu = (teamId: SetStateAction<string>) => {
@@ -125,108 +170,110 @@ export default function MatchesPage() {
   return (
     <Layout title="Matches" page={LayoutPages.matches}>
       <>
-        <div className="flex flex-row-reverse p-4">
-          <button
-            className="bg-blue-500 text-white font-bold rounded p-4"
-            onClick={() => setAddUpdateMatch(true)}
-          >
-            Add a Match
-          </button>
-        </div>
-        <div className="flex justify-between items-center">
-          <div className="relative w-1/2 m-2">
-            <input
-              type="text"
-              className="block w-full py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
-              placeholder="Search"
-              onChange={onSearch}
-              value={searchKey}
-            // onKeyDown={onKeyPress}
-            />
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.873-4.873M14.828 10.897a4.999 4.999 0 1 1-7.072 0 4.999 4.999 0 0 1 7.072 0z"></path>
-              </svg>
+        <div className="w-[calc((w-screen)-(w-1/5)) overflow-y-hidden">
+          <div className="flex flex-row-reverse p-4">
+            <button
+              className="bg-blue-500 text-white font-bold rounded p-4"
+              onClick={() => setAddUpdateMatch(true)}
+            >
+              Add a Match
+            </button>
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="relative w-1/2 m-2">
+              <input
+                type="text"
+                className="block w-full py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
+                placeholder="Search"
+                onKeyDown={onKeyPress}
+              />
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.873-4.873M14.828 10.897a4.999 4.999 0 1 1-7.072 0 4.999 4.999 0 0 1 7.072 0z"></path>
+                </svg>
+              </div>
             </div>
           </div>
         </div>
 
-        <table className="app-table w-full">
-          <thead className="w-full">
-            <THR>
-              <>
-                <TH>League</TH>
-                <TH>Team A</TH>
-                <TH>Team B</TH>
-                <TH>Date</TH>
-                <TH>Nets</TH>
-                <TH>Rounds</TH>
-                <TH>Pair Limit</TH>
-                <TH>Net Range</TH>
-                <TH>Active</TH>
-                <TH>Actions</TH>
-              </>
-            </THR>
-          </thead>
-
-          <tbody className="w-full">
-            {data?.getMatches?.data?.map((match: any) => (
-              <TDR key={match?._id}>
+        <div className="w-[calc((w-screen)-(w-1/5)) overflow-scroll max-h-screen">
+          <table className="app-table w-full">
+            <thead className="w-full sticky top-0 z-20">
+              <THR>
                 <>
-                  <TD>{match?.league?.name}</TD>
-                  <TD>{match?.teamA?.name}</TD>
-                  <TD>{match?.teamB?.name}</TD>
-                  <TD>{new Date(match?.date).toDateString()}</TD>
-                  <TD>{match?.numberOfNets}</TD>
-                  <TD>{match?.numberOfRounds}</TD>
-                  <TD>{match?.pairLimit}</TD>
-                  <TD>{match?.netRange}</TD>
-                  <TD>{match?.active ? "Yes" : "No"}</TD>
-                  <TD>
-                    <div className="flex item-center">
-                      <div className="relative">
-                        <button
-                          className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                          onClick={() => toggleMenu(match?._id)}
-                        >
-                          <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                        </button>
-                        {(isOpenAction === match?._id) && (
-                          <div className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                            <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                              <a onClick={() => {
-                                setUpdateMatch(match);
-                                setAddUpdateMatch(true);
-                                setIsOpenAction('');
-                              }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                              <a><MatchLink
-                                matchId={match?._id}
-                                teamId={match?.teamAId}
-                                title={match?.teamA?.name}
-                                label="Team A: "
-                                marginEnable={false}
-                              ></MatchLink></a>
-                              <br />
-                              <a><MatchLink
-                                matchId={match?._id}
-                                teamId={match?.teamBId}
-                                title={match?.teamB?.name}
-                                label="Team B: "
-                                marginEnable={true}
-                              ></MatchLink></a>
-                              <a onClick={() => {
-                              }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </TD>
+                  <TH>League</TH>
+                  <TH>Team A</TH>
+                  <TH>Team B</TH>
+                  <TH>Date</TH>
+                  <TH>Nets</TH>
+                  <TH>Rounds</TH>
+                  <TH>Pair Limit</TH>
+                  <TH>Net Range</TH>
+                  <TH>Active</TH>
+                  <TH>Actions</TH>
                 </>
-              </TDR>
-            ))}
-          </tbody>
-        </table>
+              </THR>
+            </thead>
+
+            <tbody className="w-full h-96 overflow-y-auto">
+              {getMatchsForDisplay().map((match: any) => (
+                <TDR key={match?._id}>
+                  <>
+                    <TD>{match?.league?.name}</TD>
+                    <TD>{match?.teamA?.name}</TD>
+                    <TD>{match?.teamB?.name}</TD>
+                    <TD>{new Date(match?.date).toDateString()}</TD>
+                    <TD>{match?.numberOfNets}</TD>
+                    <TD>{match?.numberOfRounds}</TD>
+                    <TD>{match?.pairLimit}</TD>
+                    <TD>{match?.netRange}</TD>
+                    <TD>{match?.active ? "Yes" : "No"}</TD>
+                    <TD>
+                      <div className="flex item-center">
+                        <div className="relative">
+                          <button
+                            className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            onClick={() => toggleMenu(match?._id)}
+                          >
+                            <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                          </button>
+                          {(isOpenAction === match?._id) && (
+                            <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                              <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                <a onClick={() => {
+                                  setUpdateMatch(match);
+                                  setAddUpdateMatch(true);
+                                  setIsOpenAction('');
+                                }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
+                                <a><MatchLink
+                                  matchId={match?._id}
+                                  teamId={match?.teamAId}
+                                  title={match?.teamA?.name}
+                                  label="Team A: "
+                                  marginEnable={false}
+                                ></MatchLink></a>
+                                <br />
+                                <a><MatchLink
+                                  matchId={match?._id}
+                                  teamId={match?.teamBId}
+                                  title={match?.teamB?.name}
+                                  label="Team B: "
+                                  marginEnable={true}
+                                ></MatchLink></a>
+                                <a onClick={() => {
+                                }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </TD>
+                  </>
+                </TDR>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {addUpdateMatch && (
           <AddUpdateMatch

@@ -101,6 +101,8 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
     props?.player ? props?.player?.active + "" : "true"
   );
 
+  const [role, setRole] = useState(props?.player?.role || 'player');
+
   const [addUpdatePlayer, { data, error, loading }] = useMutation(
     ADD_UPDATE_LEAGUE,
     {
@@ -285,6 +287,24 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
                         {team?.name}
                       </option>
                     ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="roll" className="font-bold">
+                Roll
+              </label>
+
+              <div>
+                <select
+                  name="role"
+                  id="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                >
+                  <option value="player">Player</option>
+                  <option value="coach">Coach</option>
                 </select>
               </div>
             </div>

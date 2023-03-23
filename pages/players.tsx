@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
@@ -123,6 +123,25 @@ export default function PlayersPage() {
   const [rankUpdatePlayerMutation] = useMutation(ADD_UPDATE_LEAGUE);
   const router = useRouter();
   const [refetchAfterRankUpdate, setRefetchAfterRankUpdate] = useState(false);
+
+  const ref = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const checkIfClickedOutside = (e: { target: any; }) => {
+      // If the menu is open and the clicked target is not within the menu,
+      // then close the menu
+      if (isOpenAction?.length > 0 && ref.current && !ref.current.contains(e.target)) {
+        setIsOpenAction('')
+      }
+    }
+
+    document.addEventListener("mousedown", checkIfClickedOutside)
+
+    return () => {
+      // Cleanup the event listener
+      document.removeEventListener("mousedown", checkIfClickedOutside)
+    }
+  }, [isOpenAction])
 
   useEffect(() => {
     refetch();
@@ -319,7 +338,7 @@ export default function PlayersPage() {
   return (
     <Layout title="Players" page={LayoutPages.players}>
       <>
-        <div>
+        <div className="w-[calc((w-screen)-(w-1/5)) overflow-hidden">
           <div className="flex flex-row-reverse p-4">
             <button
               className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
@@ -339,7 +358,7 @@ export default function PlayersPage() {
             <div className="relative w-1/2 m-2">
               <input
                 type="text"
-                className="block w-full py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
+                className="block py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
                 placeholder="Search"
                 onChange={onSearch}
                 value={searchKey}
@@ -351,153 +370,155 @@ export default function PlayersPage() {
                 </svg>
               </div>
             </div>
-            <div
-              className="border border-gray-30"
+            <div className="flex align-self-right">
+              <div
+                className="border border-gray-30"
 
-              style={{
-                borderRadius: '8px',
-                height: '42px',
-                color: 'grey',
-              }}>
-              <select
-                name="leagueId"
-                id="leagueId"
-                value={leagueId}
-                onChange={(e) => setLeagueId(e.target.value)}
                 style={{
                   borderRadius: '8px',
-                  padding: '8px',
-                }}
-              >
-                <option>Select a Leagues</option>
-                <option>UnAssigned</option>
-                {leaguesQuery.data?.getLeagues?.code === 200 &&
-                  leaguesQuery.data?.getLeagues?.data?.map((league: any) => (
-                    <option key={league?._id} value={league?._id}>
-                      {league?.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            <div
-              className="border border-gray-30"
+                  height: '42px',
+                  color: 'grey',
+                }}>
+                <select
+                  name="leagueId"
+                  id="leagueId"
+                  value={leagueId}
+                  onChange={(e) => setLeagueId(e.target.value)}
+                  style={{
+                    borderRadius: '8px',
+                    padding: '8px',
+                  }}
+                >
+                  <option>Select a Leagues</option>
+                  <option>UnAssigned</option>
+                  {leaguesQuery.data?.getLeagues?.code === 200 &&
+                    leaguesQuery.data?.getLeagues?.data?.map((league: any) => (
+                      <option key={league?._id} value={league?._id}>
+                        {league?.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
+              <div
+                className="border border-gray-30 ml-4"
 
-              style={{
-                borderRadius: '8px',
-                height: '42px',
-                color: 'grey',
-              }}>
-              <select
-                name="teamId"
-                id="teamId"
-                value={teamId}
-                onChange={(e) => setTeamId(e.target.value)}
                 style={{
                   borderRadius: '8px',
-                  padding: '8px',
-                }}
-              >
-                <option>Select a team</option>
-                <option>UnAssigned</option>
-                {teamsQuery?.data?.getTeams?.code === 200 &&
-                  teamsQuery?.data?.getTeams?.data?.map((team: any) => (
-                    <option key={team?._id} value={team?._id}>
-                      {team?.name}
-                    </option>
-                  ))}
-              </select>
+                  height: '42px',
+                  color: 'grey',
+                }}>
+                <select
+                  name="teamId"
+                  id="teamId"
+                  value={teamId}
+                  onChange={(e) => setTeamId(e.target.value)}
+                  style={{
+                    borderRadius: '8px',
+                    padding: '8px',
+                  }}
+                >
+                  <option>Select a team</option>
+                  <option>UnAssigned</option>
+                  {teamsQuery?.data?.getTeams?.code === 200 &&
+                    teamsQuery?.data?.getTeams?.data?.map((team: any) => (
+                      <option key={team?._id} value={team?._id}>
+                        {team?.name}
+                      </option>
+                    ))}
+                </select>
+              </div>
             </div>
           </div>
         </div>
-
-        <table className="app-table w-full">
-          <thead className="w-full">
-            <THR>
-              <>
-                <TH>Name</TH>
-                <TH>Email</TH>
-                <TH>Shirt Number</TH>
-                <TH>Rank</TH>
-                <TH>Team</TH>
-                <TH>League</TH>
-                <TH>Active</TH>
-                <TH>Actions</TH>
-              </>
-            </THR>
-          </thead>
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="droppable">
-              {(provided) => (
-                <tbody className="w-full" ref={provided.innerRef} {...provided.droppableProps}>
-                  {updatedPlayers?.map((player: any, index) => (
-                    <Draggable
-                      key={player._id}
-                      draggableId={player._id}
-                      index={index}
-                      isDragDisabled={selectedIds.includes(teamId)}
-                    >
-                      {(provided, snapshot) => (
-                        <tr
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className={snapshot.isDragging ? 'dragging w-full even:bg-purple-100 hover:bg-purple-200' : 'w-full even:bg-purple-100 hover:bg-purple-200'}
-                        >
-                          <>
-                            <TD>
-                              <>
-                                {player?.firstName}&nbsp;{player?.lastName}
-                              </>
-                            </TD>
-                            <TD>{player?.login?.email}</TD>
-                            <TD>{player?.player?.shirtNumber}</TD>
-                            <TD>{player?.player?.rank}</TD>
-                            <TD>{player?.player?.team?.name}</TD>
-                            <TD>{player?.player?.league?.name}</TD>
-                            <TD>{player?.active ? "Yes" : "No"}</TD>
-                            <TD>
-                              <div className="flex item-center">
-                                <div className="relative">
-                                  <button
-                                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                    onClick={() => toggleMenu(player?._id)}
-                                  >
-                                    <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                                  </button>
-                                  {(isOpenAction === player?._id) && (
-                                    <div className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                                      <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                        <a onClick={() => {
-                                          setUpdatePlayer(player);
-                                          setAddUpdatePlayer(true);
-                                          setIsOpenAction('');
-                                        }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                                        <a onClick={() => {
-                                          onDelete(player, index);
-                                          setIsOpenAction('');
-                                        }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
-                                        <a className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a>
+        <div className="w-[calc((w-screen)-(w-1/5)) overflow-scroll max-h-screen">
+          <table className="app-table w-full">
+            <thead className="w-full sticky top-0 z-20">
+              <THR>
+                <>
+                  <TH>Name</TH>
+                  <TH>Email</TH>
+                  <TH>Shirt Number</TH>
+                  <TH>Rank</TH>
+                  <TH>Team</TH>
+                  <TH>League</TH>
+                  <TH>Active</TH>
+                  <TH>Actions</TH>
+                </>
+              </THR>
+            </thead>
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="droppable">
+                {(provided) => (
+                  <tbody className="w-full" ref={provided.innerRef} {...provided.droppableProps}>
+                    {updatedPlayers?.map((player: any, index) => (
+                      <Draggable
+                        key={player._id}
+                        draggableId={player._id}
+                        index={index}
+                        isDragDisabled={selectedIds.includes(teamId)}
+                      >
+                        {(provided, snapshot) => (
+                          <tr
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={snapshot.isDragging ? 'dragging w-full even:bg-purple-100 hover:bg-purple-200' : 'w-full even:bg-purple-100 hover:bg-purple-200'}
+                          >
+                            <>
+                              <TD>
+                                <>
+                                  {player?.firstName}&nbsp;{player?.lastName}
+                                </>
+                              </TD>
+                              <TD>{player?.login?.email}</TD>
+                              <TD>{player?.player?.shirtNumber}</TD>
+                              <TD>{player?.player?.rank}</TD>
+                              <TD>{player?.player?.team?.name}</TD>
+                              <TD>{player?.player?.league?.name}</TD>
+                              <TD>{player?.active ? "Yes" : "No"}</TD>
+                              <TD>
+                                <div className="flex item-center">
+                                  <div className="relative">
+                                    <button
+                                      className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                      onClick={() => toggleMenu(player?._id)}
+                                    >
+                                      <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                    </button>
+                                    {(isOpenAction === player?._id) && (
+                                      <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                        <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                          <a onClick={() => {
+                                            setUpdatePlayer(player);
+                                            setAddUpdatePlayer(true);
+                                            setIsOpenAction('');
+                                          }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
+                                          <a onClick={() => {
+                                            onDelete(player, index);
+                                            setIsOpenAction('');
+                                          }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
+                                          <a className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a>
+                                        </div>
                                       </div>
-                                    </div>
-                                  )}
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
 
-                            </TD>
-                          </>
-                        </tr>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </tbody>
-              )
-              }
-            </Droppable >
-          </DragDropContext >
+                              </TD>
+                            </>
+                          </tr>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </tbody>
+                )
+                }
+              </Droppable >
+            </DragDropContext >
 
-        </table >
-
+          </table >
+        </div>
         {addUpdatePlayer && (
           <AddUpdatePlayer
             key={uuidv4()}

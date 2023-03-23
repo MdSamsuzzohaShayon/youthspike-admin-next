@@ -69,6 +69,8 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
     props?.coach ? props?.coach?.active + "" : "true"
   );
 
+  const [role, setRole] = useState(props?.coach?.role || 'coach');
+
   const [addUpdateCoach, { data, error, loading }] = useMutation(
     ADD_UPDATE_COACH,
     {
@@ -207,6 +209,24 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
                 </div>
               </div>
             )}
+
+            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+              <label htmlFor="roll" className="font-bold">
+                Roll
+              </label>
+
+              <div>
+                <select
+                  name="role"
+                  id="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                >
+                  <option value="player">Player</option>
+                  <option value="coach">Coach</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           <hr />
