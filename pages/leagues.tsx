@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
 import { gql, useMutation, useQuery } from "@apollo/client";
@@ -27,6 +27,10 @@ const LEAGUES = gql`
 export default function LeaguesPage() {
   const [addUpdateLeague, setAddUpdateLeague] = useState(false);
   const [updateLeague, setUpdateLeague] = useState(null);
+  const [searchKey, setSearchKey] = useState('');
+  const [filteredLeagues, setFilteredLeagues] = useState<any[]>([]);
+  const [allLeaguesData, setAllLeaguesData] = useState<any[]>([]);
+  const [isOpenAction, setIsOpenAction] = useState('');
   const { data, error, loading, refetch } = useQuery(LEAGUES);
   const router = useRouter();
   const onAddUpdateLeague = () => {
@@ -40,10 +44,47 @@ export default function LeaguesPage() {
     refetch();
   }, [router.asPath])
 
+  useEffect(() => {
+    setAllLeaguesData(data?.getLeagues?.data ?? []);
+    console.log(data);
+  }, [data]);
+
   const onAddUpdateLeagueClose = () => {
     setUpdateLeague(null);
     setAddUpdateLeague(false);
   };
+
+
+  const filteredData = (key: string) => {
+    const filteredLeague = allLeaguesData.filter((league: any) => {
+      const leagueName = `${league.name}`.toLocaleLowerCase();
+      return leagueName.includes(key.toLocaleLowerCase());
+    });
+    return filteredLeague;
+  }
+
+  const onKeyPress = (event: any) => {
+    if (event.key === "Enter") {
+      setSearchKey(event.target.value)
+      setFilteredLeagues(filteredData(event.target.value));
+    }
+  }
+
+  const toggleMenu = (teamId: SetStateAction<string>) => {
+    if (isOpenAction?.length > 0) {
+      setIsOpenAction('');
+    } else {
+      setIsOpenAction(teamId);
+    }
+  };
+
+  const getLeaguesForDisplay = () => {
+    if (searchKey !== "") {
+      return filteredLeagues;
+    } else {
+      return allLeaguesData;
+    }
+  }
 
   return (
     <Layout title="Leagues" page={LayoutPages.leagues}>
@@ -55,6 +96,21 @@ export default function LeaguesPage() {
           >
             Add a League
           </button>
+        </div>
+        <div className="flex justify-between items-center">
+          <div className="relative w-1/2 m-2">
+            <input
+              type="text"
+              className="block w-full py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
+              placeholder="Search"
+              onKeyDown={onKeyPress}
+            />
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.873-4.873M14.828 10.897a4.999 4.999 0 1 1-7.072 0 4.999 4.999 0 0 1 7.072 0z"></path>
+              </svg>
+            </div>
+          </div>
         </div>
 
         <table className="app-table w-full">
@@ -72,7 +128,7 @@ export default function LeaguesPage() {
           </thead>
 
           <tbody className="w-full">
-            {data?.getLeagues?.data?.map((league: any) => (
+            {getLeaguesForDisplay().map((league: any) => (
               <TDR key={league?._id}>
                 <>
                   <TD>{league?.name}</TD>
@@ -81,15 +137,29 @@ export default function LeaguesPage() {
                   <TD>{league?.playerLimit}</TD>
                   <TD>{league?.active ? "Yes" : "No"}</TD>
                   <TD>
-                    <button
-                      className="btn btn-sm bg-blue-200 p-2 rounded"
-                      onClick={() => {
-                        setUpdateLeague(league);
-                        setAddUpdateLeague(true);
-                      }}
-                    >
-                      Edit
-                    </button>
+                    <div className="flex item-center">
+                      <div className="relative">
+                        <button
+                          className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          onClick={() => toggleMenu(league?._id)}
+                        >
+                          <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                        </button>
+                        {(isOpenAction === league?._id) && (
+                          <div className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                            <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                              <a onClick={() => {
+                                setUpdateLeague(league);
+                                setAddUpdateLeague(true);
+                                setIsOpenAction('');
+                              }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
+                              <a onClick={() => {
+                              }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </TD>
                 </>
               </TDR>

@@ -61,6 +61,19 @@ const TEAM_DROPDOWN = gql`
     }
   }
 `;
+const LEAGUE_DROPDOWN = gql`
+  query GetLeagues {
+    getLeagues {
+      code
+      success
+      message
+      data {
+        _id
+        name
+      }
+    }
+  }
+`;
 
 const ADD_UPDATE_LEAGUE = gql`
   mutation CreateOrUpdatePlayer(
@@ -94,9 +107,13 @@ const ADD_UPDATE_LEAGUE = gql`
 `;
 
 export default function PlayersPage() {
+
+  const leaguesQuery = useQuery(LEAGUE_DROPDOWN);
   const teamsQuery = useQuery(TEAM_DROPDOWN);
   const [teamId, setTeamId] = useState('');
+  const [leagueId, setLeagueId] = useState('');
   const [searchKey, setSearchKey] = useState('');
+  const [isOpenAction, setIsOpenAction] = useState('');
   const [addUpdatePlayer, setAddUpdatePlayer] = useState(false);
   const [addPlayers, setAddPlayers] = useState(false);
   const [updatePlayer, setUpdatePlayer] = useState(null);
@@ -135,16 +152,20 @@ export default function PlayersPage() {
     if (teamId && (teamId !== 'Select a team')) {
       updatedPlayers = data?.getPlayers?.data?.filter((current: { player: { teamId: string; }; }) => current?.player?.teamId === teamId);
     }
+
     return updatedPlayers;
   }
 
   const getUpdatedPlayers = () => {
     let updatedPlayers = data?.getPlayers?.data;
+
     if (teamId && (teamId !== 'Select a team')) {
       updatedPlayers = data?.getPlayers?.data?.filter((current: { player: { teamId: string; }; }) => current?.player?.teamId === teamId);
     }
+
     updatedPlayers = _.orderBy(updatedPlayers, (item: any) => item.player.rank, ["asc"]);
     setUpdatedPlayers(updatedPlayers)
+
   }
 
   const onAddUpdatePlayer = () => {
@@ -194,6 +215,7 @@ export default function PlayersPage() {
   }
 
   const onDelete = (player: any, index: number) => {
+
     let newPlayers: any[] = [...updatedPlayers];
     const previesIndexPlayer = newPlayers[index];
     // Remove the object at the specified index
@@ -286,6 +308,14 @@ export default function PlayersPage() {
 
   const selectedIds: String[] = ['', 'Select a team', 'UnAssigned'];
 
+  const toggleMenu = (playerId: SetStateAction<string>) => {
+    if (isOpenAction?.length > 0) {
+      setIsOpenAction('');
+    } else {
+      setIsOpenAction(playerId);
+    }
+  };
+
   return (
     <Layout title="Players" page={LayoutPages.players}>
       <>
@@ -320,6 +350,34 @@ export default function PlayersPage() {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.873-4.873M14.828 10.897a4.999 4.999 0 1 1-7.072 0 4.999 4.999 0 0 1 7.072 0z"></path>
                 </svg>
               </div>
+            </div>
+            <div
+              className="border border-gray-30"
+
+              style={{
+                borderRadius: '8px',
+                height: '42px',
+                color: 'grey',
+              }}>
+              <select
+                name="leagueId"
+                id="leagueId"
+                value={leagueId}
+                onChange={(e) => setLeagueId(e.target.value)}
+                style={{
+                  borderRadius: '8px',
+                  padding: '8px',
+                }}
+              >
+                <option>Select a Leagues</option>
+                <option>UnAssigned</option>
+                {leaguesQuery.data?.getLeagues?.code === 200 &&
+                  leaguesQuery.data?.getLeagues?.data?.map((league: any) => (
+                    <option key={league?._id} value={league?._id}>
+                      {league?.name}
+                    </option>
+                  ))}
+              </select>
             </div>
             <div
               className="border border-gray-30"
@@ -399,26 +457,32 @@ export default function PlayersPage() {
                             <TD>{player?.active ? "Yes" : "No"}</TD>
                             <TD>
                               <div className="flex item-center">
-                                <button
-                                  className="btn btn-sm bg-blue-200 p-2 rounded"
-                                  onClick={() => {
-                                    setUpdatePlayer(player);
-                                    setAddUpdatePlayer(true);
-                                  }}
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  className="flex items-center text-red-500 hover:text-red-600 focus:outline-none"
-                                  onClick={() => onDelete(player, index)}
-                                >
-                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24">
-                                    <path fill="none" d="M0 0h24v24H0V0z" />
-                                    <path d="M18 6L6 18M6 6l12 12" />
-                                  </svg>
-                                  <span className="ml-1">Delete</span>
-                                </button>
+                                <div className="relative">
+                                  <button
+                                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    onClick={() => toggleMenu(player?._id)}
+                                  >
+                                    <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                  </button>
+                                  {(isOpenAction === player?._id) && (
+                                    <div className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                      <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                        <a onClick={() => {
+                                          setUpdatePlayer(player);
+                                          setAddUpdatePlayer(true);
+                                          setIsOpenAction('');
+                                        }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
+                                        <a onClick={() => {
+                                          onDelete(player, index);
+                                          setIsOpenAction('');
+                                        }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
+                                        <a className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
+
                             </TD>
                           </>
                         </tr>
@@ -427,11 +491,12 @@ export default function PlayersPage() {
                   ))}
                   {provided.placeholder}
                 </tbody>
-              )}
-            </Droppable>
-          </DragDropContext>
+              )
+              }
+            </Droppable >
+          </DragDropContext >
 
-        </table>
+        </table >
 
         {addUpdatePlayer && (
           <AddUpdatePlayer
@@ -443,14 +508,16 @@ export default function PlayersPage() {
           />
         )}
 
-        {addPlayers && (
-          <AddPlayers
-            onSuccess={onAddUpdatePlayer}
-            onClose={() => setAddPlayers(false)}
-            data={data?.getPlayers?.data}
-          />
-        )}
+        {
+          addPlayers && (
+            <AddPlayers
+              onSuccess={onAddUpdatePlayer}
+              onClose={() => setAddPlayers(false)}
+              data={data?.getPlayers?.data}
+            />
+          )
+        }
       </>
-    </Layout>
+    </Layout >
   );
 }

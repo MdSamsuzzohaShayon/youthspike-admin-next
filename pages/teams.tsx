@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
 import { gql, useMutation, useQuery } from "@apollo/client";
@@ -38,13 +38,24 @@ const TEAMS = gql`
 
 export default function TeamsPage() {
   const [addUpdateTeam, setAddUpdateTeam] = useState(false);
+  const [searchKey, setSearchKey] = useState('');
+  const [isOpenAction, setIsOpenAction] = useState('');
+  const [filteredTeams, setFilteredTeams] = useState<any[]>([]);
+  const [allTeamData, setAllTeamData] = useState<any[]>([]);
   const [updateTeam, setUpdateTeam] = useState<any>(null);
   const { data, error, loading, refetch } = useQuery(TEAMS);
   const router = useRouter();
 
   useEffect(() => {
     refetch();
-  }, [router.asPath])
+  }, [router.asPath]);
+
+
+  useEffect(() => {
+    setAllTeamData(data?.getTeams?.data ?? []);
+  }, [data]);
+
+
   const onAddUpdateTeam = () => {
     setUpdateTeam(null);
     setAddUpdateTeam(false);
@@ -54,6 +65,38 @@ export default function TeamsPage() {
   const onAddUpdateTeamClose = () => {
     setUpdateTeam(null);
     setAddUpdateTeam(false);
+  };
+
+  const filteredData = (key: string) => {
+    const filteredTeam = allTeamData.filter((team: any) => {
+      const teamName = `${team.name}`.toLocaleLowerCase();
+      return teamName.includes(key.toLocaleLowerCase());
+    });
+    return filteredTeam;
+  }
+
+  const onKeyPress = (event: any) => {
+    if (event.key === "Enter") {
+      setSearchKey(event.target.value)
+      setFilteredTeams(filteredData(event.target.value));
+    }
+  }
+
+  const getTeamsForDisplay = () => {
+    if (searchKey !== "") {
+      return filteredTeams;
+    } else {
+      return allTeamData;
+    }
+  }
+
+
+  const toggleMenu = (teamId: SetStateAction<string>) => {
+    if (isOpenAction?.length > 0) {
+      setIsOpenAction('');
+    } else {
+      setIsOpenAction(teamId);
+    }
   };
 
   return (
@@ -66,6 +109,21 @@ export default function TeamsPage() {
           >
             Add a Team
           </button>
+        </div>
+        <div className="flex justify-between items-center">
+          <div className="relative w-1/2 m-2">
+            <input
+              type="text"
+              className="block w-full py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
+              placeholder="Search"
+              onKeyDown={onKeyPress}
+            />
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.873-4.873M14.828 10.897a4.999 4.999 0 1 1-7.072 0 4.999 4.999 0 0 1 7.072 0z"></path>
+              </svg>
+            </div>
+          </div>
         </div>
 
         <table className="app-table w-full">
@@ -82,7 +140,7 @@ export default function TeamsPage() {
           </thead>
 
           <tbody className="w-full">
-            {data?.getTeams?.data?.map((team: any) => (
+            {getTeamsForDisplay().map((team: any) => (
               <TDR key={team?._id}>
                 <>
                   <TD>{team?.name}</TD>
@@ -94,15 +152,29 @@ export default function TeamsPage() {
                   </TD>
                   <TD>{team?.active ? "Yes" : "No"}</TD>
                   <TD>
-                    <button
-                      className="btn btn-sm bg-blue-200 p-2 rounded"
-                      onClick={() => {
-                        setUpdateTeam(team);
-                        setAddUpdateTeam(true);
-                      }}
-                    >
-                      Edit
-                    </button>
+                    <div className="flex item-center">
+                      <div className="relative">
+                        <button
+                          className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          onClick={() => toggleMenu(team?._id)}
+                        >
+                          <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                        </button>
+                        {(isOpenAction === team?._id) && (
+                          <div className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                            <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                              <a onClick={() => {
+                                setUpdateTeam(team);
+                                setAddUpdateTeam(true);
+                                setIsOpenAction('');
+                              }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
+                              <a onClick={() => {
+                              }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </TD>
                 </>
               </TDR>
