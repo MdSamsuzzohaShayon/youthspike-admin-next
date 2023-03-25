@@ -28,6 +28,7 @@ const TEAM_DROPDOWN = gql`
       data {
         _id
         name
+        leagueId
       }
     }
   }
@@ -77,6 +78,7 @@ interface AddUpdatePlayerProps {
   onSuccess?: AddUpdatePlayerOnSuccess;
   onClose?: AddUpdatePlayerOnClose;
   data?: any,
+  addInAnotherLeague?: Boolean;
 }
 
 export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
@@ -88,6 +90,8 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
   const [lastName, setLastName] = useState(props?.player?.lastName || "");
   const [teamId, setTeamId] = useState(props?.player?.player?.teamId || "UnAssigned");
   const [rank, setRank] = useState(props?.player?.player?.rank || 1);
+  const [isCoach, setIsCoach] = useState(false);
+  const [password, setPassword] = useState('');
 
   const [shirtNumber, setShirtNumber] = useState(
     props?.player?.player.shirtNumber || 1
@@ -100,8 +104,6 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
   const [active, setActive] = useState(
     props?.player ? props?.player?.active + "" : "true"
   );
-
-  const [role, setRole] = useState(props?.player?.role || 'player');
 
   const [addUpdatePlayer, { data, error, loading }] = useMutation(
     ADD_UPDATE_LEAGUE,
@@ -152,6 +154,8 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
       console.log(JSON.parse(JSON.stringify(error)));
     }
   }, [data, error]);
+
+  const updatedTeams = teamsQuery?.data?.getTeams?.data?.filter((current: { leagueId: any; }) => (leagueId?.length > 0 ? current?.leagueId === leagueId : true))
 
   return (
     <>
@@ -281,30 +285,12 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
                   onChange={(e) => setTeamId(e.target.value)}
                 >
                   <option>Select a team</option>
-                  {teamsQuery?.data?.getTeams?.code === 200 &&
-                    teamsQuery?.data?.getTeams?.data?.map((team: any) => (
+                  {
+                    updatedTeams?.map((team: any) => (
                       <option key={team?._id} value={team?._id}>
                         {team?.name}
                       </option>
                     ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-              <label htmlFor="roll" className="font-bold">
-                Roll
-              </label>
-
-              <div>
-                <select
-                  name="role"
-                  id="role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                >
-                  <option value="player">Player</option>
-                  <option value="coach">Coach</option>
                 </select>
               </div>
             </div>
@@ -328,14 +314,40 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
                 </div>
               </div>
             )}
+
+            <div className="flex items-center mb-4">
+              <input id="default-checkbox" type="checkbox" checked={isCoach} onChange={() => setIsCoach(!isCoach)} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+              <label htmlFor="default-checkbox" className="ml-2 font-bold text-black ">is Coach</label>
+            </div>
           </div>
 
+          {
+            isCoach && (
+              <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+                <label htmlFor="password" className="font-bold">
+                  Password
+                </label>
+
+                <div>
+                  <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    placeholder="Password"
+                    value={password}
+                    minLength={6}
+                    maxLength={16}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
           <hr />
 
           <div className="my-2">
             {props?.player ? (
               <button
-                className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+                className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
                 type="button"
                 onClick={() => handleAddPlayer()}
               >
@@ -343,7 +355,7 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
               </button>
             ) : (
               <button
-                className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+                className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-22"
                 type="button"
                 onClick={() => handleAddPlayer()}
               >
@@ -351,7 +363,7 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
               </button>
             )}
 
-            <button className="bg-red-100 font-bold rounded p-4 mx-2">
+            <button className="transform hover:bg-red-600 transition duration-300 hover:scale-105 text-white bg-red-500 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center mr-2 mb-2">
               Cancel
             </button>
           </div>

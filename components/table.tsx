@@ -1,18 +1,18 @@
 export function TH(props: { children?: JSX.Element | string }) {
-  return <th className="text-start p-6 bg-purple-300">{props.children}</th>;
+  return <th className="w-full uppercase text-start p-6 bg-gray-100 dark:bg-gray-200 border-gray-300 border border-collapse ">{props.children}</th>;
 }
 
 export function TD(props: { children?: JSX.Element | string }) {
-  return <td className="text-start p-6">{props.children}</td>;
+  return <td className="whitespace-nowrap text-[#6a7a8c] hover:text-[#000000] w-full text-start p-3 border-collapse border-gray-300 border ">{props.children}</td>;
 }
 
 export function THR(props: { children?: JSX.Element | string }) {
-  return <tr className="w-full bg-purple-200">{props.children}</tr>;
+  return <tr className="whitespace-nowrap w-full bg-gray-100 dark:bg-gray-200 border-collapse border-gray-300 border">{props.children}</tr>;
 }
 
 export function TDR(props: { children?: JSX.Element | string }) {
   return (
-    <tr className="w-full even:bg-purple-100 hover:bg-purple-200">
+    <tr className="w-full bg-white odd:bg-gray-50 border-collapse border-gray-300 border hover:bg-gray-100 dark:hover:bg-gray-100">
       {props.children}
     </tr>
   );

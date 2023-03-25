@@ -180,17 +180,9 @@ export default function CoachesPage() {
   return (
     <Layout title="Coaches" page={LayoutPages.coaches}>
       <>
-        <div className="w-[calc((w-screen)-(w-1/5)) overflow-hidden">
-          <div className="flex flex-row-reverse p-4">
-            <button
-              className="bg-blue-500 text-white font-bold rounded p-4"
-              onClick={() => setAddUpdateCoach(true)}
-            >
-              Add a Coach
-            </button>
-          </div>
-          <div className="flex justify-between items-center">
-            <div className="relative w-1/2 m-2">
+        <div className="w-[calc((w-screen)-(w-1/5)) overflow-hidden flex justify-between pb-4 pt-2">
+          <div className="relative w-1/2">
+            <div className="relative m-2">
               <input
                 type="text"
                 className="block w-full py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
@@ -198,15 +190,23 @@ export default function CoachesPage() {
                 onKeyDown={onKeyPress}
               />
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.873-4.873M14.828 10.897a4.999 4.999 0 1 1-7.072 0 4.999 4.999 0 0 1 7.072 0z"></path>
-                </svg>
+                <svg aria-hidden="true" className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
               </div>
             </div>
           </div>
+          <div className="flex pl-4">
+            <button type="button" className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 dark:hover:shadow-black/30 text-white bg-slate-700 dark:divide-gray-700 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-md px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
+              onClick={() => setAddUpdateCoach(true)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="ionicon w-7 h-7 mr-2" viewBox="0 0 512 512"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 176v160M336 256H176" /></svg>
+              Add a Coach
+            </button>
+          </div>
         </div>
 
-        <div className="w-[calc((w-screen)-(w-1/5)) overflow-scroll max-h-screen">
+        <div style={{
+          maxHeight: 'calc(100vh - 200px)'
+        }} className="w-[calc((w-screen)-(w-1/5)) overflow-scroll">
           <table className="app-table w-full">
             <thead className="w-full sticky top-0 z-20">
               <THR>
@@ -221,7 +221,7 @@ export default function CoachesPage() {
               </THR>
             </thead>
 
-            <tbody className="w-full">
+            <tbody className="w-full shadow-lg">
               {(getCoachesForDisplay()).map((coach: any) => (
                 <TDR key={coach?._id}>
                   <>
@@ -235,7 +235,7 @@ export default function CoachesPage() {
                     <TD>{coach?.coach?.team?.league?.name}</TD>
                     <TD>{coach?.active ? "Yes" : "No"}</TD>
                     <TD>
-                      <div className="flex item-center">
+                      <div className="flex item-center justify-center">
                         <div className="relative">
                           <button
                             className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -251,8 +251,8 @@ export default function CoachesPage() {
                                   setAddUpdateCoach(true);
                                   setIsOpenAction('');
                                 }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                                <a onClick={() => {
-                                }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
+                                {/* <a onClick={() => {
+                                }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a> */}
                               </div>
                             </div>
                           )}

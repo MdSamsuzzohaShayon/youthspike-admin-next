@@ -116,7 +116,7 @@ export default function AddPlayers(props: AddPlayersProps) {
 
         <div className="my-2">
           <button
-            className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+            className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
             type="button"
             onClick={() => addPlayers()}
             disabled={!file || !leagueId}
@@ -124,7 +124,7 @@ export default function AddPlayers(props: AddPlayersProps) {
             Add Players
           </button>
 
-          <button className="bg-red-100 font-bold rounded p-4 mx-2">
+          <button className="transform hover:bg-red-600 transition duration-300 hover:scale-105 text-white bg-red-500 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center mr-2 mb-2">
             Cancel
           </button>
         </div>

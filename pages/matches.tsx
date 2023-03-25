@@ -170,17 +170,9 @@ export default function MatchesPage() {
   return (
     <Layout title="Matches" page={LayoutPages.matches}>
       <>
-        <div className="w-[calc((w-screen)-(w-1/5)) overflow-y-hidden">
-          <div className="flex flex-row-reverse p-4">
-            <button
-              className="bg-blue-500 text-white font-bold rounded p-4"
-              onClick={() => setAddUpdateMatch(true)}
-            >
-              Add a Match
-            </button>
-          </div>
-          <div className="flex justify-between items-center">
-            <div className="relative w-1/2 m-2">
+        <div className="w-[calc((w-screen)-(w-1/5)) overflow-y-hidden flex justify-between pb-4 pt-2">
+          <div className="relative w-1/2">
+            <div className="relative m-2">
               <input
                 type="text"
                 className="block w-full py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
@@ -188,15 +180,24 @@ export default function MatchesPage() {
                 onKeyDown={onKeyPress}
               />
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.873-4.873M14.828 10.897a4.999 4.999 0 1 1-7.072 0 4.999 4.999 0 0 1 7.072 0z"></path>
-                </svg>
+                <svg aria-hidden="true" className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
               </div>
             </div>
           </div>
+          <div className="flex pl-4">
+            <button type="button" className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-700 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-md px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
+              onClick={() => setAddUpdateMatch(true)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="ionicon w-7 h-7 mr-2" viewBox="0 0 512 512"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 176v160M336 256H176" /></svg>
+              Add a Match
+            </button>
+          </div>
+
         </div>
 
-        <div className="w-[calc((w-screen)-(w-1/5)) overflow-scroll max-h-screen">
+        <div style={{
+          maxHeight: 'calc(100vh - 200px)'
+        }} className="w-[calc((w-screen)-(w-1/5))] overflow-scroll">
           <table className="app-table w-full">
             <thead className="w-full sticky top-0 z-20">
               <THR>
@@ -210,6 +211,7 @@ export default function MatchesPage() {
                   <TH>Pair Limit</TH>
                   <TH>Net Range</TH>
                   <TH>Active</TH>
+                  <TH>Match Links</TH>
                   <TH>Actions</TH>
                 </>
               </THR>
@@ -229,43 +231,34 @@ export default function MatchesPage() {
                     <TD>{match?.netRange}</TD>
                     <TD>{match?.active ? "Yes" : "No"}</TD>
                     <TD>
-                      <div className="flex item-center">
-                        <div className="relative">
-                          <button
-                            className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            onClick={() => toggleMenu(match?._id)}
-                          >
-                            <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                          </button>
-                          {(isOpenAction === match?._id) && (
-                            <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                              <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                <a onClick={() => {
-                                  setUpdateMatch(match);
-                                  setAddUpdateMatch(true);
-                                  setIsOpenAction('');
-                                }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                                <a><MatchLink
-                                  matchId={match?._id}
-                                  teamId={match?.teamAId}
-                                  title={match?.teamA?.name}
-                                  label="Team A: "
-                                  marginEnable={false}
-                                ></MatchLink></a>
-                                <br />
-                                <a><MatchLink
-                                  matchId={match?._id}
-                                  teamId={match?.teamBId}
-                                  title={match?.teamB?.name}
-                                  label="Team B: "
-                                  marginEnable={true}
-                                ></MatchLink></a>
-                                <a onClick={() => {
-                                }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                      <div><MatchLink
+                        matchId={match?._id}
+                        teamId={match?.teamAId}
+                        title={match?.teamA?.name}
+                        label="Team A: "
+                        marginEnable={false}
+                      ></MatchLink>
+                        <br />
+                        <MatchLink
+                          matchId={match?._id}
+                          teamId={match?.teamBId}
+                          title={match?.teamB?.name}
+                          label="Team B: "
+                          marginEnable={true}
+                        ></MatchLink>
+                      </div>
+                    </TD>
+                    <TD>
+                      <div className="flex justify-center">
+                        <button
+                          className="bg-blue-500 text-white font-bold rounded bg-transparent"
+                          onClick={() => {
+                            setUpdateMatch(match);
+                            setAddUpdateMatch(true);
+                          }}
+                        >
+                          <svg color="red" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" /></svg>
+                        </button>
                       </div>
                     </TD>
                   </>
@@ -275,16 +268,18 @@ export default function MatchesPage() {
           </table>
         </div>
 
-        {addUpdateMatch && (
-          <AddUpdateMatch
-            key={uuidv4()}
-            onSuccess={onAddUpdateMatch}
-            match={updateMatch}
-            onClose={onAddUpdateMatchClose}
-          ></AddUpdateMatch>
-        )}
+        {
+          addUpdateMatch && (
+            <AddUpdateMatch
+              key={uuidv4()}
+              onSuccess={onAddUpdateMatch}
+              match={updateMatch}
+              onClose={onAddUpdateMatchClose}
+            ></AddUpdateMatch>
+          )
+        }
       </>
-    </Layout>
+    </Layout >
   );
 }
 
@@ -670,7 +665,7 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
           <div className="my-2">
             {props?.match ? (
               <button
-                className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+                className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
                 type="button"
                 onClick={() => addOrUpdateMatch()}
               >
@@ -678,7 +673,7 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
               </button>
             ) : (
               <button
-                className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+                className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
                 type="button"
                 onClick={() => addOrUpdateMatch()}
               >
@@ -686,7 +681,7 @@ function AddUpdateMatch(props: AddUpdateMatchProps) {
               </button>
             )}
 
-            <button onClick={() => props?.onClose && props.onClose()} className="bg-red-100 font-bold rounded p-4 mx-2">
+            <button onClick={() => props?.onClose && props.onClose()} className="transform hover:bg-red-600 transition duration-300 hover:scale-105 text-white bg-red-500 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center mr-2 mb-2">
               Cancel
             </button>
           </div>

@@ -123,6 +123,8 @@ export default function PlayersPage() {
   const [rankUpdatePlayerMutation] = useMutation(ADD_UPDATE_LEAGUE);
   const router = useRouter();
   const [refetchAfterRankUpdate, setRefetchAfterRankUpdate] = useState(false);
+  const [addInAnotherLeague, setAddInAnotherLeague] = useState(false);
+
 
   const ref = useRef<HTMLInputElement | null>(null);
 
@@ -346,99 +348,122 @@ export default function PlayersPage() {
   return (
     <Layout title="Players" page={LayoutPages.players}>
       <>
-        <div className="w-[calc((w-screen)-(w-1/5)) overflow-hidden">
-          <div className="flex flex-row-reverse p-4">
-            <button
-              className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+        <div className="w-[calc((w-screen)-(w-1/5)) overflow-hidden flex flex-row-reverse justify-between pb-4 pt-2">
+          <div className="flex flex-row-reverse pl-4">
+            <button type="button" className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-md px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
               onClick={() => setAddPlayers(true)}
             >
+              <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                className="w-6 h-6 mr-2" viewBox="0 0 512.000000 512.000000"
+                preserveAspectRatio="xMidYMid meet">
+                <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                  fill="#ffffff" stroke="none">
+                  <path d="M2478 4905 c-61 -23 -106 -63 -133 -120 l-26 -53 -1 -1311 c0 -721
+-3 -1311 -6 -1310 -4 0 -110 164 -237 365 -126 201 -245 383 -264 405 -49 58
+-103 83 -181 84 -55 0 -74 -5 -120 -31 -97 -54 -145 -164 -117 -269 18 -69
+940 -1522 1004 -1583 61 -57 131 -78 208 -62 101 21 117 41 373 440 128 201
+312 490 410 642 97 153 210 329 249 390 104 162 117 207 88 306 -52 175 -292
+227 -411 90 -16 -19 -135 -201 -264 -405 l-235 -370 -5 1311 c-3 763 -9 1319
+-14 1331 -24 52 -71 107 -112 131 -55 32 -150 41 -206 19z"/>
+                  <path d="M516 3504 c-179 -44 -328 -194 -371 -375 -22 -96 -22 -2442 0 -2538
+44 -183 193 -332 376 -376 56 -13 312 -15 2039 -15 1727 0 1983 2 2039 15 183
+43 333 193 376 376 22 96 22 2442 0 2538 -45 191 -206 344 -400 381 -40 7
+-166 10 -371 8 -309 -3 -311 -3 -346 -27 -128 -88 -113 -269 27 -332 36 -17
+71 -19 335 -19 275 0 297 -1 327 -20 67 -41 63 44 63 -1260 0 -1304 4 -1219
+-63 -1260 -31 -20 -66 -20 -1985 -20 -2158 0 -1991 -5 -2032 63 -19 31 -20 59
+-20 1217 0 1171 0 1185 20 1218 36 59 57 62 382 62 277 0 294 1 336 21 66 32
+97 86 97 169 0 76 -22 119 -83 161 l-35 24 -326 2 c-256 1 -339 -1 -385 -13z"/>
+                </g>
+              </svg>
+
               Import Players
             </button>
 
-            <button
-              className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+            <button type="button" className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-md px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
               onClick={() => setAddUpdatePlayer(true)}
             >
+              <svg xmlns="http://www.w3.org/2000/svg" className="ionicon w-7 h-7 mr-2" viewBox="0 0 512 512"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 176v160M336 256H176" /></svg>
               Add a Player
             </button>
           </div>
-          <div className="flex justify-between items-center">
-            <div className="relative w-1/2 m-2">
-              <input
-                type="text"
-                className="block py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
-                placeholder="Search"
-                onChange={onSearch}
-                value={searchKey}
-                onKeyDown={onKeyPress}
-              />
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.873-4.873M14.828 10.897a4.999 4.999 0 1 1-7.072 0 4.999 4.999 0 0 1 7.072 0z"></path>
-                </svg>
-              </div>
-            </div>
-            <div className="flex align-self-right">
-              <div
-                className="border border-gray-30"
-
-                style={{
-                  borderRadius: '8px',
-                  height: '42px',
-                  color: 'grey',
-                }}>
-                <select
-                  name="leagueId"
-                  id="leagueId"
-                  value={leagueId}
-                  onChange={(e) => setLeagueId(e.target.value)}
-                  style={{
-                    borderRadius: '8px',
-                    padding: '8px',
-                  }}
-                >
-                  <option>Select a league</option>
-                  <option>UnAssigned</option>
-                  {leaguesQuery.data?.getLeagues?.code === 200 &&
-                    leaguesQuery.data?.getLeagues?.data?.map((league: any) => (
-                      <option key={league?._id} value={league?._id}>
-                        {league?.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
-              <div
-                className="border border-gray-30 ml-4"
-
-                style={{
-                  borderRadius: '8px',
-                  height: '42px',
-                  color: 'grey',
-                }}>
-                <select
-                  name="teamId"
-                  id="teamId"
-                  value={teamId}
-                  onChange={(e) => setTeamId(e.target.value)}
-                  style={{
-                    borderRadius: '8px',
-                    padding: '8px',
-                  }}
-                >
-                  <option>Select a team</option>
-                  <option>UnAssigned</option>
-                  {teamsQuery?.data?.getTeams?.code === 200 &&
-                    teamsQuery?.data?.getTeams?.data?.map((team: any) => (
-                      <option key={team?._id} value={team?._id}>
-                        {team?.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
+          <div className="relative w-1/2 m-3">
+            <input
+              type="text"
+              className=" w-full block py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
+              placeholder="Search"
+              onChange={onSearch}
+              value={searchKey}
+              onKeyDown={onKeyPress}
+            />
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg aria-hidden="true" className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
             </div>
           </div>
         </div>
-        <div className="w-[calc((w-screen)-(w-1/5)) overflow-scroll max-h-screen">
+        <div className="flex justify-end items-center mb-4">
+
+          <div className="flex align-self-right">
+            <div
+              className="border border-gray-30"
+
+              style={{
+                borderRadius: '8px',
+                height: '42px',
+                color: 'grey',
+              }}>
+              <select
+                name="leagueId"
+                id="leagueId"
+                value={leagueId}
+                onChange={(e) => setLeagueId(e.target.value)}
+                style={{
+                  borderRadius: '8px',
+                  padding: '8px',
+                }}
+              >
+                <option>Select a league</option>
+                <option>UnAssigned</option>
+                {leaguesQuery.data?.getLeagues?.code === 200 &&
+                  leaguesQuery.data?.getLeagues?.data?.map((league: any) => (
+                    <option key={league?._id} value={league?._id}>
+                      {league?.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div
+              className="border border-gray-30 ml-4"
+
+              style={{
+                borderRadius: '8px',
+                height: '42px',
+                color: 'grey',
+              }}>
+              <select
+                name="teamId"
+                id="teamId"
+                value={teamId}
+                onChange={(e) => setTeamId(e.target.value)}
+                style={{
+                  borderRadius: '8px',
+                  padding: '8px',
+                }}
+              >
+                <option>Select a team</option>
+                <option>UnAssigned</option>
+                {teamsQuery?.data?.getTeams?.code === 200 &&
+                  teamsQuery?.data?.getTeams?.data?.map((team: any) => (
+                    <option key={team?._id} value={team?._id}>
+                      {team?.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div style={{
+          maxHeight: 'calc(100vh - 270px)'
+        }} className="w-[calc((w-screen)-(w-1/5)) overflow-scroll">
           <table className="app-table w-full">
             <thead className="w-full sticky top-0 z-20">
               <THR>
@@ -470,7 +495,7 @@ export default function PlayersPage() {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className={snapshot.isDragging ? 'dragging w-full even:bg-purple-100 hover:bg-purple-200' : 'w-full even:bg-purple-100 hover:bg-purple-200'}
+                            className={snapshot.isDragging ? 'dragging w-full bg-white odd:bg-gray-50 hover:bg-gray-100 dark:hover:bg-gray-100' : 'w-full bg-white odd:bg-gray-50 hover:bg-gray-100 dark:hover:bg-gray-100'}
                           >
                             <>
                               <TD>
@@ -485,7 +510,7 @@ export default function PlayersPage() {
                               <TD>{player?.player?.league?.name}</TD>
                               <TD>{player?.active ? "Yes" : "No"}</TD>
                               <TD>
-                                <div className="flex item-center">
+                                <div className="flex item-center justify-center">
                                   <div className="relative">
                                     <button
                                       className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -505,7 +530,14 @@ export default function PlayersPage() {
                                             onDelete(player, index);
                                             setIsOpenAction('');
                                           }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
-                                          <a className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a>
+                                          <a
+                                            onClick={() => {
+                                              setUpdatePlayer(player);
+                                              setAddUpdatePlayer(true);
+                                              setIsOpenAction('');
+                                              setAddInAnotherLeague(true);
+                                            }}
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a>
                                         </div>
                                       </div>
                                     )}
@@ -534,6 +566,7 @@ export default function PlayersPage() {
             player={updatePlayer}
             onClose={onAddUpdatePlayerClose}
             data={data?.getPlayers?.data}
+            addInAnotherLeague={addInAnotherLeague}
           />
         )}
 

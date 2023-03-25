@@ -1,4 +1,4 @@
-import { gql /* , useQuery */, useMutation } from "@apollo/client";
+import { gql, useQuery, useMutation } from "@apollo/client";
 import { useState, useEffect } from "react";
 import { Modal } from "../model";
 import { toast } from "react-toastify";
@@ -64,6 +64,13 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
   const [password, setPassword] = useState(props?.coach?.login?.password || "");
   const [firstName, setFirstName] = useState(props?.coach?.firstName || "");
   const [lastName, setLastName] = useState(props?.coach?.lastName || "");
+  const [teamId, setTeamId] = useState('');
+  const [rank, setRank] = useState(1);
+  const [isPlayer, setIsPlayer] = useState(false);
+
+  const [shirtNumber, setShirtNumber] = useState(1);
+
+  const [leagueId, setLeagueId] = useState('');
 
   const [active, setActive] = useState(
     props?.coach ? props?.coach?.active + "" : "true"
@@ -211,30 +218,97 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
             )}
 
             <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-              <label htmlFor="roll" className="font-bold">
-                Roll
-              </label>
-
-              <div>
-                <select
-                  name="role"
-                  id="role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                >
-                  <option value="player">Player</option>
-                  <option value="coach">Coach</option>
-                </select>
-              </div>
+              <input id="default-checkbox" type="checkbox" checked={isPlayer} onChange={() => setIsPlayer(!isPlayer)} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+              <label htmlFor="default-checkbox" className="ml-2 font-bold text-black ">is Coach</label>
             </div>
           </div>
+          {
+            isPlayer && (
+              <div className="flex flex-row flex-wrap">
+                <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+                  <label htmlFor="shirtNumber" className="font-bold">
+                    Shirt Number
+                  </label>
 
+                  <div>
+                    <input
+                      type="number"
+                      name="shirtNumber"
+                      id="shirtNumber"
+                      placeholder="Shirt Number"
+                      value={shirtNumber}
+                      min="1"
+                      onChange={(e) => setShirtNumber(Number(e.target.value))}
+                    />
+                  </div>
+                </div>
+
+                <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+                  <label htmlFor="rank" className="font-bold">
+                    Rank
+                  </label>
+
+                  <div>
+                    <input
+                      type="number"
+                      name="rank"
+                      id="rank"
+                      placeholder="Rank"
+                      value={rank}
+                      min="1"
+                      onChange={(e) => setRank(Number(e.target.value))}
+                    />
+                  </div>
+                </div>
+
+                <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+                  <label htmlFor="leagueId" className="font-bold">
+                    League
+                  </label>
+
+                  <div>
+                    <select
+                      name="leagueId"
+                      id="leagueId"
+                      value={leagueId}
+                      onChange={(e) => setLeagueId(e.target.value)}
+                    >
+                      <option>Select a league</option>
+                      {/* {leaguesQuery?.data?.getLeagues?.code === 200 &&
+                    leaguesQuery?.data?.getLeagues?.data?.map((league: any) => (
+                      <option key={league?._id} value={league?._id}>
+                        {league?.name}
+                      </option>
+                    ))} */}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+                  <label htmlFor="teamId" className="font-bold">
+                    Team
+                  </label>
+
+                  <div>
+                    <select
+                      name="teamId"
+                      id="teamId"
+                      value={teamId}
+                      onChange={(e) => setTeamId(e.target.value)}
+                    >
+                      <option>Select a team</option>
+
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
           <hr />
 
           <div className="my-2">
             {props?.coach ? (
               <button
-                className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+                className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
                 type="button"
                 onClick={() => {
                   let isAlreadyAvailable = false;
@@ -261,7 +335,7 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
               </button>
             ) : (
               <button
-                className="bg-blue-500 text-white font-bold rounded p-4 mx-2"
+                className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
                 type="button"
                 onClick={() => {
                   let isAlreadyAvailable = false;
@@ -286,7 +360,7 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
               </button>
             )}
 
-            <button className="bg-red-100 font-bold rounded p-4 mx-2">
+            <button className="transform hover:bg-red-600 transition duration-300 hover:scale-105 text-white bg-red-500 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center mr-2 mb-22">
               Cancel
             </button>
           </div>
