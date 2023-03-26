@@ -40,6 +40,7 @@ const LEAGUES = gql`
 
         login {
           email
+          password
         }
 
         active

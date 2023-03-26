@@ -44,6 +44,8 @@ const ADD_UPDATE_LEAGUE = gql`
     $teamId: String!
     $active: Boolean!
     $email: String
+    $role: String
+    $password: String
     $id: String
   ) {
     createOrUpdatePlayer(
@@ -55,6 +57,8 @@ const ADD_UPDATE_LEAGUE = gql`
       teamId: $teamId
       active: $active
       email: $email
+      role: $role
+      password: $password
       id: $id
     ) {
       code
@@ -90,8 +94,8 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
   const [lastName, setLastName] = useState(props?.player?.lastName || "");
   const [teamId, setTeamId] = useState(props?.player?.player?.teamId || "UnAssigned");
   const [rank, setRank] = useState(props?.player?.player?.rank || 1);
-  const [isCoach, setIsCoach] = useState(false);
-  const [password, setPassword] = useState('');
+  const [isCoach, setIsCoach] = useState(props?.player?.role === 'playerAndCoach');
+  const [password, setPassword] = useState(props?.player?.login?.email || '');
 
   const [shirtNumber, setShirtNumber] = useState(
     props?.player?.player.shirtNumber || 1
@@ -117,6 +121,8 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
         teamId: teamId === 'Select a team' ? 'UnAssigned' : teamId,
         active: active === "true" ? true : false,
         email,
+        role: isCoach ? 'playerAndCoach' : 'player',
+        password,
         id: props?.player?._id,
       },
     }

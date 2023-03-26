@@ -23,6 +23,22 @@ const COACHES = gql`
           password
         }
         active
+        player {
+          shirtNumber
+          rank
+          teamId
+          leagueId
+
+          league {
+            _id
+            name
+          }
+
+          team {
+            _id
+            name
+          }
+        }
         coach {
           team {
             name

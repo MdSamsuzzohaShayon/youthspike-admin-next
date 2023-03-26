@@ -14,6 +14,21 @@ const TEAM_DROPDOWN = gql`
       data {
         _id
         name
+        leagueId
+      }
+    }
+  }
+`;
+
+const LEAGUE_DROPDOWN = gql`
+  query GetLeagues {
+    getLeagues {
+      code
+      success
+      message
+      data {
+        _id
+        name
       }
     }
   }
@@ -25,6 +40,11 @@ const ADD_UPDATE_COACH = gql`
     $lastName: String!
     $email: String!
     $password: String!
+    $shirtNumber: Int
+    $rank: Int
+    $leagueId: String
+    $teamId: String
+    $role: String
     $id: String
   ) {
     signupCoach(
@@ -32,6 +52,11 @@ const ADD_UPDATE_COACH = gql`
       lastName: $lastName
       email: $email
       password: $password
+      shirtNumber: $shirtNumber
+      rank: $rank
+      leagueId: $leagueId
+      teamId: $teamId
+      role: $role
       id: $id
     ) {
       code
@@ -58,25 +83,24 @@ interface AddUpdateCoachProps {
 }
 
 export default function AddUpdateCoach(props: AddUpdateCoachProps) {
-  // const teamsQuery = useQuery(TEAM_DROPDOWN);
+  const teamsQuery = useQuery(TEAM_DROPDOWN);
+  const leaguesQuery = useQuery(LEAGUE_DROPDOWN);
 
   const [email, setEmail] = useState(props?.coach?.login?.email || "");
   const [password, setPassword] = useState(props?.coach?.login?.password || "");
   const [firstName, setFirstName] = useState(props?.coach?.firstName || "");
   const [lastName, setLastName] = useState(props?.coach?.lastName || "");
-  const [teamId, setTeamId] = useState('');
-  const [rank, setRank] = useState(1);
-  const [isPlayer, setIsPlayer] = useState(false);
+  const [teamId, setTeamId] = useState(props?.coach?.player?.teamId || '');
+  const [rank, setRank] = useState(props?.coach?.player?.rank || 1);
+  const [isPlayer, setIsPlayer] = useState(props?.coach?.role === 'playerAndCoach');
 
-  const [shirtNumber, setShirtNumber] = useState(1);
+  const [shirtNumber, setShirtNumber] = useState(props?.coach?.player?.rank || 1);
 
-  const [leagueId, setLeagueId] = useState('');
+  const [leagueId, setLeagueId] = useState(props?.coach?.player?.leagueId);
 
   const [active, setActive] = useState(
     props?.coach ? props?.coach?.active + "" : "true"
   );
-
-  const [role, setRole] = useState(props?.coach?.role || 'coach');
 
   const [addUpdateCoach, { data, error, loading }] = useMutation(
     ADD_UPDATE_COACH,
@@ -86,6 +110,11 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
         lastName,
         email,
         password,
+        shirtNumber,
+        leagueId,
+        teamId,
+        rank,
+        role: isPlayer ? 'playerAndCoach' : 'coach',
         id: props?.coach?._id,
       },
     }
@@ -98,7 +127,7 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
       console.log(JSON.parse(JSON.stringify(error)));
     }
   }, [props, data, error]);
-
+  const updatedTeams = teamsQuery?.data?.getTeams?.data?.filter((current: { leagueId: any; }) => (leagueId?.length > 0 && current?.leagueId === leagueId))
   return (
     <>
       <Modal showModal={true} onClose={() => props.onClose && props.onClose()}>
@@ -174,29 +203,6 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
               </div>
             </div>
 
-            {/* <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-            <label htmlFor="teamId" className="font-bold">
-              Team
-            </label>
-
-            <div>
-              <select
-                name="teamId"
-                id="teamId"
-                value={teamId}
-                onChange={(e) => setTeamId(e.target.value)}
-              >
-                <option>Select a team</option>
-                {teamsQuery?.data?.getTeams?.code === 200 &&
-                  teamsQuery?.data?.getTeams?.data?.map((team: any) => (
-                    <option key={team?._id} value={team?._id}>
-                      {team?.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-          </div> */}
-
             {props?.coach && (
               <div className="w-full md:w-1/2 lg:w-1/3 my-2">
                 <label htmlFor="active" className="font-bold">
@@ -219,7 +225,7 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
 
             <div className="w-full md:w-1/2 lg:w-1/3 my-2">
               <input id="default-checkbox" type="checkbox" checked={isPlayer} onChange={() => setIsPlayer(!isPlayer)} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-              <label htmlFor="default-checkbox" className="ml-2 font-bold text-black ">is Coach</label>
+              <label htmlFor="default-checkbox" className="ml-2 font-bold text-black ">is Player</label>
             </div>
           </div>
           {
@@ -274,12 +280,12 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
                       onChange={(e) => setLeagueId(e.target.value)}
                     >
                       <option>Select a league</option>
-                      {/* {leaguesQuery?.data?.getLeagues?.code === 200 &&
-                    leaguesQuery?.data?.getLeagues?.data?.map((league: any) => (
-                      <option key={league?._id} value={league?._id}>
-                        {league?.name}
-                      </option>
-                    ))} */}
+                      {leaguesQuery?.data?.getLeagues?.code === 200 &&
+                        leaguesQuery?.data?.getLeagues?.data?.map((league: any) => (
+                          <option key={league?._id} value={league?._id}>
+                            {league?.name}
+                          </option>
+                        ))}
                     </select>
                   </div>
                 </div>
@@ -297,7 +303,12 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
                       onChange={(e) => setTeamId(e.target.value)}
                     >
                       <option>Select a team</option>
-
+                      {
+                        updatedTeams?.map((team: any) => (
+                          <option key={team?._id} value={team?._id}>
+                            {team?.name}
+                          </option>
+                        ))}
                     </select>
                   </div>
                 </div>
