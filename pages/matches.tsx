@@ -93,6 +93,25 @@ const MATCHES = gql`
   }
 `;
 
+const TEAMS = gql`
+  query GetTeams(
+    $userId: String
+  ) {
+    getTeams(
+      userId: $userId
+    ) {
+      code
+      success
+      data {
+        _id
+        name
+        coachId
+        leagueId
+      }
+    }
+  }
+`;
+
 export default function MatchesPage() {
   const [addUpdateMatch, setAddUpdateMatch] = useState(false);
   const [updateMatch, setUpdateMatch] = useState<any>(null);
@@ -112,9 +131,14 @@ export default function MatchesPage() {
     }
   );
 
+  const [getTeamsData, { data: teamsData }] = useLazyQuery(TEAMS,
+    {
+      variables: { userId: userRole !== 'admin' && userRole !== 'player' ? userID : null },
+    }
+  );
+
   const getDatafromLocalStorage = async () => {
     const localStorageData = await LoginService.getUser();
-    console.log({ localStorageData })
     setUserRole(localStorageData?.role);
     setUserData(localStorageData?._id);
   }
@@ -124,8 +148,8 @@ export default function MatchesPage() {
   }, []);
 
   useEffect(() => {
-    console.log({ userID })
-    getMatchesData()
+    getTeamsData();
+    getMatchesData();
   }, [userID]);
 
   const ref = useRef<HTMLInputElement | null>(null);
@@ -189,13 +213,6 @@ export default function MatchesPage() {
     }
   }
 
-  const toggleMenu = (teamId: SetStateAction<string>) => {
-    if (isOpenAction?.length > 0) {
-      setIsOpenAction('');
-    } else {
-      setIsOpenAction(teamId);
-    }
-  };
 
   return (
     <Layout title="Matches" page={LayoutPages.matches}>
@@ -264,21 +281,26 @@ export default function MatchesPage() {
                     <TD>{match?.netRange}</TD>
                     <TD>{match?.active ? "Yes" : "No"}</TD>
                     <TD>
-                      <div><MatchLink
-                        matchId={match?._id}
-                        teamId={match?.teamAId}
-                        title={match?.teamA?.name}
-                        label="Team A: "
-                        marginEnable={false}
-                      ></MatchLink>
+                      <div>
+                        {teamsData?.getTeams?.data?.find((current: {
+                          leagueId: any; _id: any;
+                        }) => current?._id === match?.teamAId && current?.leagueId === match?.leagueId) && (<MatchLink
+                          matchId={match?._id}
+                          teamId={match?.teamAId}
+                          title={match?.teamA?.name}
+                          label="Team A: "
+                          marginEnable={false}
+                        ></MatchLink>)}
                         <br />
-                        <MatchLink
+                        {teamsData?.getTeams?.data?.find((current: {
+                          leagueId: any; _id: any;
+                        }) => current?._id === match?.teamBId && current?.leagueId === match?.leagueId) && (<MatchLink
                           matchId={match?._id}
                           teamId={match?.teamBId}
                           title={match?.teamB?.name}
                           label="Team B: "
                           marginEnable={true}
-                        ></MatchLink>
+                        ></MatchLink>)}
                       </div>
                     </TD>
                     <TD>
@@ -327,21 +349,6 @@ const LEAGUES = gql`
         name
         startDate
         endDate
-      }
-    }
-  }
-`;
-
-const TEAMS = gql`
-  query GetTeams {
-    getTeams {
-      code
-      success
-      data {
-        _id
-        name
-        coachId
-        leagueId
       }
     }
   }
