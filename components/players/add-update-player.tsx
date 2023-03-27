@@ -83,6 +83,7 @@ interface AddUpdatePlayerProps {
   onClose?: AddUpdatePlayerOnClose;
   data?: any,
   addInAnotherLeague?: Boolean;
+  userRole?: any,
 }
 
 export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
@@ -161,7 +162,7 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
     }
   }, [data, error]);
 
-  const updatedTeams = teamsQuery?.data?.getTeams?.data?.filter((current: { leagueId: any; }) => (leagueId?.length > 0 ? current?.leagueId === leagueId : true))
+  const updatedTeams = teamsQuery?.data?.getTeams?.data?.filter((current: { leagueId: any; }) => (current?.leagueId === leagueId))
 
   return (
     <>
@@ -321,33 +322,35 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
               </div>
             )}
 
-            <div className="flex items-center mb-4">
-              <input id="default-checkbox" type="checkbox" checked={isCoach} onChange={() => setIsCoach(!isCoach)} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-              <label htmlFor="default-checkbox" className="ml-2 font-bold text-black ">is Coach</label>
-            </div>
+            {
+              props.userRole === 'admin' && (<div className="fw-full md:w-1/2 lg:w-1/3 my-2">
+                <input id="default-checkbox" type="checkbox" checked={isCoach} onChange={() => setIsCoach(!isCoach)} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                <label htmlFor="default-checkbox" className="ml-2 font-bold text-black ">is Coach</label>
+              </div>)
+            }
+            {
+              isCoach && (
+                <div className="w-full md:w-1/2 lg:w-1/3 my-2">
+                  <label htmlFor="password" className="font-bold">
+                    Password
+                  </label>
+
+                  <div>
+                    <input
+                      type="password"
+                      name="password"
+                      id="password"
+                      placeholder="Password"
+                      value={password}
+                      minLength={6}
+                      maxLength={16}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
           </div>
 
-          {
-            isCoach && (
-              <div className="w-full md:w-1/2 lg:w-1/3 my-2">
-                <label htmlFor="password" className="font-bold">
-                  Password
-                </label>
-
-                <div>
-                  <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    placeholder="Password"
-                    value={password}
-                    minLength={6}
-                    maxLength={16}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-              </div>
-            )}
           <hr />
 
           <div className="my-2">

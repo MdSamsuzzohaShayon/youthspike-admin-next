@@ -88,39 +88,41 @@ export default function LoginPage() {
           left: 0,
         }}
       >
-        <div className="container w-full md:w-1/3 border rounded my-6 mx-auto p-4">
-          <h1 className="text-3xl text-center font-bold p-2">Login</h1>
-          <div className="p-1 w-full">
-            <input
-              type="email"
-              name="email"
-              id="email"
-              placeholder="Email Address"
-              className="w-full p-2 border rounded"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+        <div className="flex flex-col h-screen justify-center items-center">
+          <div className="w-1/3 border rounded p-4 shadow-xl bg-[#F6F8FA]">
+            <h1 className="text-3xl text-center font-bold p-2">Login</h1>
+            <div className="p-4 w-full">
+              <input
+                type="email"
+                name="email"
+                id="email"
+                placeholder="Email Address"
+                className="w-full p-2 border rounded"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
 
-          <div className="p-1 w-full">
-            <input
-              type="password"
-              name="email"
-              id="email"
-              placeholder="Password"
-              className="w-full p-2 border rounded"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+            <div className="px-4 py-2 w-full">
+              <input
+                type="password"
+                name="email"
+                id="email"
+                placeholder="Password"
+                className="w-full p-2 border rounded"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
 
-          <div className="p-1">
-            <button
-              className="rounded p-2 bg-blue-900 text-white"
-              onClick={() => loginFunction()}
-            >
-              Login
-            </button>
+            <div className=" p-1 text-center">
+              <button
+                className="w-1/3 rounded p-2 bg-[#1d4ed8] hover:bg-[#1e40af] focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 text-white mt-4 font-bold transform transition duration-300 hover:scale-110"
+                onClick={() => loginFunction()}
+              >
+                Login
+              </button>
+            </div>
           </div>
         </div>
       </main>

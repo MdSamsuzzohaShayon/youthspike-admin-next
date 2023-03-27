@@ -134,7 +134,7 @@ export default function PlayersPage() {
 
   const [userID, setUserData] = useState('');
 
-  const [getPlayersData, { data, error, loading }] = useLazyQuery(PLAYERS,
+  const [getPlayersData, { data, error, loading, refetch }] = useLazyQuery(PLAYERS,
     {
       variables: { userId: userRole !== 'admin' && userRole !== 'player' ? userID : null },
     }
@@ -175,12 +175,12 @@ export default function PlayersPage() {
   }, [isOpenAction])
 
   useEffect(() => {
-    getPlayersData();
+    refetch();
   }, [router.asPath])
 
   useEffect(() => {
     if (refetchAfterRankUpdate) {
-      getPlayersData();
+      refetch();
       setRefetchAfterRankUpdate(false);
     }
   }, [refetchAfterRankUpdate])
@@ -189,11 +189,12 @@ export default function PlayersPage() {
     if (data?.getPlayers?.data) {
       getUpdatedPlayers();
     }
-  }, [data, teamId, getPlayersData, leagueId])
+
+  }, [data, teamId, getPlayersData, refetch, leagueId])
 
   useEffect(() => {
     if (updatedData?.createOrUpdatePlayer?.code === 200) {
-      getPlayersData();
+      refetch();
     }
   }, [updatedData])
 
@@ -212,7 +213,6 @@ export default function PlayersPage() {
 
   const getUpdatedPlayers = () => {
     let updatedPlayers = data?.getPlayers?.data;
-    console.log({ teamId, leagueId })
     if (teamId && (teamId !== 'Select a team' && teamId?.length > 0)) {
       updatedPlayers = data?.getPlayers?.data?.filter((current: { player: { teamId: string; leagueId: string; }; }) => current?.player?.teamId === teamId && ((leagueId === 'Select a league' || leagueId?.length === 0) ? true : current?.player?.leagueId === leagueId));
     } else {
@@ -230,7 +230,8 @@ export default function PlayersPage() {
     setUpdatePlayer(null);
     setAddUpdatePlayer(false);
     setAddPlayers(false);
-    getPlayersData()
+    setAddInAnotherLeague(false);
+    refetch()
   };
 
   const onAddUpdatePlayerClose = () => {
@@ -374,6 +375,8 @@ export default function PlayersPage() {
     }
   };
 
+  const displayPlayers = updatedPlayers?.filter(current => router?.query?.teamId ? current?.player?.teamId === router?.query?.teamId?.toString() : true);
+
   return (
     <Layout title="Players" page={LayoutPages.players}>
       <>
@@ -512,7 +515,7 @@ export default function PlayersPage() {
               <Droppable droppableId="droppable">
                 {(provided) => (
                   <tbody className="w-full" ref={provided.innerRef} {...provided.droppableProps}>
-                    {updatedPlayers?.map((player: any, index) => (
+                    {displayPlayers?.map((player: any, index) => (
                       <Draggable
                         key={player._id}
                         draggableId={player._id}
@@ -596,6 +599,7 @@ export default function PlayersPage() {
             onClose={onAddUpdatePlayerClose}
             data={data?.getPlayers?.data}
             addInAnotherLeague={addInAnotherLeague}
+            userRole={userRole}
           />
         )}
 

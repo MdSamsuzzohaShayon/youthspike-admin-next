@@ -267,8 +267,6 @@ export default function CoachesPage() {
                                   setAddUpdateCoach(true);
                                   setIsOpenAction('');
                                 }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                                {/* <a onClick={() => {
-                                }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a> */}
                               </div>
                             </div>
                           )}

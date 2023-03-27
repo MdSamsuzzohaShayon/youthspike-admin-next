@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState, useRef, use } from "react";
 import { UserContext } from "@/config/auth";
 import Link from "next/link";
 import { LoginService } from "@/utils/login";
@@ -21,6 +21,28 @@ export interface LayoutProps {
 export default function Layout(props: LayoutProps) {
   let user: any = useContext(UserContext);
 
+
+  const [isOpenAction, setIsOpenAction] = useState(false);
+  const ref = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const checkIfClickedOutside = (e: { target: any; }) => {
+      // If the menu is open and the clicked target is not within the menu,
+      // then close the menu
+      if (isOpenAction === true && ref.current && !ref.current.contains(e.target)) {
+        setIsOpenAction(false)
+      }
+    }
+
+    document.addEventListener("mousedown", checkIfClickedOutside)
+
+    return () => {
+      // Cleanup the event listener
+      document.removeEventListener("mousedown", checkIfClickedOutside)
+    }
+  }, [isOpenAction])
+
+
   useEffect(() => {
     try {
       user = LoginService.getUser();
@@ -40,8 +62,12 @@ export default function Layout(props: LayoutProps) {
     LoginService.deleteUser();
     window.location.href = "/login";
   }
-  console.log({ props })
-  console.log(props?.page == LayoutPages.leagues)
+
+  const handleOpen = () => {
+    setIsOpenAction(true);
+  }
+
+
   return (
     <>
       <Head>
@@ -68,37 +94,31 @@ export default function Layout(props: LayoutProps) {
             Spikeball Admin
           </h1>
 
-          <div className="flex align-right items-center p-4">
-            {user && (
-              <div>
-                <b>
-                  {user?.firstName}&nbsp;{user?.lastName}
-                </b>
+          <div className="flex align-right items-center">
+            <button onClick={handleOpen}>
+              <svg enable-background="new 0 0 64 64" className="h-9 w-9" version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><g id="Layer_1"><g><circle cx="32" cy="32" fill="#4F5D73" r="32" /></g><g opacity="0.2"><g><path d="M43.905,47.543c-3.821-1.66-5.217-4.242-5.643-6.469c2.752-2.215,4.943-5.756,6.148-9.573     c1.239-1.579,1.96-3.226,1.96-4.62c0-0.955-0.347-1.646-0.955-2.158c-0.203-8.106-5.942-14.613-13.039-14.714     C32.322,10.009,32.268,10,32.213,10c-0.022,0-0.043,0.004-0.065,0.004c-7.052,0.039-12.783,6.41-13.125,14.409     c-0.884,0.528-1.394,1.305-1.394,2.469c0,1.641,0.992,3.63,2.663,5.448c1.187,3.327,3.118,6.38,5.5,8.438     c-0.354,2.292-1.699,5.039-5.697,6.776c-2.159,0.938-6.105,1.781-7.808,2.649c4.362,4.769,12.624,7.769,19.589,7.805l0.099,0.003     C31.983,57.999,31.992,58,32,58c7.014,0,15.325-3.01,19.713-7.808C50.01,49.324,46.063,48.481,43.905,47.543z" fill="#231F20" /></g></g><g><g><path d="M43.905,45.543c-3.821-1.66-5.217-4.242-5.643-6.469c2.752-2.215,4.943-5.756,6.148-9.573     c1.239-1.579,1.96-3.226,1.96-4.62c0-0.955-0.347-1.646-0.955-2.158C45.213,14.618,39.474,8.11,32.378,8.01     C32.322,8.009,32.268,8,32.213,8c-0.022,0-0.043,0.004-0.065,0.004c-7.052,0.039-12.783,6.41-13.125,14.409     c-0.884,0.528-1.394,1.305-1.394,2.469c0,1.641,0.992,3.63,2.663,5.448c1.187,3.327,3.118,6.38,5.5,8.438     c-0.354,2.292-1.699,5.039-5.697,6.776c-2.159,0.938-6.105,1.781-7.808,2.649c4.362,4.769,12.624,7.769,19.589,7.805l0.099,0.003     C31.983,55.999,31.992,56,32,56c7.014,0,15.325-3.01,19.713-7.808C50.01,47.324,46.063,46.481,43.905,45.543z" fill="#FFFFFF" /></g></g></g><g id="Layer_2" /></svg>
+            </button>
+            {(isOpenAction) && (
+              <div ref={ref} className="z-20 absolute right-5 top-[50px] mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                <div className="py-1 h-[120px]" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                  <div className="block h-[60px] items-center flex px-4 py-2 text-md bg-slate-200 text-gray-700 " role="menuitem">
+                    {user && (
+                      <div>
+                        <b>
+                          <span className="capitalize">{user?.role}:</span>&nbsp;{user?.firstName}&nbsp;{user?.lastName}
+                        </b>
+                      </div>
+                    )}
+                  </div>
+                  <a onClick={() => {
+                    logout()
+                  }} className="block h-[60px] px-4 py-2 items-center flex text-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">
+
+                    <svg className="svg-icon mr-2" style={{ width: '20px', height: '20px', verticalAlign: 'middle', fill: 'red', overflow: 'hidden', }} viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M768 106V184c97.2 76 160 194.8 160 328 0 229.6-186.4 416-416 416S96 741.6 96 512c0-133.2 62.8-251.6 160-328V106C121.6 190.8 32 341.2 32 512c0 265.2 214.8 480 480 480s480-214.8 480-480c0-170.8-89.6-321.2-224-406z" fill="" /><path d="M512 32c-17.6 0-32 14.4-32 32v448c0 17.6 14.4 32 32 32s32-14.4 32-32V64c0-17.6-14.4-32-32-32z" fill="" /></svg>
+                    Logout</a>
+                </div>
               </div>
             )}
-            <button onClick={logout}>
-              <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                className="w-10 h-10 ml-4" viewBox="0 0 512.000000 512.000000"
-                preserveAspectRatio="xMidYMid meet">
-                <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-                  fill="red" stroke="none">
-                  <path d="M2415 5114 c-902 -60 -1692 -566 -2113 -1354 -282 -527 -368 -1166
--236 -1760 214 -961 973 -1720 1934 -1934 365 -81 755 -81 1120 0 879 196
-1596 850 1873 1710 138 427 159 902 61 1344 -214 961 -973 1720 -1934 1934
--209 46 -516 72 -705 60z m260 -998 c52 -24 101 -72 132 -129 17 -29 18 -72
-18 -512 0 -473 0 -481 -22 -520 -46 -87 -153 -155 -243 -155 -90 0 -197 68
--243 155 -22 39 -22 47 -22 520 0 440 1 483 18 512 54 100 140 153 247 153 47
-0 79 -7 115 -24z m944 -505 c48 -25 89 -66 156 -156 144 -193 243 -432 281
--680 23 -148 14 -404 -19 -545 -146 -615 -622 -1064 -1237 -1167 -124 -20
--356 -20 -480 0 -542 91 -994 464 -1180 975 -57 157 -81 281 -87 457 -6 181 4
-288 44 440 77 295 271 612 412 673 56 24 157 21 213 -7 101 -48 166 -162 155
--268 -7 -64 -26 -105 -93 -193 -280 -371 -252 -899 66 -1243 114 -125 269
--219 447 -274 81 -25 101 -27 263 -27 162 0 182 2 263 27 414 127 685 470 704
-892 11 235 -56 447 -202 640 -80 107 -90 129 -90 215 0 87 20 132 83 194 77
-74 207 94 301 47z"/>
-                </g>
-              </svg>
-            </button>
           </div>
         </div>
 

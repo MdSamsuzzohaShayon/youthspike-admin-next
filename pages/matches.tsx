@@ -106,7 +106,7 @@ export default function MatchesPage() {
   const [userRole, setUserRole] = useState('');
 
 
-  const [getMatchesData, { data, error, loading }] = useLazyQuery(MATCHES,
+  const [getMatchesData, { data, error, loading, refetch }] = useLazyQuery(MATCHES,
     {
       variables: { userId: userRole !== 'admin' && userRole !== 'player' ? userID : null },
     }
@@ -146,7 +146,7 @@ export default function MatchesPage() {
   }, [isOpenAction])
 
   useEffect(() => {
-    getMatchesData();
+    refetch();
   }, [router.asPath])
 
   useEffect(() => {
@@ -156,7 +156,7 @@ export default function MatchesPage() {
   const onAddUpdateMatch = () => {
     setUpdateMatch(null);
     setAddUpdateMatch(false);
-    getMatchesData();
+    refetch();
   };
 
   const onAddUpdateMatchClose = () => {
@@ -212,14 +212,17 @@ export default function MatchesPage() {
               </div>
             </div>
           </div>
-          <div className="flex pl-4">
-            <button type="button" className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-700 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-md px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
-              onClick={() => setAddUpdateMatch(true)}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="ionicon w-7 h-7 mr-2" viewBox="0 0 512 512"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 176v160M336 256H176" /></svg>
-              Add a Match
-            </button>
-          </div>
+          {
+            userRole == 'admin' && (<div className="flex pl-4">
+              <button type="button" className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-700 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-md px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
+                onClick={() => setAddUpdateMatch(true)}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="ionicon w-7 h-7 mr-2" viewBox="0 0 512 512"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 176v160M336 256H176" /></svg>
+                Add a Match
+              </button>
+            </div>)
+          }
+
 
         </div>
 
@@ -285,7 +288,7 @@ export default function MatchesPage() {
                             setAddUpdateMatch(true);
                           }}
                         >
-                          <svg color="red" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" /></svg>
+                          <svg color="green" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" /></svg>
                         </button>
                       </div>
                     </TD>
