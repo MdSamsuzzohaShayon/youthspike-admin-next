@@ -1,14 +1,19 @@
-import { SetStateAction, useEffect, useRef, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState, } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation, useLazyQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
 import { format } from "date-fns";
 import { useRouter } from "next/router";
+import { LoginService } from "@/utils/login";
 
 const LEAGUES = gql`
-  query GetLeagues {
-    getLeagues {
+  query GetLeagues(
+    $userId: String
+  ) {
+    getLeagues(
+      userId: $userId
+    ) {
       code
       success
       message
@@ -31,12 +36,35 @@ export default function LeaguesPage() {
   const [filteredLeagues, setFilteredLeagues] = useState<any[]>([]);
   const [allLeaguesData, setAllLeaguesData] = useState<any[]>([]);
   const [isOpenAction, setIsOpenAction] = useState('');
-  const { data, error, loading, refetch } = useQuery(LEAGUES);
+  const [userID, setUserData] = useState('');
+  const [userRole, setUserRole] = useState('');
+
+
+  const [getLeaguesData, { data, error, loading }] = useLazyQuery(LEAGUES,
+    {
+      variables: { userId: userRole !== 'admin' && userRole !== 'player' ? userID : null },
+    }
+  );
+
+  const getDatafromLocalStorage = async () => {
+    const localStorageData = await LoginService.getUser();
+    setUserRole(localStorageData?.role);
+    setUserData(localStorageData?._id);
+  }
+
+  useEffect(() => {
+    getDatafromLocalStorage();
+  }, []);
+
+  useEffect(() => {
+    getLeaguesData()
+  }, [userID]);
+
   const router = useRouter();
   const onAddUpdateLeague = () => {
     setUpdateLeague(null);
     setAddUpdateLeague(false);
-    refetch();
+    getLeaguesData();
   };
 
   const ref = useRef<HTMLInputElement | null>(null);
@@ -58,7 +86,7 @@ export default function LeaguesPage() {
     }
   }, [isOpenAction])
   useEffect(() => {
-    refetch();
+    getLeaguesData();
   }, [router.asPath])
 
   useEffect(() => {

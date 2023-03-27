@@ -36,6 +36,11 @@ export default function Layout(props: LayoutProps) {
     }
   });
 
+  const logout = () => {
+    LoginService.deleteToken();
+    LoginService.deleteUser();
+    window.location.href = "/login";
+  }
 
   return (
     <>
@@ -67,12 +72,11 @@ export default function Layout(props: LayoutProps) {
             {user && (
               <div>
                 <b>
-                  Admin
-                  {/* {user?.firstName}&nbsp;{user?.lastName} */}
+                  {user?.firstName}&nbsp;{user?.lastName}
                 </b>
               </div>
             )}
-            <button>
+            <button onClick={logout}>
               <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
                 className="w-10 h-10 ml-4" viewBox="0 0 512.000000 512.000000"
                 preserveAspectRatio="xMidYMid meet">
@@ -278,7 +282,7 @@ m-3019 -210 c133 -89 297 -175 460 -242 l115 -46 3 -77 c2 -42 0 -76 -3 -76
                 </button>
               </Link>
 
-              <Link href="/coaches">
+              {user?.role === 'admin' && (<Link href="/coaches">
                 <button
                   className={`text-l flex items-center text-left px-4 py-4 bg-slate-700 hover:bg-slate-800 active:bg-slate-800 dark:hover:bg-slate-800 text-white w-full font-medium ${props?.page == LayoutPages.coaches ? "bg-blue-700" : ""
                     }`}
@@ -318,7 +322,7 @@ l-20 -24 -140 126 c-186 167 -178 158 -133 139 80 -33 167 -6 214 65 l26 39
                   </svg>
                   Coaches
                 </button>
-              </Link>
+              </Link>)}
 
               <Link href="/players">
                 <button

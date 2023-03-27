@@ -1,7 +1,7 @@
 import { SetStateAction, useEffect, useRef, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
 import { format } from "date-fns";
 import { MatchLink } from "@/components/matches/link";
@@ -11,10 +11,15 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useRouter } from "next/router";
+import { LoginService } from "@/utils/login";
 
 const MATCHES = gql`
-  query GetMatches {
-    getMatches {
+  query GetMatches(
+    $userId: String
+  ) {
+    getMatches(
+      userId: $userId
+    ) {
       code
       success
       message
@@ -95,8 +100,31 @@ export default function MatchesPage() {
   const [isOpenAction, setIsOpenAction] = useState('');
   const [filteredMatchs, setFilteredMatchs] = useState<any[]>([]);
   const [allMatchsData, setAllMatchsData] = useState<any[]>([]);
-  const { data, error, loading, refetch } = useQuery(MATCHES);
   const router = useRouter();
+
+  const [userID, setUserData] = useState('');
+  const [userRole, setUserRole] = useState('');
+
+
+  const [getMatchesData, { data, error, loading }] = useLazyQuery(MATCHES,
+    {
+      variables: { userId: userRole !== 'admin' && userRole !== 'player' ? userID : null },
+    }
+  );
+
+  const getDatafromLocalStorage = async () => {
+    const localStorageData = await LoginService.getUser();
+    setUserRole(localStorageData?.role);
+    setUserData(localStorageData?._id);
+  }
+
+  useEffect(() => {
+    getDatafromLocalStorage();
+  }, []);
+
+  useEffect(() => {
+    getMatchesData()
+  }, [userID]);
 
   const ref = useRef<HTMLInputElement | null>(null);
 
@@ -118,7 +146,7 @@ export default function MatchesPage() {
   }, [isOpenAction])
 
   useEffect(() => {
-    refetch();
+    getMatchesData();
   }, [router.asPath])
 
   useEffect(() => {
@@ -128,7 +156,7 @@ export default function MatchesPage() {
   const onAddUpdateMatch = () => {
     setUpdateMatch(null);
     setAddUpdateMatch(false);
-    refetch();
+    getMatchesData();
   };
 
   const onAddUpdateMatchClose = () => {

@@ -19,6 +19,32 @@ const LOGIN = gql`
           login {
             email
           }
+          player {
+          shirtNumber
+          rank
+          teamId
+          leagueId
+
+          league {
+            _id
+            name
+          }
+
+          team {
+            _id
+            name
+          }
+        }
+        coach {
+          team {
+            name
+            _id
+            league {
+              _id
+              name
+            }
+          }
+        }
           active
         }
       }
@@ -39,7 +65,6 @@ export default function LoginPage() {
   useEffect(() => {
     LoginService.deleteToken();
     LoginService.deleteUser();
-
     if (data?.login?.code == 200) {
       const loginData = data?.login?.data;
       LoginService.saveUser({ ...loginData.user, timeStamp: new Date() });

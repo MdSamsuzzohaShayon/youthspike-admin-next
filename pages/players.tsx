@@ -1,6 +1,6 @@
 import { SetStateAction, useEffect, useRef, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
 import AddUpdatePlayer from "@/components/players/add-update-player";
 import AddPlayers from "@/components/players/add-players";
@@ -8,10 +8,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from "next/router";
 import _, { constant } from 'lodash';
 import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
+import { LoginService } from "@/utils/login";
 
-const LEAGUES = gql`
-  query GetPlayers {
-    getPlayers {
+const PLAYERS = gql`
+  query GetPlayers(
+    $userId: String
+  ) {
+    getPlayers(
+      userId: $userId
+    ) {
       code
       success
       message
@@ -118,13 +123,36 @@ export default function PlayersPage() {
   const [addUpdatePlayer, setAddUpdatePlayer] = useState(false);
   const [addPlayers, setAddPlayers] = useState(false);
   const [updatePlayer, setUpdatePlayer] = useState(null);
-  const { data, refetch } = useQuery(LEAGUES);
+  // const { data, refetch } = useQuery(PLAYERS);
   const [updatedPlayers, setUpdatedPlayers] = useState<any[]>([]);
   const [addUpdatePlayerMutation, { data: updatedData }] = useMutation(ADD_UPDATE_LEAGUE);
   const [rankUpdatePlayerMutation] = useMutation(ADD_UPDATE_LEAGUE);
   const router = useRouter();
   const [refetchAfterRankUpdate, setRefetchAfterRankUpdate] = useState(false);
   const [addInAnotherLeague, setAddInAnotherLeague] = useState(false);
+  const [userRole, setUserRole] = useState('');
+
+  const [userID, setUserData] = useState('');
+
+  const [getPlayersData, { data, error, loading }] = useLazyQuery(PLAYERS,
+    {
+      variables: { userId: userRole !== 'admin' && userRole !== 'player' ? userID : null },
+    }
+  );
+
+  const getDatafromLocalStorage = async () => {
+    const localStorageData = await LoginService.getUser();
+    setUserRole(localStorageData?.role);
+    setUserData(localStorageData?._id);
+  }
+
+  useEffect(() => {
+    getDatafromLocalStorage();
+  }, []);
+
+  useEffect(() => {
+    getPlayersData()
+  }, [userID]);
 
 
   const ref = useRef<HTMLInputElement | null>(null);
@@ -147,12 +175,12 @@ export default function PlayersPage() {
   }, [isOpenAction])
 
   useEffect(() => {
-    refetch();
+    getPlayersData();
   }, [router.asPath])
 
   useEffect(() => {
     if (refetchAfterRankUpdate) {
-      refetch();
+      getPlayersData();
       setRefetchAfterRankUpdate(false);
     }
   }, [refetchAfterRankUpdate])
@@ -161,11 +189,11 @@ export default function PlayersPage() {
     if (data?.getPlayers?.data) {
       getUpdatedPlayers();
     }
-  }, [data, teamId, refetch, leagueId])
+  }, [data, teamId, getPlayersData, leagueId])
 
   useEffect(() => {
     if (updatedData?.createOrUpdatePlayer?.code === 200) {
-      refetch();
+      getPlayersData();
     }
   }, [updatedData])
 
@@ -202,7 +230,7 @@ export default function PlayersPage() {
     setUpdatePlayer(null);
     setAddUpdatePlayer(false);
     setAddPlayers(false);
-    refetch()
+    getPlayersData()
   };
 
   const onAddUpdatePlayerClose = () => {
@@ -351,7 +379,7 @@ export default function PlayersPage() {
       <>
         <div className="w-[calc((w-screen)-(w-1/5)) overflow-hidden flex flex-row-reverse justify-between pb-4 pt-2">
           <div className="flex flex-row-reverse pl-4">
-            <button type="button" className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-md px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
+            <button type="button" className="w-188 transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-md px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
               onClick={() => setAddPlayers(true)}
             >
               <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
@@ -380,7 +408,7 @@ export default function PlayersPage() {
               Import Players
             </button>
 
-            <button type="button" className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-md px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
+            <button type="button" className="w-188 transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-md px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
               onClick={() => setAddUpdatePlayer(true)}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="ionicon w-7 h-7 mr-2" viewBox="0 0 512 512"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 176v160M336 256H176" /></svg>

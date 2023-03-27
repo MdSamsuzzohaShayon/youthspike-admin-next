@@ -1,7 +1,7 @@
 import { SetStateAction, useEffect, useRef, useState } from "react";
 import Layout, { LayoutPages } from "@/components/layout";
 import { Modal } from "@/components/model";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
 import { v4 as uuidv4 } from 'uuid';
 import { ITeam } from "@/types/team";
@@ -9,10 +9,15 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useRouter } from "next/router";
+import { LoginService } from "@/utils/login";
 
 const TEAMS = gql`
-  query GetTeams {
-    getTeams {
+  query GetTeams(
+    $userId: String
+  ) {
+    getTeams(
+      userId: $userId
+    ) {
       code
       success
       data {
@@ -44,8 +49,30 @@ export default function TeamsPage() {
   const [filteredTeams, setFilteredTeams] = useState<any[]>([]);
   const [allTeamData, setAllTeamData] = useState<any[]>([]);
   const [updateTeam, setUpdateTeam] = useState<any>(null);
-  const { data, error, loading, refetch } = useQuery(TEAMS);
+  // const { data, error, loading, refetch } = useQuery(TEAMS);
   const router = useRouter();
+  const [userID, setUserID] = useState('');
+  const [userRole, setUserRole] = useState('');
+
+  const [getLeaguesData, { data, error, loading }] = useLazyQuery(TEAMS,
+    {
+      variables: { userId: userRole !== 'admin' && userRole !== 'player' ? userID : null },
+    }
+  );
+
+  const getDatafromLocalStorage = async () => {
+    const localStorageData = await LoginService.getUser();
+    setUserRole(localStorageData?.role);
+    setUserID(localStorageData?._id);
+  }
+
+  useEffect(() => {
+    getDatafromLocalStorage();
+  }, []);
+
+  useEffect(() => {
+    getLeaguesData()
+  }, [userID]);
 
   const ref = useRef<HTMLInputElement | null>(null);
 
@@ -67,7 +94,7 @@ export default function TeamsPage() {
   }, [isOpenAction])
 
   useEffect(() => {
-    refetch();
+    getLeaguesData();
   }, [router.asPath]);
 
 
@@ -84,7 +111,7 @@ export default function TeamsPage() {
     setUpdateTeam(null);
     setAddUpdateTeam(false);
     setAddInOtherLeague(false);
-    refetch();
+    getLeaguesData();
   };
 
   const onAddUpdateTeamClose = () => {
