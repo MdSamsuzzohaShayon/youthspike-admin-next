@@ -4,7 +4,6 @@ import { UserContext } from "@/config/auth";
 import Link from "next/link";
 import { LoginService } from "@/utils/login";
 
-
 export enum LayoutPages {
   "leagues" = "leagues",
   "teams" = "teams",
@@ -41,7 +40,8 @@ export default function Layout(props: LayoutProps) {
     LoginService.deleteUser();
     window.location.href = "/login";
   }
-
+  console.log({ props })
+  console.log(props?.page == LayoutPages.leagues)
   return (
     <>
       <Head>
@@ -107,7 +107,7 @@ export default function Layout(props: LayoutProps) {
             <div className="flex-1 py-4 space-y-1 bg-slate-700 divide-y divide-gray-200 dark:divide-gray-700">
               <Link href="/leagues">
                 <button
-                  className={` flex items-center text-md text-l text-left px-4 py-4 bg-slate-700 hover:bg-slate-800 active:bg-slate-800  dark:hover:bg-slate-800 text-white w-full font-medium ${props?.page == LayoutPages.leagues ? "bg-blue-700" : ""
+                  className={` flex items-center text-md text-l text-left px-4 py-4 hover:bg-slate-800 active:bg-slate-800  dark:hover:bg-slate-800 text-white w-full font-medium ${props?.page == LayoutPages.leagues ? "bg-slate-500 border-l-4 border-green-500" : "bg-slate-700"
                     }`}
                 >
                   <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
@@ -180,7 +180,7 @@ c-25 -24 -25 -27 -25 -200 l0 -175 80 0 80 0 0 120 0 120 520 0 520 0 0 -120
 
               <Link href="/teams">
                 <button
-                  className={`text-l flex items-center text-left px-4 py-4 bg-slate-700 hover:bg-slate-800 active:bg-slate-800 dark:hover:bg-slate-800 text-white w-full font-medium ${props?.page == LayoutPages.teams ? "bg-blue-700" : ""
+                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-800 active:bg-slate-800 dark:hover:bg-slate-800 text-white w-full font-medium ${props?.page == LayoutPages.teams ? "bg-slate-500 border-l-4 border-green-500" : "bg-slate-700"
                     }`}
                 >
                   <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
@@ -284,7 +284,7 @@ m-3019 -210 c133 -89 297 -175 460 -242 l115 -46 3 -77 c2 -42 0 -76 -3 -76
 
               {user?.role === 'admin' && (<Link href="/coaches">
                 <button
-                  className={`text-l flex items-center text-left px-4 py-4 bg-slate-700 hover:bg-slate-800 active:bg-slate-800 dark:hover:bg-slate-800 text-white w-full font-medium ${props?.page == LayoutPages.coaches ? "bg-blue-700" : ""
+                  className={`text-l flex items-center text-left px-4 py-4  hover:bg-slate-800 active:bg-slate-800 dark:hover:bg-slate-800 text-white w-full font-medium ${props?.page == LayoutPages.coaches ? "bg-slate-500 border-l-4 border-green-500" : "bg-slate-700"
                     }`}
                 >
                   <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
@@ -326,7 +326,7 @@ l-20 -24 -140 126 c-186 167 -178 158 -133 139 80 -33 167 -6 214 65 l26 39
 
               <Link href="/players">
                 <button
-                  className={`text-l flex items-center text-left px-4 py-4 bg-slate-700 hover:bg-slate-800 active:bg-slate-800 dark:hover:bg-slate-800 text-white w-full font-medium ${props?.page == LayoutPages.players ? "bg-blue-700" : ""
+                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-800 active:bg-slate-800 dark:hover:bg-slate-800 text-white w-full font-medium ${props?.page == LayoutPages.players ? "bg-slate-500 border-l-4 border-green-500" : "bg-slate-700"
                     }`}
                 >
                   <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
@@ -495,7 +495,7 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
 
               <Link href={"/matches"}>
                 <button
-                  className={`text-l flex items-center text-left px-4 py-4 bg-slate-700 hover:bg-slate-800 active:bg-slate-800  dark:hover:bg-slate-800 text-white w-full font-medium ${props?.page == LayoutPages.matches ? "bg-blue-700" : ""
+                  className={`text-l flex items-center text-left px-4 py-4 hover:bg-slate-800 active:bg-slate-800  dark:hover:bg-slate-800 text-white w-full font-medium ${props?.page == LayoutPages.matches ? "bg-slate-500 border-l-4 border-green-500" : "bg-slate-700"
                     }`}
                 >
                   <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
