@@ -86,9 +86,9 @@ export default function LeaguesPage() {
     }
   }, [isOpenAction])
 
-  useEffect(() => {
-    refetch();
-  }, [router.asPath])
+  // useEffect(() => {
+  //   refetch();
+  // }, [router.asPath])
 
   useEffect(() => {
     setAllLeaguesData(data?.getLeagues?.data ?? []);
@@ -519,7 +519,7 @@ function AddUpdateLeague(props: AddUpdateLeagueProps) {
             </button>
           )}
 
-          <button className="transform hover:bg-red-600 transition duration-300 hover:scale-95 text-white bg-red-500 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center mr-2 mb-2">
+          <button onClick={props.onClose} className="transform hover:bg-red-600 transition duration-300 hover:scale-95 text-white bg-red-500 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center mr-2 mb-2">
             Cancel
           </button>
         </div>

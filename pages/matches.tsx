@@ -114,6 +114,7 @@ export default function MatchesPage() {
 
   const getDatafromLocalStorage = async () => {
     const localStorageData = await LoginService.getUser();
+    console.log({ localStorageData })
     setUserRole(localStorageData?.role);
     setUserData(localStorageData?._id);
   }
@@ -123,6 +124,7 @@ export default function MatchesPage() {
   }, []);
 
   useEffect(() => {
+    console.log({ userID })
     getMatchesData()
   }, [userID]);
 
@@ -145,9 +147,9 @@ export default function MatchesPage() {
     }
   }, [isOpenAction])
 
-  useEffect(() => {
-    refetch();
-  }, [router.asPath])
+  // useEffect(() => {
+  //   // refetch();
+  // }, [router.asPath])
 
   useEffect(() => {
     setAllMatchsData(data?.getMatches?.data ?? []);

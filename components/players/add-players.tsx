@@ -4,8 +4,12 @@ import { useEffect, useState } from "react";
 import { Modal } from "../model";
 
 const LEAGUE_DROPDOWN = gql`
-  query GetLeagues {
-    getLeagues {
+  query GetLeagues(
+    $userId: String
+  ) {
+    getLeagues(
+      userId: $userId
+    ) {
       code
       success
       message
@@ -39,13 +43,17 @@ interface AddPlayersOnClose {
 interface AddPlayersProps {
   onSuccess?: AddPlayersOnSuccess;
   onClose?: AddPlayersOnClose;
-  data?: any,
+  data?: any;
+  userID?: any;
+  userRole?: any;
 }
 
 export default function AddPlayers(props: AddPlayersProps) {
   const [leagueId, setLeagueId] = useState("");
   const [file, setFile] = useState<File | null>(null);
-  const { data: leagues } = useQuery(LEAGUE_DROPDOWN);
+  const { data: leagues } = useQuery(LEAGUE_DROPDOWN, {
+    variables: { userId: props.userRole !== 'admin' && props.userRole !== 'player' ? props.userID : null },
+  });
   const [importPlayers, { data }] = useMutation(IMPORT_PLAYERS);
 
   useEffect(() => {
@@ -124,7 +132,7 @@ export default function AddPlayers(props: AddPlayersProps) {
             Add Players
           </button>
 
-          <button className="transform hover:bg-red-600 transition duration-300 hover:scale-105 text-white bg-red-500 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center mr-2 mb-2">
+          <button onClick={props.onClose} className="transform hover:bg-red-600 transition duration-300 hover:scale-105 text-white bg-red-500 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center mr-2 mb-2">
             Cancel
           </button>
         </div>

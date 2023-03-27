@@ -55,8 +55,12 @@ const PLAYERS = gql`
 `;
 
 const TEAM_DROPDOWN = gql`
-  query GetTeams {
-    getTeams {
+  query GetTeams(
+    $userId: String
+  ) {
+    getTeams(
+      userId: $userId
+    ) {
       code
       success
       message
@@ -68,8 +72,12 @@ const TEAM_DROPDOWN = gql`
   }
 `;
 const LEAGUE_DROPDOWN = gql`
-  query GetLeagues {
-    getLeagues {
+  query GetLeagues(
+    $userId: String
+  ) {
+    getLeagues(
+      userId: $userId
+    ) {
       code
       success
       message
@@ -113,9 +121,16 @@ const ADD_UPDATE_LEAGUE = gql`
 `;
 
 export default function PlayersPage() {
+  const [userRole, setUserRole] = useState('');
 
-  const leaguesQuery = useQuery(LEAGUE_DROPDOWN);
-  const teamsQuery = useQuery(TEAM_DROPDOWN);
+  const [userID, setUserData] = useState('');
+  const [getLeaguesData, { data: leaguesQuery }] = useLazyQuery(LEAGUE_DROPDOWN,
+    {
+      variables: { userId: userRole !== 'admin' && userRole !== 'player' ? userID : null },
+    });
+  const [getTeamsData, { data: teamsQuery }] = useLazyQuery(TEAM_DROPDOWN, {
+    variables: { userId: userRole !== 'admin' && userRole !== 'player' ? userID : null },
+  });
   const [teamId, setTeamId] = useState('');
   const [leagueId, setLeagueId] = useState('');
   const [searchKey, setSearchKey] = useState('');
@@ -123,16 +138,12 @@ export default function PlayersPage() {
   const [addUpdatePlayer, setAddUpdatePlayer] = useState(false);
   const [addPlayers, setAddPlayers] = useState(false);
   const [updatePlayer, setUpdatePlayer] = useState(null);
-  // const { data, refetch } = useQuery(PLAYERS);
   const [updatedPlayers, setUpdatedPlayers] = useState<any[]>([]);
   const [addUpdatePlayerMutation, { data: updatedData }] = useMutation(ADD_UPDATE_LEAGUE);
   const [rankUpdatePlayerMutation] = useMutation(ADD_UPDATE_LEAGUE);
   const router = useRouter();
   const [refetchAfterRankUpdate, setRefetchAfterRankUpdate] = useState(false);
   const [addInAnotherLeague, setAddInAnotherLeague] = useState(false);
-  const [userRole, setUserRole] = useState('');
-
-  const [userID, setUserData] = useState('');
 
   const [getPlayersData, { data, error, loading, refetch }] = useLazyQuery(PLAYERS,
     {
@@ -151,7 +162,9 @@ export default function PlayersPage() {
   }, []);
 
   useEffect(() => {
-    getPlayersData()
+    getPlayersData();
+    getTeamsData();
+    getLeaguesData();
   }, [userID]);
 
 
@@ -174,9 +187,9 @@ export default function PlayersPage() {
     }
   }, [isOpenAction])
 
-  useEffect(() => {
-    refetch();
-  }, [router.asPath])
+  // useEffect(() => {
+  //   refetch();
+  // }, [router.asPath])
 
   useEffect(() => {
     if (refetchAfterRankUpdate) {
@@ -455,8 +468,8 @@ export default function PlayersPage() {
               >
                 <option>Select a league</option>
                 <option>UnAssigned</option>
-                {leaguesQuery.data?.getLeagues?.code === 200 &&
-                  leaguesQuery.data?.getLeagues?.data?.map((league: any) => (
+                {leaguesQuery?.getLeagues?.code === 200 &&
+                  leaguesQuery?.getLeagues?.data?.map((league: any) => (
                     <option key={league?._id} value={league?._id}>
                       {league?.name}
                     </option>
@@ -483,8 +496,8 @@ export default function PlayersPage() {
               >
                 <option>Select a team</option>
                 <option>UnAssigned</option>
-                {teamsQuery?.data?.getTeams?.code === 200 &&
-                  teamsQuery?.data?.getTeams?.data?.map((team: any) => (
+                {teamsQuery?.getTeams?.code === 200 &&
+                  teamsQuery?.getTeams?.data?.map((team: any) => (
                     <option key={team?._id} value={team?._id}>
                       {team?.name}
                     </option>
@@ -600,6 +613,7 @@ export default function PlayersPage() {
             data={data?.getPlayers?.data}
             addInAnotherLeague={addInAnotherLeague}
             userRole={userRole}
+            userID={userID}
           />
         )}
 
@@ -609,6 +623,8 @@ export default function PlayersPage() {
               onSuccess={onAddUpdatePlayer}
               onClose={() => setAddPlayers(false)}
               data={data?.getPlayers?.data}
+              userID={userID}
+              userRole={userRole}
             />
           )
         }

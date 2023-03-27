@@ -6,8 +6,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 
 const LEAGUE_DROPDOWN = gql`
-  query GetLeagues {
-    getLeagues {
+  query GetLeagues(
+    $userId: String
+  ) {
+    getLeagues(
+      userId: $userId
+    ) {
       code
       success
       message
@@ -20,8 +24,12 @@ const LEAGUE_DROPDOWN = gql`
 `;
 
 const TEAM_DROPDOWN = gql`
-  query GetTeams {
-    getTeams {
+  query GetTeams(
+    $userId: String
+    ) {
+    getTeams(
+      userId: $userId
+    ) {
       code
       success
       message
@@ -84,11 +92,16 @@ interface AddUpdatePlayerProps {
   data?: any,
   addInAnotherLeague?: Boolean;
   userRole?: any,
+  userID?: any,
 }
 
 export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
-  const leaguesQuery = useQuery(LEAGUE_DROPDOWN);
-  const teamsQuery = useQuery(TEAM_DROPDOWN);
+  const leaguesQuery = useQuery(LEAGUE_DROPDOWN, {
+    variables: { userId: props.userRole !== 'admin' && props.userRole !== 'player' ? props.userID : null },
+  });
+  const teamsQuery = useQuery(TEAM_DROPDOWN, {
+    variables: { userId: props.userRole !== 'admin' && props.userRole !== 'player' ? props.userID : null },
+  });
 
   const [email, setEmail] = useState(props?.player?.login?.email || "");
   const [firstName, setFirstName] = useState(props?.player?.firstName || "");
@@ -372,7 +385,7 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
               </button>
             )}
 
-            <button className="transform hover:bg-red-600 transition duration-300 hover:scale-105 text-white bg-red-500 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center mr-2 mb-2">
+            <button onClick={props.onClose} className="transform hover:bg-red-600 transition duration-300 hover:scale-105 text-white bg-red-500 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center mr-2 mb-2">
               Cancel
             </button>
           </div>

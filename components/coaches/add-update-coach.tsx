@@ -371,7 +371,7 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
               </button>
             )}
 
-            <button className="transform hover:bg-red-600 transition duration-300 hover:scale-105 text-white bg-red-500 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center mr-2 mb-22">
+            <button onClick={props.onClose} className="transform hover:bg-red-600 transition duration-300 hover:scale-105 text-white bg-red-500 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center mr-2 mb-22">
               Cancel
             </button>
           </div>
