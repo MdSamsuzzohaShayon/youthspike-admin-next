@@ -235,12 +235,12 @@ export default function TeamsPage() {
                                       setAddUpdateTeam(true);
                                       setIsOpenAction('');
                                     }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                                    <a onClick={() => {
+                                    {/* <a onClick={() => {
                                       setUpdateTeam(team);
                                       setAddUpdateTeam(true);
                                       setIsOpenAction('');
                                       setAddInOtherLeague(true);
-                                    }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in other league</a>
+                                    }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in other league</a> */}
                                   </div>
                                 </div>
                               )}

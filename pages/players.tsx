@@ -575,14 +575,14 @@ export default function PlayersPage() {
                                             onDelete(player, index);
                                             setIsOpenAction('');
                                           }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
-                                          <a
+                                          {/* <a
                                             onClick={() => {
                                               setUpdatePlayer(player);
                                               setAddUpdatePlayer(true);
                                               setIsOpenAction('');
                                               setAddInAnotherLeague(true);
                                             }}
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a>
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a> */}
                                         </div>
                                       </div>
                                     )}
