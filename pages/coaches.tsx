@@ -239,7 +239,9 @@ export default function CoachesPage() {
 
             <tbody className="w-full shadow-lg">
               {(getCoachesForDisplay()).map((coach: any) => (
-                <TDR key={coach?._id}>
+                <TDR
+                  key={`${coach?._id}-${coach?.coach?.team?.name}-${coach?.coach?.team?.league?.name}`}
+                >
                   <>
                     <TD>
                       <>
@@ -255,11 +257,11 @@ export default function CoachesPage() {
                         <div className="relative">
                           <button
                             className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            onClick={() => toggleMenu(coach?._id)}
+                            onClick={() => toggleMenu(`${coach?._id}-${coach?.coach?.team?.name}-${coach?.coach?.team?.league?.name}`)}
                           >
                             <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
                           </button>
-                          {(isOpenAction === coach?._id) && (
+                          {(isOpenAction === `${coach?._id}-${coach?.coach?.team?.name}-${coach?.coach?.team?.league?.name}`) && (
                             <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                               <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                 <a onClick={() => {

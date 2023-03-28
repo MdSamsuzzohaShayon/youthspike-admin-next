@@ -117,7 +117,7 @@ export default function LoginPage() {
 
             <div className=" p-1 text-center">
               <button
-                className="w-1/3 rounded p-2 bg-[#1d4ed8] hover:bg-[#1e40af] focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 text-white mt-4 font-bold transform transition duration-300 hover:scale-110"
+                className="w-1/3 rounded p-2 bg-slate-500 hover:bg-slate-500 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 text-white mt-4 font-bold transform transition duration-300 hover:scale-110"
                 onClick={() => loginFunction()}
               >
                 Login

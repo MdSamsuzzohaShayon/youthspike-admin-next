@@ -118,6 +118,7 @@ export default function TeamsPage() {
   const onAddUpdateTeamClose = () => {
     setUpdateTeam(null);
     setAddUpdateTeam(false);
+    setAddInOtherLeague(false);
   };
 
   const filteredData = (key: string) => {
