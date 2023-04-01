@@ -693,7 +693,6 @@ export default function PlayersPage() {
                                 <TD><></></TD>
                                 <TD>
                                   <>
-                                    {player?.firstName}&nbsp;{player?.lastName}
                                   </>
                                 </TD>
                                 <TD>{player?.login?.email}</TD>
