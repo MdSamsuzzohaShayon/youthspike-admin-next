@@ -267,7 +267,7 @@ export default function MatchesPage() {
               </THR>
             </thead>
 
-            <tbody className="w-full h-96 overflow-y-auto">
+            <tbody className="w-full">
               {getMatchsForDisplay().map((match: any) => (
                 <TDR key={match?._id}>
                   <>
