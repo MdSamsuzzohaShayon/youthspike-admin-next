@@ -81,7 +81,7 @@ const TEAMS = gql`
 `;
 
 export default function CoachesPage() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState('');
   const [addUpdateCoach, setAddUpdateCoach] = useState(false);
   const [updateCoach, setUpdateCoach] = useState(null);
   const [searchKey, setSearchKey] = useState('');
@@ -194,6 +194,15 @@ export default function CoachesPage() {
     }
   }
 
+
+  const groupedData = Object.values(getCoachesForDisplay()?.reduce((acc, curr) => {
+    if (!acc[curr._id]) {
+      acc[curr._id] = { coachId: curr._id, mappedArray: [] };
+    }
+    acc[curr._id].mappedArray.push(curr);
+    return acc;
+  }, {}));
+
   return (
     <Layout title="Coaches" page={LayoutPages.coaches}>
       <>
@@ -240,101 +249,103 @@ export default function CoachesPage() {
             </thead>
 
             <tbody className="w-full shadow-lg">
-              {(getCoachesForDisplay()).map((coach: any) => (
-                <>
-                  <TDR
-                    key={`${coach?._id}-${coach?.coach?.team?.name}-${coach?.coach?.team?.league?.name}`}
-                  >
-                    <>
-                      <TD>
-                        <button
-                          className="text-white px-4 py-2 rounded"
-                          onClick={() => setIsOpen(!isOpen)}
+              {groupedData?.map((current: any) => (
+                current?.mappedArray?.map((coach: any, index: number) => (
+                  <>
+                    {index === 0 && (<TDR
+                      key={`${current?.coachId}`}
+                    >
+                      <>
+                        <TD>
+                          {current?.mappedArray?.length > 1 ? (<button
+                            className="text-white px-4 py-2 rounded"
+                            onClick={() => setIsOpen(isOpen?.length === 0 ? `${current?.coachId}` : '')}
+                          >
+                            {isOpen === `${current?.coachId}` ? <svg className="w-7 h-7" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="KeyboardArrowUpIcon"><path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg> : <svg className="w-7 h-7" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="KeyboardArrowDownIcon"><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"></path></svg>}
+                          </button>) : <></>}
+                        </TD>
+                        <TD>
+                          <>
+                            {coach?.firstName}&nbsp;{coach?.lastName}
+                          </>
+                        </TD>
+                        <TD>{coach?.login?.email}</TD>
+                        <TD>{coach?.coach?.team?.name}</TD>
+                        <TD>{coach?.coach?.team?.league?.name}</TD>
+                        <TD>{coach?.active ? "Yes" : "No"}</TD>
+                        <TD>
+                          <div className="flex item-center justify-center">
+                            <div className="relative">
+                              <button
+                                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                onClick={() => toggleMenu(`${coach?._id}-${coach?.coach?.team?.name}-${coach?.coach?.team?.league?.name}`)}
+                              >
+                                <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                              </button>
+                              {(isOpenAction === `${coach?._id}-${coach?.coach?.team?.name}-${coach?.coach?.team?.league?.name}`) && (
+                                <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                  <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                    <a onClick={() => {
+                                      setUpdateCoach(coach);
+                                      setAddUpdateCoach(true);
+                                      setIsOpenAction('');
+                                    }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </TD>
+                      </>
+                    </TDR>)}
+                    {isOpen === `${current?.coachId}` && index > 0 && (
+                      <>
+                        <TDR
+                          key={`${coach?._id}-${coach?.coach?.team?._id}-${coach?.coach?.team?.league?._id}`}
                         >
-                          {isOpen ? <svg className="w-7 h-7" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="KeyboardArrowUpIcon"><path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg> : <svg className="w-7 h-7" focusable="false" aria-hidden="true" viewBox="0 0 24 24" data-testid="KeyboardArrowDownIcon"><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"></path></svg>}
-                        </button>
-                      </TD>
-                      <TD>
-                        <>
-                          {coach?.firstName}&nbsp;{coach?.lastName}
-                        </>
-                      </TD>
-                      <TD>{coach?.login?.email}</TD>
-                      <TD>{coach?.coach?.team?.name}</TD>
-                      <TD>{coach?.coach?.team?.league?.name}</TD>
-                      <TD>{coach?.active ? "Yes" : "No"}</TD>
-                      <TD>
-                        <div className="flex item-center justify-center">
-                          <div className="relative">
-                            <button
-                              className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                              onClick={() => toggleMenu(`${coach?._id}-${coach?.coach?.team?.name}-${coach?.coach?.team?.league?.name}`)}
-                            >
-                              <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                            </button>
-                            {(isOpenAction === `${coach?._id}-${coach?.coach?.team?.name}-${coach?.coach?.team?.league?.name}`) && (
-                              <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                  <a onClick={() => {
-                                    setUpdateCoach(coach);
-                                    setAddUpdateCoach(true);
-                                    setIsOpenAction('');
-                                  }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
+                          <>
+                            <TD>
+                              <></>
+                            </TD>
+                            <TD>
+                              <>
+                              </>
+                            </TD>
+                            <TD>{coach?.login?.email}</TD>
+                            <TD>{coach?.coach?.team?.name}</TD>
+                            <TD>{coach?.coach?.team?.league?.name}</TD>
+                            <TD>{coach?.active ? "Yes" : "No"}</TD>
+                            <TD>
+                              <div className="flex item-center justify-center">
+                                <div className="relative">
+                                  <button
+                                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    onClick={() => toggleMenu(`${coach?._id}-${coach?.coach?.team?.name}-${coach?.coach?.team?.league?.name}`)}
+                                  >
+                                    <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                  </button>
+                                  {(isOpenAction === `${coach?._id}-${coach?.coach?.team?.name}-${coach?.coach?.team?.league?.name}`) && (
+                                    <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                      <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                        <a onClick={() => {
+                                          setUpdateCoach(coach);
+                                          setAddUpdateCoach(true);
+                                          setIsOpenAction('');
+                                        }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
-                            )}
-                          </div>
-                        </div>
-                      </TD>
-                    </>
-                  </TDR>
-                  {isOpen && (
-                    <>
-                      <TDR
-                        key={`${coach?._id}-${coach?.coach?.team?.name}-${coach?.coach?.team?.league?.name}`}
-                      >
-                        <>
-                          <TD>
-                            <></>
-                          </TD>
-                          <TD>
-                            <>
-                              {coach?.firstName}&nbsp;{coach?.lastName}
-                            </>
-                          </TD>
-                          <TD>{coach?.login?.email}</TD>
-                          <TD>{coach?.coach?.team?.name}</TD>
-                          <TD>{coach?.coach?.team?.league?.name}</TD>
-                          <TD>{coach?.active ? "Yes" : "No"}</TD>
-                          <TD>
-                            <div className="flex item-center justify-center">
-                              <div className="relative">
-                                <button
-                                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                  onClick={() => toggleMenu(`${coach?._id}-${coach?.coach?.team?.name}-${coach?.coach?.team?.league?.name}`)}
-                                >
-                                  <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                                </button>
-                                {(isOpenAction === `${coach?._id}-${coach?.coach?.team?.name}-${coach?.coach?.team?.league?.name}`) && (
-                                  <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                                    <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                      <a onClick={() => {
-                                        setUpdateCoach(coach);
-                                        setAddUpdateCoach(true);
-                                        setIsOpenAction('');
-                                      }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </TD>
-                        </>
-                      </TDR>
-                    </>
-                  )}
-                </>
-              ))}
+                            </TD>
+                          </>
+                        </TDR>
+                      </>
+                    )}
+                  </>
+                ))
+              ))
+              }
 
             </tbody>
           </table>
