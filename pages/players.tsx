@@ -425,8 +425,7 @@ export default function PlayersPage() {
         }],
       })
     }
-  })
-
+  });
   return (
     <Layout title="Players" page={LayoutPages.players}>
       <>
@@ -636,7 +635,7 @@ export default function PlayersPage() {
                                                 setAddUpdatePlayer(true);
                                                 setIsOpenAction('');
                                               }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                                              <a onClick={() => {
+                                              {userRole === 'admin' && (<><a onClick={() => {
                                                 onDelete({
                                                   ...player,
                                                   player: {
@@ -654,28 +653,28 @@ export default function PlayersPage() {
                                                 }, index);
                                                 setIsOpenAction('');
                                               }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
-                                              <a
-                                                onClick={() => {
-                                                  setUpdatePlayer({
-                                                    ...player,
-                                                    player: {
-                                                      ...player?.player,
-                                                      league: {
-                                                        _id: current?.league?.id,
-                                                        name: current?.league?.name,
+                                                <a
+                                                  onClick={() => {
+                                                    setUpdatePlayer({
+                                                      ...player,
+                                                      player: {
+                                                        ...player?.player,
+                                                        league: {
+                                                          _id: current?.league?.id,
+                                                          name: current?.league?.name,
+                                                        },
+                                                        team: {
+                                                          _id: current?.team?.id,
+                                                          name: current?.team?.name,
+                                                        },
                                                       },
-                                                      team: {
-                                                        _id: current?.team?.id,
-                                                        name: current?.team?.name,
-                                                      },
-                                                    },
 
-                                                  });
-                                                  setAddUpdatePlayer(true);
-                                                  setIsOpenAction('');
-                                                  setAddInAnotherLeague(true);
-                                                }}
-                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a>
+                                                    });
+                                                    setAddUpdatePlayer(true);
+                                                    setIsOpenAction('');
+                                                    setAddInAnotherLeague(true);
+                                                  }}
+                                                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a></>)}
                                             </div>
                                           </div>
                                         )}
@@ -732,7 +731,7 @@ export default function PlayersPage() {
                                               setAddUpdatePlayer(true);
                                               setIsOpenAction('');
                                             }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                                            <a onClick={() => {
+                                            {userRole === 'admin' && (<><a onClick={() => {
                                               onDelete({
                                                 ...player,
                                                 player: {
@@ -750,28 +749,29 @@ export default function PlayersPage() {
                                               }, index);
                                               setIsOpenAction('');
                                             }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
-                                            <a
-                                              onClick={() => {
-                                                setUpdatePlayer({
-                                                  ...player,
-                                                  player: {
-                                                    ...player?.player,
-                                                    league: {
-                                                      _id: current?.league?.id,
-                                                      name: current?.league?.name,
+                                              <a
+                                                onClick={() => {
+                                                  setUpdatePlayer({
+                                                    ...player,
+                                                    player: {
+                                                      ...player?.player,
+                                                      league: {
+                                                        _id: current?.league?.id,
+                                                        name: current?.league?.name,
+                                                      },
+                                                      team: {
+                                                        _id: current?.team?.id,
+                                                        name: current?.team?.name,
+                                                      },
                                                     },
-                                                    team: {
-                                                      _id: current?.team?.id,
-                                                      name: current?.team?.name,
-                                                    },
-                                                  },
 
-                                                });
-                                                setAddUpdatePlayer(true);
-                                                setIsOpenAction('');
-                                                setAddInAnotherLeague(true);
-                                              }}
-                                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a>
+                                                  });
+                                                  setAddUpdatePlayer(true);
+                                                  setIsOpenAction('');
+                                                  setAddInAnotherLeague(true);
+                                                }}
+                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a>
+                                            </>)}
                                           </div>
                                         </div>
                                       )}

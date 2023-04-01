@@ -198,7 +198,11 @@ export default function TeamsPage() {
       teamLeaguesData = teamLeagues?.map((teamCurrent: any) => {
         const findLeague = leaguesData?.getLeagues?.data?.find((leagueCurrent: { _id: any; }) => leagueCurrent?._id === teamCurrent);
         return findLeague;
-      })
+      });
+      const find = teamLeaguesData?.find((curleague: { _id: any; }) => curleague?._id === current?.league?._id);
+      if (!find) {
+        teamLeaguesData.push(current?.league);
+      }
     } else {
       teamLeaguesData.push(current?.league);
     }
