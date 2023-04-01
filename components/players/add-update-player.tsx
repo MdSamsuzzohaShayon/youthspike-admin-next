@@ -54,6 +54,9 @@ const ADD_UPDATE_LEAGUE = gql`
     $email: String
     $role: String
     $password: String
+    $onLeagueOrTeamChange: Boolean
+    $removedTeam: String
+    $removedLeague: String
     $id: String
   ) {
     createOrUpdatePlayer(
@@ -67,6 +70,9 @@ const ADD_UPDATE_LEAGUE = gql`
       email: $email
       role: $role
       password: $password
+      onLeagueOrTeamChange: $onLeagueOrTeamChange
+      removedTeam: $removedTeam
+      removedLeague: $removedLeague
       id: $id
     ) {
       code
@@ -106,7 +112,7 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
   const [email, setEmail] = useState(props?.player?.login?.email || "");
   const [firstName, setFirstName] = useState(props?.player?.firstName || "");
   const [lastName, setLastName] = useState(props?.player?.lastName || "");
-  const [teamId, setTeamId] = useState(props?.player?.player?.teamId || "UnAssigned");
+  const [teamId, setTeamId] = useState(props?.player?.player?.team?._id || "UnAssigned");
   const [rank, setRank] = useState(props?.player?.player?.rank || 1);
   const [isCoach, setIsCoach] = useState(props?.player?.role === 'playerAndCoach');
   const [password, setPassword] = useState(props?.player?.login?.email || '');
@@ -116,7 +122,7 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
   );
 
   const [leagueId, setLeagueId] = useState(
-    props?.player?.player.leagueId || ""
+    props?.player?.player?.league?._id || ""
   );
 
   const [active, setActive] = useState(
@@ -137,6 +143,9 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
         email,
         role: isCoach ? 'playerAndCoach' : 'player',
         password,
+        onLeagueOrTeamChange: props?.player?.player?.league?._id !== leagueId || props?.player?.player?.team?._id !== teamId,
+        removedTeam: props?.addInAnotherLeague ? '' : props?.player?.player?.team?._id,
+        removedLeague: props?.addInAnotherLeague ? '' : props?.player?.player?.league?._id,
         id: props?.player?._id,
       },
     }
