@@ -422,7 +422,6 @@ export default function PlayersPage() {
     }
   })
 
-  console.log({ updatedDisplayPlayers })
   return (
     <Layout title="Players" page={LayoutPages.players}>
       <>

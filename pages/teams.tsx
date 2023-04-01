@@ -483,64 +483,65 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
                   {isOpen === `collapsible-${team?._id}-${team?.teamLeaguesData && team?.teamLeaguesData[0]?._id}` && team?.teamLeaguesData?.length > 1 && (
                     <>
                       {team?.teamLeaguesData?.map((current: any, index: number) => (
-                        index > 0 && (<TDR key={`${team?._id}-${current?._id}`}>
-                          <>
-                            <TD>
-                              <></>
-                            </TD>
-                            <TD></TD>
-                            <TD>
-                              {current?.name}
-                            </TD>
-                            <TD>
-                              <>
-                                {team?.coach?.firstName}&nbsp;{team?.coach?.lastName}
-                              </>
-                            </TD>
-                            <TD>{team?.active ? "Yes" : "No"}</TD>
-                            <TD>
-                              {
-                                userRole === 'admin' ?
-                                  <div className="flex item-center justify-center">
-                                    <div className="relative">
-                                      <button
-                                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        onClick={() => toggleMenu(`${team?._id}-${current?._id}`)}
-                                      >
-                                        <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                                      </button>
-                                      {(isOpenAction === `${team?._id}-${current?._id}`) && (
-                                        <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                                          <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                            <a onClick={() => {
-                                              setUpdateTeam({ ...team, league: team?.teamLeaguesData && team?.teamLeaguesData[index] });
-                                              setAddUpdateTeam(true);
-                                              setIsOpenAction('');
-                                            }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                                            <a onClick={() => {
-                                              setUpdateTeam({ ...team, league: team?.teamLeaguesData && team?.teamLeaguesData[index] });
-                                              setAddUpdateTeam(true);
-                                              setIsOpenAction('');
-                                              setAddInOtherLeague(true);
-                                            }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in other league</a>
+                        index > 0 && (
+                          <TDR key={`${team?._id}-${current?._id}`}>
+                            <>
+                              <TD>
+                                <></>
+                              </TD>
+                              <TD></TD>
+                              <TD>
+                                {current?.name}
+                              </TD>
+                              <TD>
+                                <>
+                                  {team?.coach?.firstName}&nbsp;{team?.coach?.lastName}
+                                </>
+                              </TD>
+                              <TD>{team?.active ? "Yes" : "No"}</TD>
+                              <TD>
+                                {
+                                  userRole === 'admin' ?
+                                    <div className="flex item-center justify-center">
+                                      <div className="relative">
+                                        <button
+                                          className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                          onClick={() => toggleMenu(`${team?._id}-${current?._id}`)}
+                                        >
+                                          <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                        </button>
+                                        {(isOpenAction === `${team?._id}-${current?._id}`) && (
+                                          <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                            <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                              <a onClick={() => {
+                                                setUpdateTeam({ ...team, league: team?.teamLeaguesData && team?.teamLeaguesData[index] });
+                                                setAddUpdateTeam(true);
+                                                setIsOpenAction('');
+                                              }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
+                                              <a onClick={() => {
+                                                setUpdateTeam({ ...team, league: team?.teamLeaguesData && team?.teamLeaguesData[index] });
+                                                setAddUpdateTeam(true);
+                                                setIsOpenAction('');
+                                                setAddInOtherLeague(true);
+                                              }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in other league</a>
+                                            </div>
                                           </div>
-                                        </div>
-                                      )}
+                                        )}
+                                      </div>
                                     </div>
-                                  </div>
-                                  :
-                                  <div className="flex item-center justify-center">
-                                    <div className="relative">
-                                      <button
-                                        className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        onClick={() => toggleTeam(team?._id)}
-                                      >
-                                        <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
-                                          className="w-7 h-7" viewBox="0 0 512.000000 512.000000"
-                                          preserveAspectRatio="xMidYMid meet">
-                                          <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-                                            fill="#000000" stroke="none">
-                                            <path d="M2645 4665 c-73 -13 -215 -51 -257 -70 -15 -6 -18 -2 -18 18 0 14 -7
+                                    :
+                                    <div className="flex item-center justify-center">
+                                      <div className="relative">
+                                        <button
+                                          className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                          onClick={() => toggleTeam(team?._id)}
+                                        >
+                                          <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                                            className="w-7 h-7" viewBox="0 0 512.000000 512.000000"
+                                            preserveAspectRatio="xMidYMid meet">
+                                            <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                                              fill="#000000" stroke="none">
+                                              <path d="M2645 4665 c-73 -13 -215 -51 -257 -70 -15 -6 -18 -2 -18 18 0 14 -7
 28 -17 31 -47 18 -258 -166 -348 -304 -62 -96 -145 -269 -186 -390 -18 -52
 -40 -104 -50 -115 -10 -11 -23 -41 -29 -67 -9 -36 -17 -48 -31 -48 -22 0 -59
 -34 -59 -54 0 -8 11 -28 25 -44 14 -17 23 -36 20 -44 -3 -7 -13 -64 -24 -126
@@ -668,41 +669,41 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
 3 -45 -1 -2 -74 57 -160 132 -118 101 -157 140 -157 158 0 21 7 36 17 36 2 0
 68 -54 147 -119z m-1555 -45 l42 -43 -89 -168 -90 -167 -43 62 c-24 34 -43 67
 -41 72 5 18 167 288 172 288 3 0 25 -20 49 -44z"/>
-                                            <path d="M2412 3212 c-24 -8 -64 -60 -56 -74 5 -8 78 -48 89 -48 15 0 2 20
+                                              <path d="M2412 3212 c-24 -8 -64 -60 -56 -74 5 -8 78 -48 89 -48 15 0 2 20
 -17 26 -13 4 -31 12 -41 19 -17 12 -17 14 -2 29 9 9 27 16 40 16 19 0 24 -6
 27 -32 6 -67 102 -71 115 -6 5 27 7 28 29 13 29 -19 44 -19 44 0 0 38 -160 78
 -228 57z"/>
-                                            <path d="M2907 3173 c-9 -16 -28 -213 -30 -318 -2 -92 0 -110 13 -110 12 0 16
+                                              <path d="M2907 3173 c-9 -16 -28 -213 -30 -318 -2 -92 0 -110 13 -110 12 0 16
 27 22 160 4 88 11 182 16 210 6 27 8 53 6 57 -6 10 -22 10 -27 1z"/>
-                                            <path d="M3023 3145 c-44 -19 -44 -39 1 -31 31 6 34 4 39 -24 13 -64 103 -66
+                                              <path d="M3023 3145 c-44 -19 -44 -39 1 -31 31 6 34 4 39 -24 13 -64 103 -66
 122 -2 11 37 24 40 50 12 22 -25 13 -50 -20 -50 -14 0 -25 -4 -25 -10 0 -13
 23 -13 55 2 25 11 34 41 14 53 -5 4 -14 17 -19 30 -5 14 -20 24 -40 29 -54 10
 -143 6 -177 -9z"/>
-                                            <path d="M2296 2988 c-38 -54 -2 -93 128 -138 52 -17 61 -18 86 -5 28 15 40
+                                              <path d="M2296 2988 c-38 -54 -2 -93 128 -138 52 -17 61 -18 86 -5 28 15 40
 33 40 64 0 14 -16 22 -64 35 -35 10 -87 28 -116 42 -28 13 -54 24 -55 24 -2 0
 -11 -10 -19 -22z"/>
-                                            <path d="M3235 2920 c-16 -4 -59 -8 -94 -9 l-63 -1 6 -32 c10 -54 40 -71 111
+                                              <path d="M3235 2920 c-16 -4 -59 -8 -94 -9 l-63 -1 6 -32 c10 -54 40 -71 111
 -63 105 12 115 15 115 41 0 31 -20 74 -34 73 -6 -1 -24 -5 -41 -9z"/>
-                                            <path d="M2534 2515 c-4 -10 -1 -21 7 -26 30 -18 199 -51 290 -56 123 -7 189
+                                              <path d="M2534 2515 c-4 -10 -1 -21 7 -26 30 -18 199 -51 290 -56 123 -7 189
 2 189 26 0 16 -13 17 -132 17 -127 0 -179 8 -325 50 -16 4 -25 1 -29 -11z"/>
-                                            <path d="M2730 2406 c0 -8 16 -16 38 -20 60 -10 220 -7 227 4 9 15 -8 18 -142
+                                              <path d="M2730 2406 c0 -8 16 -16 38 -20 60 -10 220 -7 227 4 9 15 -8 18 -142
 24 -100 5 -123 3 -123 -8z"/>
-                                            <path d="M2497 2083 c-14 -14 -6 -34 17 -43 14 -5 30 -18 36 -30 15 -28 40
+                                              <path d="M2497 2083 c-14 -14 -6 -34 17 -43 14 -5 30 -18 36 -30 15 -28 40
 -26 40 3 0 37 -73 91 -93 70z"/>
-                                            <path d="M2720 2041 c0 -11 9 -22 19 -26 11 -3 27 -17 36 -31 13 -20 19 -23
+                                              <path d="M2720 2041 c0 -11 9 -22 19 -26 11 -3 27 -17 36 -31 13 -20 19 -23
 30 -14 11 9 12 17 4 34 -25 49 -89 75 -89 37z"/>
-                                            <path d="M2950 2028 c0 -16 75 -79 84 -71 14 14 4 43 -20 62 -30 23 -64 28
+                                              <path d="M2950 2028 c0 -16 75 -79 84 -71 14 14 4 43 -20 62 -30 23 -64 28
 -64 9z"/>
-                                          </g>
-                                        </svg>
-                                      </button>
+                                            </g>
+                                          </svg>
+                                        </button>
+                                      </div>
                                     </div>
-                                  </div>
-                              }
+                                }
 
-                            </TD>
-                          </>
-                        </TDR>)
+                              </TD>
+                            </>
+                          </TDR>)
                       ))}
 
                     </>)}
