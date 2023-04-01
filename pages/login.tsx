@@ -69,7 +69,7 @@ export default function LoginPage() {
       const loginData = data?.login?.data;
       LoginService.saveUser({ ...loginData.user, timeStamp: new Date() });
       LoginService.saveToken(loginData.token);
-      window.location.href = "/";
+      window.location.href = "/leagues";
     }
   }, [data]);
 
