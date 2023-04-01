@@ -402,7 +402,27 @@ export default function PlayersPage() {
   };
 
   const displayPlayers = updatedPlayers?.filter(current => router?.query?.teamId ? current?.player?.teamId === router?.query?.teamId?.toString() : true);
+  const updatedDisplayPlayers = [];
+  const allMapping = data?.getPlayers?.playerMapings;
+  displayPlayers?.map(currentPlayer => {
+    const findmap = allMapping?.find((curmap: { playerId: any; }) => curmap?.playerId === currentPlayer?._id);
+    if (findmap?.teamAndLeague?.length > 0) {
+      updatedDisplayPlayers.push({
+        ...currentPlayer,
+        mapPlayer: findmap?.teamAndLeague,
+      })
+    } else {
+      updatedDisplayPlayers.push({
+        ...currentPlayer,
+        mapPlayer: [{
+          league: currentPlayer?.player?.league,
+          team: currentPlayer?.player?.team,
+        }],
+      })
+    }
+  })
 
+  console.log({ updatedDisplayPlayers })
   return (
     <Layout title="Players" page={LayoutPages.players}>
       <>
