@@ -194,6 +194,15 @@ export default function CoachesPage() {
     }
   }
 
+
+  const groupedData = Object.values(getCoachesForDisplay()?.reduce((acc, curr) => {
+    if (!acc[curr._id]) {
+      acc[curr._id] = { coachId: curr._id, mappedArray: [] };
+    }
+    acc[curr._id].mappedArray.push(curr);
+    return acc;
+  }, {}));
+  console.log(groupedData)
   return (
     <Layout title="Coaches" page={LayoutPages.coaches}>
       <>
