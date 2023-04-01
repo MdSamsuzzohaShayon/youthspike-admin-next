@@ -50,6 +50,19 @@ const PLAYERS = gql`
 
         active
       }
+      playerMapings {
+        playerId
+        teamAndLeague {
+          team {
+            id
+            name
+          }
+          league {
+            id
+            name
+          }
+        }
+      }
     }
   }
 `;
