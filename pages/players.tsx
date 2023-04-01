@@ -404,7 +404,7 @@ export default function PlayersPage() {
   };
 
   const displayPlayers = updatedPlayers?.filter(current => router?.query?.teamId ? current?.player?.teamId === router?.query?.teamId?.toString() : true);
-  const updatedDisplayPlayers = [];
+  const updatedDisplayPlayers: any[] = [];
   const allMapping = data?.getPlayers?.playerMapings;
   displayPlayers?.map(currentPlayer => {
     const findmap = allMapping?.find((curmap: { playerId: any; }) => curmap?.playerId === currentPlayer?._id);
@@ -423,7 +423,7 @@ export default function PlayersPage() {
       })
     }
   })
-
+  console.log({ updatedDisplayPlayers })
   return (
     <Layout title="Players" page={LayoutPages.players}>
       <>
@@ -564,32 +564,88 @@ export default function PlayersPage() {
               <Droppable droppableId="droppable">
                 {(provided) => (
                   <tbody className="w-full" ref={provided.innerRef} {...provided.droppableProps}>
-                    {displayPlayers?.map((player: any, index) => (
-                      <>
-                        <Draggable
-                          key={player._id}
-                          draggableId={player._id}
-                          index={index}
-                          isDragDisabled={selectedIds.includes(teamId)}
-                        >
-                          {(provided, snapshot) => (
-                            <tr
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className={snapshot.isDragging ? 'dragging w-full bg-white odd:bg-gray-50 hover:bg-gray-100 dark:hover:bg-gray-100' : 'w-full bg-white odd:bg-gray-50 hover:bg-gray-100 dark:hover:bg-gray-100'}
-                            >
+                    {updatedDisplayPlayers?.map((player: any) => (
+                      player?.mapPlayer?.map((current: any, index: number) => (
+                        <>
+                          {index === 0 && (<Draggable
+                            key={player._id}
+                            draggableId={player._id}
+                            index={index}
+                            isDragDisabled={selectedIds.includes(teamId)}
+                          >
+                            {(provided, snapshot) => (
+                              <tr
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className={snapshot.isDragging ? 'dragging w-full bg-white odd:bg-gray-50 hover:bg-gray-100 dark:hover:bg-gray-100' : 'w-full bg-white odd:bg-gray-50 hover:bg-gray-100 dark:hover:bg-gray-100'}
+                              >
+                                <>
+                                  <TD>
+                                    <>
+                                      <button
+                                        className="text-white px-4 py-2 rounded"
+                                        onClick={() => setIsOpen(isOpen?.length > 0 ? '' : player._id)}
+                                      >
+                                        {isOpen === player._id ? <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M12 17.414 3.293 8.707l1.414-1.414L12 14.586l7.293-7.293 1.414 1.414L12 17.414z" /></svg> : <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M7.293 4.707 14.586 12l-7.293 7.293 1.414 1.414L17.414 12 8.707 3.293 7.293 4.707z" /></svg>}
+                                      </button>
+                                    </>
+                                  </TD>
+                                  <TD>
+                                    <>
+                                      {player?.firstName}&nbsp;{player?.lastName}
+                                    </>
+                                  </TD>
+                                  <TD>{player?.login?.email}</TD>
+                                  <TD>{player?.player?.shirtNumber}</TD>
+                                  <TD>{player?.player?.rank}</TD>
+                                  <TD>{current?.team?.name}</TD>
+                                  <TD>{current?.league?.name}</TD>
+                                  <TD>{player?.active ? "Yes" : "No"}</TD>
+                                  <TD>
+                                    <div className="flex item-center justify-center">
+                                      <div className="relative">
+                                        <button
+                                          className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                          onClick={() => toggleMenu(`${player?._id}-${current?.team?.id}-${current?.league?.id}-${index}`)}
+                                        >
+                                          <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
+                                        </button>
+                                        {(isOpenAction === `${player?._id}-${current?.team?.id}-${current?.league?.id}-${index}`) && (
+                                          <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                            <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                              <a onClick={() => {
+                                                setUpdatePlayer(player);
+                                                setAddUpdatePlayer(true);
+                                                setIsOpenAction('');
+                                              }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
+                                              <a onClick={() => {
+                                                onDelete(player, index);
+                                                setIsOpenAction('');
+                                              }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
+                                              <a
+                                                onClick={() => {
+                                                  setUpdatePlayer(player);
+                                                  setAddUpdatePlayer(true);
+                                                  setIsOpenAction('');
+                                                  setAddInAnotherLeague(true);
+                                                }}
+                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                  </TD>
+                                </>
+                              </tr>
+                            )}
+                          </Draggable>)}
+                          {isOpen === player._id && index > 0 && (
+                            <tr>
                               <>
-                                <TD>
-                                  <>
-                                    <button
-                                      className="text-white px-4 py-2 rounded"
-                                      onClick={() => setIsOpen(isOpen)}
-                                    >
-                                      {isOpen ? <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M12 17.414 3.293 8.707l1.414-1.414L12 14.586l7.293-7.293 1.414 1.414L12 17.414z" /></svg> : <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M7.293 4.707 14.586 12l-7.293 7.293 1.414 1.414L17.414 12 8.707 3.293 7.293 4.707z" /></svg>}
-                                    </button>
-                                  </>
-                                </TD>
+                                <TD><></></TD>
                                 <TD>
                                   <>
                                     {player?.firstName}&nbsp;{player?.lastName}
@@ -598,19 +654,19 @@ export default function PlayersPage() {
                                 <TD>{player?.login?.email}</TD>
                                 <TD>{player?.player?.shirtNumber}</TD>
                                 <TD>{player?.player?.rank}</TD>
-                                <TD>{player?.player?.team?.name}</TD>
-                                <TD>{player?.player?.league?.name}</TD>
+                                <TD>{current?.team?.name}</TD>
+                                <TD>{current?.league?.name}</TD>
                                 <TD>{player?.active ? "Yes" : "No"}</TD>
                                 <TD>
                                   <div className="flex item-center justify-center">
                                     <div className="relative">
                                       <button
                                         className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        onClick={() => toggleMenu(player?._id)}
+                                        onClick={() => toggleMenu(`${player?._id}-${current?.team?.id}-${current?.league?.id}-${index}`)}
                                       >
                                         <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
                                       </button>
-                                      {(isOpenAction === player?._id) && (
+                                      {(isOpenAction === `${player?._id}-${current?.team?.id}-${current?.league?.id}-${index}`) && (
                                         <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                                           <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                             <a onClick={() => {
@@ -622,80 +678,25 @@ export default function PlayersPage() {
                                               onDelete(player, index);
                                               setIsOpenAction('');
                                             }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
-                                            {/* <a
-                                            onClick={() => {
-                                              setUpdatePlayer(player);
-                                              setAddUpdatePlayer(true);
-                                              setIsOpenAction('');
-                                              setAddInAnotherLeague(true);
-                                            }}
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a> */}
+                                            <a
+                                              onClick={() => {
+                                                setUpdatePlayer(player);
+                                                setAddUpdatePlayer(true);
+                                                setIsOpenAction('');
+                                                setAddInAnotherLeague(true);
+                                              }}
+                                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a>
                                           </div>
                                         </div>
                                       )}
                                     </div>
                                   </div>
-
                                 </TD>
                               </>
                             </tr>
                           )}
-                        </Draggable>
-                        {isOpen && (
-                          <tr>
-                            <>
-                              <TD>""</TD>
-                              <TD>
-                                <>
-                                  {player?.firstName}&nbsp;{player?.lastName}
-                                </>
-                              </TD>
-                              <TD>{player?.login?.email}</TD>
-                              <TD>{player?.player?.shirtNumber}</TD>
-                              <TD>{player?.player?.rank}</TD>
-                              <TD>{player?.player?.team?.name}</TD>
-                              <TD>{player?.player?.league?.name}</TD>
-                              <TD>{player?.active ? "Yes" : "No"}</TD>
-                              <TD>
-                                <div className="flex item-center justify-center">
-                                  <div className="relative">
-                                    <button
-                                      className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                      onClick={() => toggleMenu(player?._id)}
-                                    >
-                                      <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                                    </button>
-                                    {(isOpenAction === player?._id) && (
-                                      <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                                        <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                          <a onClick={() => {
-                                            setUpdatePlayer(player);
-                                            setAddUpdatePlayer(true);
-                                            setIsOpenAction('');
-                                          }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                                          <a onClick={() => {
-                                            onDelete(player, index);
-                                            setIsOpenAction('');
-                                          }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Delete</a>
-                                          {/* <a
-                                            onClick={() => {
-                                              setUpdatePlayer(player);
-                                              setAddUpdatePlayer(true);
-                                              setIsOpenAction('');
-                                              setAddInAnotherLeague(true);
-                                            }}
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a> */}
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </TD>
-                            </>
-                          </tr>
-                        )}
-                      </>
-                    ))}
+                        </>
+                      ))))}
                     {provided.placeholder}
                   </tbody>
                 )
