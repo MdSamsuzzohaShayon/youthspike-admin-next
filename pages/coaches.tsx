@@ -80,11 +80,29 @@ const TEAMS = gql`
   }
 `;
 
+const LEAGUE_DROPDOWN = gql`
+  query GetLeagues {
+    getLeagues {
+      code
+      success
+      message
+      data {
+        _id
+        name
+      }
+    }
+  }
+`;
+
 export default function CoachesPage() {
+
+  const leaguesQuery = useQuery(LEAGUE_DROPDOWN);
+
   const [isOpen, setIsOpen] = useState('');
   const [addUpdateCoach, setAddUpdateCoach] = useState(false);
   const [updateCoach, setUpdateCoach] = useState(null);
   const [searchKey, setSearchKey] = useState('');
+  const [leagueId, setLeagueId] = useState('');
   const [isOpenAction, setIsOpenAction] = useState('');
   const [filteredCoaches, setFilteredCoachs] = useState<any[]>([]);
   const [allCoachData, setAllCoachData] = useState<{ coach: { team: { name: any; _id: any; league: any; }; }; _id: any; firstName: any; lastName: any; }[]>([]);
@@ -227,6 +245,40 @@ export default function CoachesPage() {
               <svg xmlns="http://www.w3.org/2000/svg" className="ionicon w-7 h-7 mr-2" viewBox="0 0 512 512"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 176v160M336 256H176" /></svg>
               Add a Coach
             </button>
+          </div>
+        </div>
+
+        <div className="flex justify-end items-center mb-4">
+          <div className="flex align-self-right">
+            <div
+              className="border border-gray-30 w-[250px]"
+
+              style={{
+                borderRadius: '8px',
+                height: '42px',
+                color: 'grey',
+              }}>
+              <select
+                className="w-[248px]"
+                name="leagueId"
+                id="leagueId"
+                value={leagueId}
+                onChange={(e) => setLeagueId(e.target.value)}
+                style={{
+                  borderRadius: '8px',
+                  padding: '8px',
+                }}
+              >
+                <option>Select a league</option>
+                <option>UnAssigned</option>
+                {leaguesQuery?.data?.getLeagues?.code === 200 &&
+                  leaguesQuery?.data?.getLeagues?.data?.map((league: any) => (
+                    <option key={league?._id} value={league?._id}>
+                      {league?.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
           </div>
         </div>
 

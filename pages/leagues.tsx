@@ -5,7 +5,13 @@ import { gql, useMutation, useLazyQuery } from "@apollo/client";
 import { TD, TDR, TH, THR } from "@/components/table";
 import { format } from "date-fns";
 import { useRouter } from "next/router";
-import { LoginService } from "@/utils/login";
+import { LoginService } from "@/utils/login"; import {
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+  Button,
+} from "@material-tailwind/react";
 
 const LEAGUES = gql`
   query GetLeagues(
@@ -195,23 +201,22 @@ export default function LeaguesPage() {
                         userRole === 'admin' ?
                           <div className="flex item-center justify-center">
                             <div className="relative">
-                              <button
-                                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                onClick={() => toggleMenu(league?._id)}
-                              >
-                                <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                              </button>
-                              {(isOpenAction === league?._id) && (
-                                <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                                  <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                    <a onClick={() => {
+                              <>
+                                <Menu>
+                                  <MenuHandler>
+                                    <Button className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" variant="gradient"><svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg></Button>
+                                  </MenuHandler>
+                                  <MenuList>
+                                    <MenuItem onClick={() => {
                                       setUpdateLeague(league);
                                       setAddUpdateLeague(true);
-                                      setIsOpenAction('');
-                                    }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                                  </div>
-                                </div>
-                              )}
+                                      setIsOpenAction('')
+                                    }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Edit</MenuItem>
+                                    <MenuItem onClick={() =>
+                                      toggleMatch(league?._id)} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">View Teams</MenuItem>
+                                  </MenuList>
+                                </Menu>
+                              </>
                             </div>
                           </div>
                           :
