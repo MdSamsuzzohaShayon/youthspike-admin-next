@@ -5,35 +5,6 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 
-const TEAM_DROPDOWN = gql`
-  query GetTeams {
-    getTeams {
-      code
-      success
-      message
-      data {
-        _id
-        name
-        leagueId
-      }
-    }
-  }
-`;
-
-const LEAGUE_DROPDOWN = gql`
-  query GetLeagues {
-    getLeagues {
-      code
-      success
-      message
-      data {
-        _id
-        name
-      }
-    }
-  }
-`;
-
 const ADD_UPDATE_COACH = gql`
   mutation SignupCoach(
     $firstName: String!
@@ -83,20 +54,12 @@ interface AddUpdateCoachProps {
 }
 
 export default function AddUpdateCoach(props: AddUpdateCoachProps) {
-  const teamsQuery = useQuery(TEAM_DROPDOWN);
-  const leaguesQuery = useQuery(LEAGUE_DROPDOWN);
 
   const [email, setEmail] = useState(props?.coach?.login?.email || "");
   const [password, setPassword] = useState(props?.coach?.login?.password || "");
   const [firstName, setFirstName] = useState(props?.coach?.firstName || "");
   const [lastName, setLastName] = useState(props?.coach?.lastName || "");
-  const [teamId, setTeamId] = useState(props?.coach?.player?.teamId || '');
-  const [rank, setRank] = useState(props?.coach?.player?.rank || 1);
   const [isPlayer, setIsPlayer] = useState(props?.coach?.role === 'playerAndCoach');
-
-  const [shirtNumber, setShirtNumber] = useState(props?.coach?.player?.rank || 1);
-
-  const [leagueId, setLeagueId] = useState(props?.coach?.player?.leagueId);
 
   const [active, setActive] = useState(
     props?.coach ? props?.coach?.active + "" : "true"
@@ -110,10 +73,8 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
         lastName,
         email,
         password,
-        shirtNumber,
-        leagueId,
-        teamId,
-        rank,
+        leagueId: props?.coach?.coach?.team?.league?._id || '',
+        teamId: props?.coach?.coach?.team?._id || '',
         role: isPlayer ? 'playerAndCoach' : 'coach',
         id: props?.coach?._id,
       },
@@ -127,7 +88,6 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
       console.log(JSON.parse(JSON.stringify(error)));
     }
   }, [props, data, error]);
-  const updatedTeams = teamsQuery?.data?.getTeams?.data?.filter((current: { leagueId: any; }) => (leagueId?.length > 0 && current?.leagueId === leagueId))
   return (
     <>
       <Modal showModal={true} onClose={() => props.onClose && props.onClose()}>
@@ -225,10 +185,10 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
 
             <div className="w-full md:w-1/2 lg:w-1/3 my-2">
               <input id="default-checkbox" type="checkbox" checked={isPlayer} onChange={() => setIsPlayer(!isPlayer)} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-              <label htmlFor="default-checkbox" className="ml-2 font-bold text-black ">is Player</label>
+              <label htmlFor="default-checkbox" className="ml-2 font-bold text-black ">Mark as a Player</label>
             </div>
           </div>
-          {
+          {/* {
             isPlayer && (
               <div className="flex flex-row flex-wrap">
                 <div className="w-full md:w-1/2 lg:w-1/3 my-2">
@@ -313,7 +273,7 @@ export default function AddUpdateCoach(props: AddUpdateCoachProps) {
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
           <hr />
 
           <div className="my-2">
