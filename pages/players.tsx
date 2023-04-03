@@ -9,6 +9,13 @@ import { useRouter } from "next/router";
 import _, { constant } from 'lodash';
 import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
 import { LoginService } from "@/utils/login";
+import {
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+  Button,
+} from "@material-tailwind/react";
 
 const PLAYERS = gql`
   query GetPlayers(
@@ -615,7 +622,7 @@ export default function PlayersPage() {
                                   <TD>
                                     <div className="flex item-center justify-center">
                                       <div className="relative">
-                                        <button
+                                        {/* <button
                                           className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                           onClick={() => toggleMenu(`${player?._id}-${current?.team?.id}-${current?.league?.id}-${index}`)}
                                         >
@@ -685,7 +692,74 @@ export default function PlayersPage() {
                                                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in Another League</a></>)}
                                             </div>
                                           </div>
-                                        )}
+                                        )} */}
+                                        <>
+                                          <Menu>
+                                            <MenuHandler>
+                                              <Button className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" variant="gradient"><svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg></Button>
+                                            </MenuHandler>
+                                            <MenuList>
+                                              <MenuItem onClick={() => {
+                                                setUpdatePlayer({
+                                                  ...player,
+                                                  player: {
+                                                    ...player?.player,
+                                                    league: {
+                                                      _id: current?.league?.id,
+                                                      name: current?.league?.name,
+                                                    },
+                                                    team: {
+                                                      _id: current?.team?.id,
+                                                      name: current?.team?.name,
+                                                    },
+                                                  },
+
+                                                });
+                                                setAddUpdatePlayer(true);
+                                                setIsOpenAction('');
+                                              }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Edit</MenuItem>
+                                              {userRole === 'admin' && (<><MenuItem onClick={() => {
+                                                onDelete({
+                                                  ...player,
+                                                  player: {
+                                                    ...player?.player,
+                                                    league: {
+                                                      _id: current?.league?.id,
+                                                      name: current?.league?.name,
+                                                    },
+                                                    team: {
+                                                      _id: current?.team?.id,
+                                                      name: current?.team?.name,
+                                                    },
+                                                  },
+
+                                                }, index);
+                                                setIsOpenAction('');
+                                              }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Delete</MenuItem></>)}
+                                              <MenuItem onClick={() => {
+                                                setUpdatePlayer({
+                                                  ...player,
+                                                  player: {
+                                                    ...player?.player,
+                                                    league: {
+                                                      _id: current?.league?.id,
+                                                      name: current?.league?.name,
+                                                    },
+                                                    team: {
+                                                      _id: current?.team?.id,
+                                                      name: current?.team?.name,
+                                                    },
+                                                  },
+
+                                                });
+                                                setAddUpdatePlayer(true);
+                                                setIsOpenAction('');
+                                                setAddInAnotherLeague(true);
+                                              }}
+                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Add In Other League</MenuItem>
+                                            </MenuList>
+                                          </Menu>
+                                        </>
                                       </div>
                                     </div>
 
@@ -711,7 +785,7 @@ export default function PlayersPage() {
                                 <TD>
                                   <div className="flex item-center justify-center">
                                     <div className="relative">
-                                      <button
+                                      {/* <button
                                         className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                         onClick={() => toggleMenu(`${player?._id}-${current?.team?.id}-${current?.league?.id}-${index}`)}
                                       >
@@ -782,7 +856,72 @@ export default function PlayersPage() {
                                             </>)}
                                           </div>
                                         </div>
-                                      )}
+                                      )} */}
+                                      <Menu>
+                                        <MenuHandler>
+                                          <Button className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" variant="gradient"><svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg></Button>
+                                        </MenuHandler>
+                                        <MenuList>
+                                          <MenuItem onClick={() => {
+                                            setUpdatePlayer({
+                                              ...player,
+                                              player: {
+                                                ...player?.player,
+                                                league: {
+                                                  _id: current?.league?.id,
+                                                  name: current?.league?.name,
+                                                },
+                                                team: {
+                                                  _id: current?.team?.id,
+                                                  name: current?.team?.name,
+                                                },
+                                              },
+
+                                            });
+                                            setAddUpdatePlayer(true);
+                                            setIsOpenAction('');
+                                          }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Edit</MenuItem>
+                                          {userRole === 'admin' && (<><MenuItem onClick={() => {
+                                            onDelete({
+                                              ...player,
+                                              player: {
+                                                ...player?.player,
+                                                league: {
+                                                  _id: current?.league?.id,
+                                                  name: current?.league?.name,
+                                                },
+                                                team: {
+                                                  _id: current?.team?.id,
+                                                  name: current?.team?.name,
+                                                },
+                                              },
+
+                                            }, index);
+                                            setIsOpenAction('');
+                                          }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Delete</MenuItem></>)}
+                                          <MenuItem onClick={() => {
+                                            setUpdatePlayer({
+                                              ...player,
+                                              player: {
+                                                ...player?.player,
+                                                league: {
+                                                  _id: current?.league?.id,
+                                                  name: current?.league?.name,
+                                                },
+                                                team: {
+                                                  _id: current?.team?.id,
+                                                  name: current?.team?.name,
+                                                },
+                                              },
+
+                                            });
+                                            setAddUpdatePlayer(true);
+                                            setIsOpenAction('');
+                                            setAddInAnotherLeague(true);
+                                          }}
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Add In Other League</MenuItem>
+                                        </MenuList>
+                                      </Menu>
                                     </div>
                                   </div>
                                 </TD>
