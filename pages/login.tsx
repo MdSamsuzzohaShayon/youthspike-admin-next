@@ -77,7 +77,7 @@ export default function LoginPage() {
       LoginService.saveUser({ ...loginData.user, timeStamp: new Date() });
       LoginService.saveToken(loginData.token);
       toast('Login Sucessfully.', { toastId: 'blockuser', hideProgressBar: false, autoClose: 7000, type: 'success' });
-      window.location.href = "/";
+      window.location.href = "/leagues";
     } else if (data?.login?.code == 404) {
       toast('Email or Password is Invalid.', { toastId: 'blockuser', hideProgressBar: false, autoClose: 7000, type: 'error' });
     }
