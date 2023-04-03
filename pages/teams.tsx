@@ -10,6 +10,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useRouter } from "next/router";
 import { LoginService } from "@/utils/login";
+import {
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+  Button,
+} from "@material-tailwind/react";
 
 
 const TEAMS = gql`
@@ -319,32 +326,27 @@ export default function TeamsPage() {
                           userRole === 'admin' ?
                             <div className="flex item-center justify-center">
                               <div className="relative">
-                                <button
-                                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                  onClick={() => toggleMenu(`${team?._id}-${team?.teamLeaguesData && team?.teamLeaguesData[0]?._id}`)}
-                                >
-                                  <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
-                                </button>
-                                {(isOpenAction === `${team?._id}-${team?.teamLeaguesData && team?.teamLeaguesData[0]?._id}`) && (
-                                  <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                                    <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                                      <a onClick={() => {
-                                        setUpdateTeam({ ...team, league: team?.teamLeaguesData && team?.teamLeaguesData[0] });
-                                        setAddUpdateTeam(true);
-                                        setIsOpenAction('');
-                                      }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Edit</a>
-                                      <a onClick={() => {
-                                        setUpdateTeam({ ...team, league: team?.teamLeaguesData && team?.teamLeaguesData[0] });
-                                        setAddUpdateTeam(true);
-                                        setIsOpenAction('');
-                                        setAddInOtherLeague(true);
-                                      }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in other league</a>
-                                      <a onClick={() => {
-                                        toggleTeam(team?._id)
-                                      }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">View Players</a>
-                                    </div>
-                                  </div>
-                                )}
+                                <Menu>
+                                  <MenuHandler>
+                                    <Button className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" variant="gradient"><svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg></Button>
+                                  </MenuHandler>
+                                  <MenuList>
+                                    <MenuItem onClick={() => {
+                                      setUpdateTeam({ ...team, league: team?.teamLeaguesData && team?.teamLeaguesData[0] });
+                                      setAddUpdateTeam(true);
+                                      setIsOpenAction('');
+                                    }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Edit</MenuItem>
+                                    <MenuItem onClick={() => {
+                                      setUpdateTeam({ ...team, league: team?.teamLeaguesData && team?.teamLeaguesData[0] });
+                                      setAddUpdateTeam(true);
+                                      setIsOpenAction('');
+                                      setAddInOtherLeague(true);
+                                    }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Add in other league</MenuItem>
+                                    <MenuItem onClick={() => {
+                                      toggleTeam(team?._id)
+                                    }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">View Players</MenuItem>
+                                  </MenuList>
+                                </Menu>
                               </div>
                             </div>
                             :
@@ -546,7 +548,7 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
                                   userRole === 'admin' ?
                                     <div className="flex item-center justify-center">
                                       <div className="relative">
-                                        <button
+                                        {/* <button
                                           className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                           onClick={() => toggleMenu(`${team?._id}-${current?._id}`)}
                                         >
@@ -568,7 +570,28 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
                                               }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in other league</a>
                                             </div>
                                           </div>
-                                        )}
+                                        )} */}
+                                        <Menu>
+                                          <MenuHandler>
+                                            <Button className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" variant="gradient"><svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg></Button>
+                                          </MenuHandler>
+                                          <MenuList>
+                                            <MenuItem onClick={() => {
+                                              setUpdateTeam({ ...team, league: team?.teamLeaguesData && team?.teamLeaguesData[0] });
+                                              setAddUpdateTeam(true);
+                                              setIsOpenAction('');
+                                            }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Edit</MenuItem>
+                                            <MenuItem onClick={() => {
+                                              setUpdateTeam({ ...team, league: team?.teamLeaguesData && team?.teamLeaguesData[0] });
+                                              setAddUpdateTeam(true);
+                                              setIsOpenAction('');
+                                              setAddInOtherLeague(true);
+                                            }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Add in other league</MenuItem>
+                                            <MenuItem onClick={() => {
+                                              toggleTeam(team?._id)
+                                            }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">View Players</MenuItem>
+                                          </MenuList>
+                                        </Menu>
                                       </div>
                                     </div>
                                     :
