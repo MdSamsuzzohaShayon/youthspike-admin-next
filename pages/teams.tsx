@@ -76,6 +76,7 @@ export default function TeamsPage() {
   const [addInOtherLeague, setAddInOtherLeague] = useState(false);
   const [searchKey, setSearchKey] = useState('');
   const [isOpenAction, setIsOpenAction] = useState('');
+  const [leagueId, setLeagueId] = useState('');
   const [filteredTeams, setFilteredTeams] = useState<any[]>([]);
   const [allTeamData, setAllTeamData] = useState<any[]>([]);
   const [updateTeam, setUpdateTeam] = useState<any>(null);
@@ -237,9 +238,43 @@ export default function TeamsPage() {
 
         </div>
 
+        <div className="flex justify-end items-center mb-4">
+          <div className="flex align-self-right">
+            <div
+              className="border border-gray-30 w-[250px]"
+
+              style={{
+                borderRadius: '8px',
+                height: '42px',
+                color: 'grey',
+              }}>
+              <select
+                className="w-[248px]"
+                name="leagueId"
+                id="leagueId"
+                value={leagueId}
+                onChange={(e) => setLeagueId(e.target.value)}
+                style={{
+                  borderRadius: '8px',
+                  padding: '8px',
+                }}
+              >
+                <option>Select a league</option>
+                <option>UnAssigned</option>
+                {leaguesData?.getLeagues?.code === 200 &&
+                  leaguesData?.getLeagues?.data?.map((league: any) => (
+                    <option key={league?._id} value={league?._id}>
+                      {league?.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
         <div style={{
           maxHeight: 'calc(100vh - 200px)'
-        }} className="w-[calc((w-screen)-(w-1/5)) overflow-scroll ">
+        }} className="w-[calc((w-screen)-(w-1/5)) overflow-scroll">
           <table className="app-table w-full">
             <thead className="w-full sticky top-0 z-20">
               <THR>
@@ -304,6 +339,9 @@ export default function TeamsPage() {
                                         setIsOpenAction('');
                                         setAddInOtherLeague(true);
                                       }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">Add in other league</a>
+                                      <a onClick={() => {
+                                        toggleTeam(team?._id)
+                                      }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">View Players</a>
                                     </div>
                                   </div>
                                 )}
