@@ -809,19 +809,18 @@ const LEAGUE_DROPDOWN = gql`
                         `;
 
 const COACH_DROPDOWN = gql`
-                        query GetCoaches {
-                          getCoaches {
-                          code
-      success
-                        message
-                        data {
-                          _id
-        firstName
-                        lastName
-      }
+  query GetCoaches {
+    getCoaches {
+    code
+    success
+    message
+    data {
+      _id
+      firstName
+      lastName
     }
   }
-                        `;
+}`;
 
 const ADD_UPDATE_LEAGUE = gql`
                         mutation CreateOrUpdateTeam(
@@ -903,6 +902,19 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
     }
   }, [data, error]);
 
+  let updatedLeagues: { _id: any; }[] = [];
+  if (props?.addInOtherLeague) {
+    leaguesQuery?.data?.getLeagues?.data?.map((current: { _id: any; }) => {
+      const find = props?.team?.teamLeaguesData?.find((curTeam: { _id: any; }) => curTeam?._id === current?._id);
+      if (!find) {
+        updatedLeagues.push(current);
+      }
+    })
+  } else {
+    updatedLeagues = leaguesQuery?.data?.getLeagues?.data;
+  }
+
+
   return (
     <>
       <Modal showModal={true} onClose={() => props.onClose && props.onClose()}>
@@ -938,12 +950,11 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
                   onChange={(e) => setLeagueId(e.target.value)}
                 >
                   <option>Select a league</option>
-                  {leaguesQuery?.data?.getLeagues?.code === 200 &&
-                    leaguesQuery?.data?.getLeagues?.data?.map((league: any) => (
-                      <option key={league?._id} value={league?._id}>
-                        {league?.name}
-                      </option>
-                    ))}
+                  {updatedLeagues?.map((league: any) => (
+                    <option key={league?._id} value={league?._id}>
+                      {league?.name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -1040,7 +1051,7 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
                   }
                 }}
               >
-                Update Team
+                {props?.addInOtherLeague ? "Add In Another League" : "Update Team"}
               </button>
             ) : (
               <button

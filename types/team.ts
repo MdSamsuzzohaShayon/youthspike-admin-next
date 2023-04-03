@@ -10,4 +10,5 @@ export interface ITeam extends IDocument {
   leagueId: string;
   league?: ILeague;
   players?: IUser[];
+  teamLeaguesData?: any;
 }
