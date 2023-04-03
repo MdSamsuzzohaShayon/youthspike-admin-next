@@ -291,7 +291,7 @@ export default function TeamsPage() {
                                   <svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg>
                                 </button>
                                 {(isOpenAction === `${team?._id}-${team?.teamLeaguesData && team?.teamLeaguesData[0]?._id}`) && (
-                                  <div ref={ref} className="z-20 absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                  <div ref={ref} className="z-20 absolute  top-50 right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                                     <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                       <a onClick={() => {
                                         setUpdateTeam({ ...team, league: team?.teamLeaguesData && team?.teamLeaguesData[0] });
@@ -748,19 +748,18 @@ const LEAGUE_DROPDOWN = gql`
                         `;
 
 const COACH_DROPDOWN = gql`
-                        query GetCoaches {
-                          getCoaches {
-                          code
-      success
-                        message
-                        data {
-                          _id
-        firstName
-                        lastName
-      }
+  query GetCoaches {
+    getCoaches {
+    code
+    success
+    message
+    data {
+      _id
+      firstName
+      lastName
     }
   }
-                        `;
+}`;
 
 const ADD_UPDATE_LEAGUE = gql`
                         mutation CreateOrUpdateTeam(
@@ -842,6 +841,19 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
     }
   }, [data, error]);
 
+  let updatedLeagues: { _id: any; }[] = [];
+  if (props?.addInOtherLeague) {
+    leaguesQuery?.data?.getLeagues?.data?.map((current: { _id: any; }) => {
+      const find = props?.team?.teamLeaguesData?.find((curTeam: { _id: any; }) => curTeam?._id === current?._id);
+      if (!find) {
+        updatedLeagues.push(current);
+      }
+    })
+  } else {
+    updatedLeagues = leaguesQuery?.data?.getLeagues?.data;
+  }
+
+
   return (
     <>
       <Modal showModal={true} onClose={() => props.onClose && props.onClose()}>
@@ -877,12 +889,11 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
                   onChange={(e) => setLeagueId(e.target.value)}
                 >
                   <option>Select a league</option>
-                  {leaguesQuery?.data?.getLeagues?.code === 200 &&
-                    leaguesQuery?.data?.getLeagues?.data?.map((league: any) => (
-                      <option key={league?._id} value={league?._id}>
-                        {league?.name}
-                      </option>
-                    ))}
+                  {updatedLeagues?.map((league: any) => (
+                    <option key={league?._id} value={league?._id}>
+                      {league?.name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -979,7 +990,7 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
                   }
                 }}
               >
-                Update Team
+                {props?.addInOtherLeague ? "Add In Another League" : "Update Team"}
               </button>
             ) : (
               <button
