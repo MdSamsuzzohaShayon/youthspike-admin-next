@@ -217,6 +217,18 @@ export default function TeamsPage() {
     teamsTableData.push({ ...current, teamLeaguesData })
   })
 
+  const updatedTeamsTableData: any[] = [];
+  teamsTableData?.forEach(cur => {
+    const filterMapping = cur?.teamLeaguesData?.find((curdata: { _id: string; }) =>
+      router?.query?.leagueId ? curdata?._id === router?.query?.leagueId?.toString() : leagueId?.length > 0 && leagueId !== "Select a league" ? curdata?._id === leagueId : true);
+
+    if (filterMapping) {
+      updatedTeamsTableData.push({
+        ...cur,
+      })
+    }
+  })
+
   return (
     <Layout title="Teams" page={LayoutPages.teams}>
       <>
@@ -297,7 +309,7 @@ export default function TeamsPage() {
             </thead>
 
             <tbody className="w-full">
-              {teamsTableData.map((team: any) => (
+              {updatedTeamsTableData.map((team: any) => (
                 <>
                   <TDR key={`${team?._id}-${team?.teamLeaguesData && team?.teamLeaguesData[0]?._id}`}>
                     <>
