@@ -234,7 +234,7 @@ export default function CoachesPage() {
       <>
         <div className="w-[calc((w-screen)-(w-1/5)) overflow-hidden flex justify-between pb-4 pt-2">
           <div className="relative w-1/2">
-            <div className="relative m-2">
+            <div className="flex relative m-2">
               <input
                 type="text"
                 className="block w-full py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
@@ -243,6 +243,39 @@ export default function CoachesPage() {
               />
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg aria-hidden="true" className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
+              </div>
+              <div className="ml-4">
+                <div className="flex align-self-right">
+                  <div
+                    className="border border-gray-30 w-[160px]"
+
+                    style={{
+                      borderRadius: '8px',
+                      height: '42px',
+                      color: 'grey',
+                    }}>
+                    <select
+                      className="w-[158px]"
+                      name="leagueId"
+                      id="leagueId"
+                      value={leagueId}
+                      onChange={(e) => setLeagueId(e.target.value)}
+                      style={{
+                        borderRadius: '8px',
+                        padding: '8px',
+                      }}
+                    >
+                      <option>Select a league</option>
+                      <option>UnAssigned</option>
+                      {leaguesQuery?.data?.getLeagues?.code === 200 &&
+                        leaguesQuery?.data?.getLeagues?.data?.map((league: any) => (
+                          <option key={league?._id} value={league?._id}>
+                            {league?.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -253,40 +286,6 @@ export default function CoachesPage() {
               <svg xmlns="http://www.w3.org/2000/svg" className="ionicon w-7 h-7 mr-2" viewBox="0 0 512 512"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" /><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 176v160M336 256H176" /></svg>
               Add a Coach
             </button>
-          </div>
-        </div>
-
-        <div className="flex justify-end items-center mb-4">
-          <div className="flex align-self-right">
-            <div
-              className="border border-gray-30 w-[250px]"
-
-              style={{
-                borderRadius: '8px',
-                height: '42px',
-                color: 'grey',
-              }}>
-              <select
-                className="w-[248px]"
-                name="leagueId"
-                id="leagueId"
-                value={leagueId}
-                onChange={(e) => setLeagueId(e.target.value)}
-                style={{
-                  borderRadius: '8px',
-                  padding: '8px',
-                }}
-              >
-                <option>Select a league</option>
-                <option>UnAssigned</option>
-                {leaguesQuery?.data?.getLeagues?.code === 200 &&
-                  leaguesQuery?.data?.getLeagues?.data?.map((league: any) => (
-                    <option key={league?._id} value={league?._id}>
-                      {league?.name}
-                    </option>
-                  ))}
-              </select>
-            </div>
           </div>
         </div>
 

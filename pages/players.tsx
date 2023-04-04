@@ -483,26 +483,25 @@ export default function PlayersPage() {
               Add a Player
             </button>
           </div>
-          <div className="relative w-1/2 m-3">
-            <input
-              type="text"
-              className=" w-full block py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
-              placeholder="Search"
-              onChange={onSearch}
-              value={searchKey}
-              onKeyDown={onKeyPress}
-            />
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <svg aria-hidden="true" className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
+        </div>
+        <div className="flex justify-between mb-4">
+          <div className="relative w-1/3">
+            <div className="flex relative m-2 w-full">
+              <input
+                type="text"
+                className=" w-full block py-2 pl-10 pr-3 leading-5 text-gray-900 placeholder-gray-500 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:placeholder-gray-400 sm:text-sm"
+                placeholder="Search"
+                onChange={onSearch}
+                value={searchKey}
+                onKeyDown={onKeyPress}
+              />
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <svg aria-hidden="true" className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="flex justify-end items-center mb-4">
-
-          <div className="flex align-self-right">
-            <div
-              className="border border-gray-30"
-
+          <div className="flex self-center">
+            <div className="border border-gray-30"
               style={{
                 borderRadius: '8px',
                 height: '42px',
@@ -694,7 +693,8 @@ export default function PlayersPage() {
                                           </div>
                                         )} */}
                                         <>
-                                          <Menu>
+                                          <Menu handler={() => setIsOpenAction(isOpenAction?.length > 0 ? '' : `${player?._id}-${current?.team?.id}-${current?.league?.id}-${index}`)}
+                                            open={`${player?._id}-${current?.team?.id}-${current?.league?.id}-${index}` === isOpenAction}>
                                             <MenuHandler>
                                               <Button className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" variant="gradient"><svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg></Button>
                                             </MenuHandler>
@@ -858,8 +858,8 @@ export default function PlayersPage() {
                                         </div>
                                       )} */}
                                       <Menu
-                                      // handler={() => setIsOpenAction(isOpenAction?.length > 0 ? '' : `${player?._id}-${current?.team?.id}-${current?.league?.id}-${index}`)}
-                                      // open={`${player?._id}-${current?.team?.id}-${current?.league?.id}-${index}` === isOpenAction}
+                                        handler={() => setIsOpenAction(isOpenAction?.length > 0 ? '' : `${player?._id}-${current?.team?.id}-${current?.league?.id}-${index}`)}
+                                        open={`${player?._id}-${current?.team?.id}-${current?.league?.id}-${index}` === isOpenAction}
                                       >
                                         <MenuHandler>
                                           <Button className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" variant="gradient"><svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg></Button>
