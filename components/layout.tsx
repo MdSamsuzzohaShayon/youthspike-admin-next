@@ -90,8 +90,8 @@ export default function Layout(props: LayoutProps) {
         <div
           className="flex items-center flex-row shadow-md overflow-hidden bg-white border-b border-gray-200 px-6 py-2 items-center justify-between"
           style={{ height: "10%" }}>
-          <h1 className="text-3xl text-center font-bold p-2">
-            Spikeball Admin
+          <h1 className="text-3xl text-center font-normal p-2">
+            Greetings | Spikeball league
           </h1>
 
           <div className="flex align-right items-center">
@@ -105,7 +105,7 @@ export default function Layout(props: LayoutProps) {
                     {user && (
                       <div>
                         <b>
-                          <span className="capitalize">{user?.role}:</span>&nbsp;{user?.firstName}&nbsp;{user?.lastName}
+                          {user?.role === 'admin' ? 'Admin' : user?.firstName}
                         </b>
                       </div>
                     )}
