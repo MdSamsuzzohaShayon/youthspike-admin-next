@@ -419,7 +419,7 @@ export default function PlayersPage() {
   displayPlayers?.map(currentPlayer => {
     const findmap = allMapping?.find((curmap: { playerId: any; }) => curmap?.playerId === currentPlayer?._id);
     if (findmap?.teamAndLeague?.length > 0) {
-      const findPlayer = findmap?.teamAndLeague?.find((curPlayer: { league: { id: any; }; team: { id: any; }; }) => curPlayer?.league?.id === currentPlayer?.player?.league?._id && curPlayer?.team?.id === currentPlayer?.player?.team?._id)
+      const findPlayer = findmap?.teamAndLeague?.find((curPlayer: { league: { id: any; }; team: { id: any; }; }) => curPlayer?.league?.id === currentPlayer?.player?.leagueId && curPlayer?.team?.id === currentPlayer?.player?.teamId)
       const arrayData = findmap?.teamAndLeague ? [...findmap?.teamAndLeague] : [];
       if (!findPlayer) {
         arrayData.push({
