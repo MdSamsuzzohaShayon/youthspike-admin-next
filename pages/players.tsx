@@ -857,7 +857,10 @@ export default function PlayersPage() {
                                           </div>
                                         </div>
                                       )} */}
-                                      <Menu>
+                                      <Menu
+                                      // handler={() => setIsOpenAction(isOpenAction?.length > 0 ? '' : `${player?._id}-${current?.team?.id}-${current?.league?.id}-${index}`)}
+                                      // open={`${player?._id}-${current?.team?.id}-${current?.league?.id}-${index}` === isOpenAction}
+                                      >
                                         <MenuHandler>
                                           <Button className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" variant="gradient"><svg className="w-6 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path></svg></Button>
                                         </MenuHandler>

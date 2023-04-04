@@ -122,7 +122,7 @@ export default function AddUpdatePlayer(props: AddUpdatePlayerProps) {
   );
 
   const [leagueId, setLeagueId] = useState(
-    props?.player?.player?.league?._id || ""
+    props?.player?.player?.league?._id || 'UnAssigned'
   );
 
   const [active, setActive] = useState(
