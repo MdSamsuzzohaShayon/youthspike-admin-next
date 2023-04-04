@@ -219,8 +219,9 @@ export default function CoachesPage() {
     }
   }
 
+  const tabaleData = getCoachesForDisplay()?.filter(filt => leagueId?.length > 0 && leagueId !== 'Select a league' ? filt?.coach?.team?.league?._id === leagueId : true);
 
-  const groupedData = Object.values(getCoachesForDisplay()?.reduce((acc, curr) => {
+  const groupedData = Object.values(tabaleData?.reduce((acc, curr) => {
     if (!acc[curr._id]) {
       acc[curr._id] = { coachId: curr._id, mappedArray: [] };
     }
