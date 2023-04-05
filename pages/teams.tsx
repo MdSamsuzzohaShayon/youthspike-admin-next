@@ -308,16 +308,16 @@ export default function TeamsPage() {
             </thead>
 
             <tbody className="w-full">
-              {updatedTeamsTableData.map((team: any) => (
+              {updatedTeamsTableData.map((team: any, index: number) => (
                 <>
-                  <TDR key={`${team?._id}-${team?.teamLeaguesData && team?.teamLeaguesData[0]?._id}`}>
+                  <TDR key={`${team?._id}-${team?.teamLeaguesData && team?.teamLeaguesData[0]?._id}-${index}-${index}`}>
                     <>
                       <TD>
                         {team?.teamLeaguesData?.length > 1 ? (<button
                           className="text-white px-4 py-2 rounded"
-                          onClick={() => setIsOpen(isOpen?.length ? '' : `collapsible-${team?._id}-${team?.teamLeaguesData && team?.teamLeaguesData[0]?._id}`)}
+                          onClick={() => setIsOpen(isOpen?.length ? '' : `collapsible-${team?._id}-${team?.teamLeaguesData && team?.teamLeaguesData[0]?._id}-${index}`)}
                         >
-                          {isOpen === `collapsible-${team?._id}-${team?.teamLeaguesData && team?.teamLeaguesData[0]?._id}` ? <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M12 17.414 3.293 8.707l1.414-1.414L12 14.586l7.293-7.293 1.414 1.414L12 17.414z" /></svg> : <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M7.293 4.707 14.586 12l-7.293 7.293 1.414 1.414L17.414 12 8.707 3.293 7.293 4.707z" /></svg>}
+                          {isOpen === `collapsible-${team?._id}-${team?.teamLeaguesData && team?.teamLeaguesData[0]?._id}-${index}` ? <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M12 17.414 3.293 8.707l1.414-1.414L12 14.586l7.293-7.293 1.414 1.414L12 17.414z" /></svg> : <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M7.293 4.707 14.586 12l-7.293 7.293 1.414 1.414L17.414 12 8.707 3.293 7.293 4.707z" /></svg>}
 
                         </button>) : <></>}
 
@@ -535,7 +535,7 @@ l-30 87 26 21 c28 22 36 23 71 14z m136 -88 c49 -41 168 -121 235 -158 24 -13
                       </TD>
                     </>
                   </TDR>
-                  {isOpen === `collapsible-${team?._id}-${team?.teamLeaguesData && team?.teamLeaguesData[0]?._id}` && team?.teamLeaguesData?.length > 1 && (
+                  {isOpen === `collapsible-${team?._id}-${team?.teamLeaguesData && team?.teamLeaguesData[0]?._id}-${index}` && team?.teamLeaguesData?.length > 1 && (
                     <>
                       {team?.teamLeaguesData?.map((current: any, index: number) => (
                         index > 0 && (

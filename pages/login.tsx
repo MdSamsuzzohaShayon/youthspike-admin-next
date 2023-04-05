@@ -60,7 +60,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loginFunction, { data, error, loading }] = useMutation(LOGIN,)
 
-  const xyz = () => {
+  const onLogin = () => {
     loginFunction({
       variables: {
         email,
@@ -83,7 +83,11 @@ export default function LoginPage() {
     }
   }, [data]);
 
-
+  const onKeyPress = (event: any) => {
+    if (event?.key === 'Enter') {
+      onLogin();
+    }
+  }
   return (
     <>
       <Head>
@@ -111,6 +115,7 @@ export default function LoginPage() {
                 className="w-full p-2 border rounded"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={onKeyPress}
               />
             </div>
 
@@ -122,6 +127,7 @@ export default function LoginPage() {
                 placeholder="Password"
                 className="w-full p-2 border rounded"
                 value={password}
+                onKeyDown={onKeyPress}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
@@ -129,7 +135,7 @@ export default function LoginPage() {
             <div className=" p-1 text-center">
               <button
                 className="w-1/3 rounded p-2 bg-slate-500 hover:bg-slate-500 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 text-white mt-4 font-bold transform transition duration-300 hover:scale-110"
-                onClick={() => xyz()}
+                onClick={() => onLogin()}
               >
                 Login
               </button>
