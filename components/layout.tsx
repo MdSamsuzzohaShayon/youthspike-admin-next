@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { gql, useMutation } from "@apollo/client";
 import { useContext, useEffect, useState, useRef, use } from "react";
 import { UserContext } from "@/config/auth";
 import Link from "next/link";
@@ -23,7 +24,21 @@ export default function Layout(props: LayoutProps) {
 
 
   const [isOpenAction, setIsOpenAction] = useState(false);
+  const [isChangePassword, setIsChangePassword] = useState(false);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [reEnterPassword, setReEnterPassword] = useState('');
   const ref = useRef<HTMLInputElement | null>(null);
+  const [changePassword, { data, error, loading }] = useMutation(LOGIN)
+
+  const changeHandle = () => {
+
+    changePassword({
+      variables: {
+        oldPassword,
+      },
+    });
+  }
 
   useEffect(() => {
     const checkIfClickedOutside = (e: { target: any; }) => {
@@ -99,8 +114,8 @@ export default function Layout(props: LayoutProps) {
               <svg enable-background="new 0 0 64 64" className="h-9 w-9" version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><g id="Layer_1"><g><circle cx="32" cy="32" fill="#4F5D73" r="32" /></g><g opacity="0.2"><g><path d="M43.905,47.543c-3.821-1.66-5.217-4.242-5.643-6.469c2.752-2.215,4.943-5.756,6.148-9.573     c1.239-1.579,1.96-3.226,1.96-4.62c0-0.955-0.347-1.646-0.955-2.158c-0.203-8.106-5.942-14.613-13.039-14.714     C32.322,10.009,32.268,10,32.213,10c-0.022,0-0.043,0.004-0.065,0.004c-7.052,0.039-12.783,6.41-13.125,14.409     c-0.884,0.528-1.394,1.305-1.394,2.469c0,1.641,0.992,3.63,2.663,5.448c1.187,3.327,3.118,6.38,5.5,8.438     c-0.354,2.292-1.699,5.039-5.697,6.776c-2.159,0.938-6.105,1.781-7.808,2.649c4.362,4.769,12.624,7.769,19.589,7.805l0.099,0.003     C31.983,57.999,31.992,58,32,58c7.014,0,15.325-3.01,19.713-7.808C50.01,49.324,46.063,48.481,43.905,47.543z" fill="#231F20" /></g></g><g><g><path d="M43.905,45.543c-3.821-1.66-5.217-4.242-5.643-6.469c2.752-2.215,4.943-5.756,6.148-9.573     c1.239-1.579,1.96-3.226,1.96-4.62c0-0.955-0.347-1.646-0.955-2.158C45.213,14.618,39.474,8.11,32.378,8.01     C32.322,8.009,32.268,8,32.213,8c-0.022,0-0.043,0.004-0.065,0.004c-7.052,0.039-12.783,6.41-13.125,14.409     c-0.884,0.528-1.394,1.305-1.394,2.469c0,1.641,0.992,3.63,2.663,5.448c1.187,3.327,3.118,6.38,5.5,8.438     c-0.354,2.292-1.699,5.039-5.697,6.776c-2.159,0.938-6.105,1.781-7.808,2.649c4.362,4.769,12.624,7.769,19.589,7.805l0.099,0.003     C31.983,55.999,31.992,56,32,56c7.014,0,15.325-3.01,19.713-7.808C50.01,47.324,46.063,46.481,43.905,45.543z" fill="#FFFFFF" /></g></g></g><g id="Layer_2" /></svg>
             </button>
             {(isOpenAction) && (
-              <div ref={ref} className="z-20 absolute right-5 top-[50px] mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                <div className="py-1 h-[120px]" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+              <div ref={ref} className="w-full z-40 absolute right-5 top-[50px] mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                   <div className="block h-[60px] items-center flex px-4 py-2 text-md bg-slate-200 text-gray-700 " role="menuitem">
                     {user && (
                       <div>
@@ -111,10 +126,19 @@ export default function Layout(props: LayoutProps) {
                     )}
                   </div>
                   <a onClick={() => {
+                    setIsChangePassword(true)
+                    setIsOpenAction(false)
+                  }} className="block h-[60px] px-4 py-2 items-center flex text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">
+
+                    <svg className="w-7 h-7 mt-2 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path opacity="0.4" d="M19.7906 4.22007C16.8306 1.27007 12.0306 1.27007 9.09063 4.22007C7.02063 6.27007 6.40063 9.22007 7.20063 11.8201L2.50063 16.5201C2.17063 16.8601 1.94063 17.5301 2.01063 18.0101L2.31063 20.1901C2.42063 20.9101 3.09063 21.5901 3.81063 21.6901L5.99063 21.9901C6.47063 22.0601 7.14063 21.8401 7.48063 21.4901L8.30063 20.6701C8.50063 20.4801 8.50063 20.1601 8.30063 19.9601L6.36063 18.0201C6.07063 17.7301 6.07063 17.2501 6.36063 16.9601C6.65063 16.6701 7.13063 16.6701 7.42063 16.9601L9.37063 18.9101C9.56063 19.1001 9.88063 19.1001 10.0706 18.9101L12.1906 16.8001C14.7806 17.6101 17.7306 16.9801 19.7906 14.9301C22.7406 11.9801 22.7406 7.17007 19.7906 4.22007ZM14.5006 12.0001C13.1206 12.0001 12.0006 10.8801 12.0006 9.50007C12.0006 8.12007 13.1206 7.00007 14.5006 7.00007C15.8806 7.00007 17.0006 8.12007 17.0006 9.50007C17.0006 10.8801 15.8806 12.0001 14.5006 12.0001Z" fill="#292D32" />
+                      <path d="M14.5 12C15.8807 12 17 10.8807 17 9.5C17 8.11929 15.8807 7 14.5 7C13.1193 7 12 8.11929 12 9.5C12 10.8807 13.1193 12 14.5 12Z" fill="#292D32" />
+                    </svg> Change Password</a>
+                  <a onClick={() => {
                     logout()
                   }} className="block h-[60px] px-4 py-2 items-center flex text-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer" role="menuitem">
 
-                    <svg className="svg-icon mr-2" style={{ width: '20px', height: '20px', verticalAlign: 'middle', fill: 'red', overflow: 'hidden', }} viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M768 106V184c97.2 76 160 194.8 160 328 0 229.6-186.4 416-416 416S96 741.6 96 512c0-133.2 62.8-251.6 160-328V106C121.6 190.8 32 341.2 32 512c0 265.2 214.8 480 480 480s480-214.8 480-480c0-170.8-89.6-321.2-224-406z" fill="" /><path d="M512 32c-17.6 0-32 14.4-32 32v448c0 17.6 14.4 32 32 32s32-14.4 32-32V64c0-17.6-14.4-32-32-32z" fill="" /></svg>
+                    <svg className="svg-icon ml-1 mr-4" style={{ width: '20px', height: '20px', verticalAlign: 'middle', fill: 'red', overflow: 'hidden', }} viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M768 106V184c97.2 76 160 194.8 160 328 0 229.6-186.4 416-416 416S96 741.6 96 512c0-133.2 62.8-251.6 160-328V106C121.6 190.8 32 341.2 32 512c0 265.2 214.8 480 480 480s480-214.8 480-480c0-170.8-89.6-321.2-224-406z" fill="" /><path d="M512 32c-17.6 0-32 14.4-32 32v448c0 17.6 14.4 32 32 32s32-14.4 32-32V64c0-17.6-14.4-32-32-32z" fill="" /></svg>
                     Logout</a>
                 </div>
               </div>
@@ -606,6 +630,53 @@ c29 -6 56 -14 59 -18 4 -3 9 -36 12 -73 l6 -68 -42 -2 -42 -1 42 -4 c39 -4 61
           </div>
         </div>
       </main>
+
+      {isChangePassword ? (
+        <>
+          <div className="flex justify-center items-center bg-[#00000080] overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                <div className="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t items-center">
+                  <h5 className="text-3xl font=semibold">Change Password</h5>
+                  <button
+                    className="bg-transparent border-0 text-black float-right"
+                    onClick={() => setIsChangePassword(false)}
+                  >
+                    <span className="text-black opacity-7 h-6 w-6 text-xl">
+                      <svg className="w-6 h-6" fill="#000000" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16.707,8.707,13.414,12l3.293,3.293a1,1,0,1,1-1.414,1.414L12,13.414,8.707,16.707a1,1,0,1,1-1.414-1.414L10.586,12,7.293,8.707A1,1,0,1,1,8.707,7.293L12,10.586l3.293-3.293a1,1,0,1,1,1.414,1.414Z" /></svg>
+                    </span>
+                  </button>
+                </div>
+                <div className="relative p-6 flex flex-col">
+                  <input placeholder="Enter Old Password" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
+
+                  <input placeholder="Enter New Password" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+
+                  <input placeholder="Re-Enter Password" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" value={reEnterPassword} onChange={(e) => setReEnterPassword(e.target.value)} />
+                </div>
+                <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
+                  <button
+                    className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1"
+                    type="button"
+                    onClick={() => setIsChangePassword(false)}
+                  >
+                    Close
+                  </button>
+                  <button
+                    className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
+                    type="button"
+                    onClick={() => setIsChangePassword(false)}
+                  >
+                    Submit
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : null
+      }
     </>
   );
 }
+
