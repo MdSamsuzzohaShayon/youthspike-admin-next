@@ -4,6 +4,9 @@ import { useContext, useEffect, useState, useRef, use } from "react";
 import { UserContext } from "@/config/auth";
 import Link from "next/link";
 import { LoginService } from "@/utils/login";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 export enum LayoutPages {
   "leagues" = "leagues",
@@ -19,6 +22,19 @@ export interface LayoutProps {
   children?: JSX.Element;
 }
 
+const CHANGE_PASSWORD = gql`
+  mutation ChangePassword($id: String!, $oldPassword: String!, $newPassword: String) {
+    changePassword(id: $id, oldPassword: $oldPassword, newPassword: $newPassword) {
+      code
+      success
+      message
+      data {
+        updated
+      }
+    }
+  }
+`;
+
 export default function Layout(props: LayoutProps) {
   let user: any = useContext(UserContext);
 
@@ -29,16 +45,27 @@ export default function Layout(props: LayoutProps) {
   const [newPassword, setNewPassword] = useState('');
   const [reEnterPassword, setReEnterPassword] = useState('');
   const ref = useRef<HTMLInputElement | null>(null);
-  const [changePassword, { data, error, loading }] = useMutation(LOGIN)
 
-  const changeHandle = () => {
-
-    changePassword({
+  const [updatePassword, { data, error, loading }] = useMutation(
+    CHANGE_PASSWORD,
+    {
       variables: {
+        id: LoginService.getUser()?._id,
         oldPassword,
+        newPassword,
       },
-    });
-  }
+    }
+  );
+
+  useEffect(() => {
+    if (data?.changePassword?.code === 200) {
+      toast('Password updated successfully!', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+      LoginService.deleteUser();
+      window.location.href = "/login";
+    } else if (data?.changePassword?.code === 300) {
+      toast('Entered password is wrong!', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+    }
+  }, [data])
 
   useEffect(() => {
     const checkIfClickedOutside = (e: { target: any; }) => {
@@ -82,6 +109,15 @@ export default function Layout(props: LayoutProps) {
     setIsOpenAction(true);
   }
 
+  const onSubmit = () => {
+    if (newPassword?.length < 6) {
+      toast('Password length should not be less than 6', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+    } else if (newPassword !== reEnterPassword) {
+      toast('Re entered password is not same', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+    } else {
+      updatePassword();
+    }
+  }
 
   return (
     <>
@@ -648,11 +684,11 @@ c29 -6 56 -14 59 -18 4 -3 9 -36 12 -73 l6 -68 -42 -2 -42 -1 42 -4 c39 -4 61
                   </button>
                 </div>
                 <div className="relative p-6 flex flex-col">
-                  <input placeholder="Enter Old Password" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
+                  <input type="password" placeholder="Enter Old Password" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
 
-                  <input placeholder="Enter New Password" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                  <input type="password" placeholder="Enter New Password" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
 
-                  <input placeholder="Re-Enter Password" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" value={reEnterPassword} onChange={(e) => setReEnterPassword(e.target.value)} />
+                  <input placeholder="Re-Enter Password" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5" value={reEnterPassword} onChange={(e) => setReEnterPassword(e.target.value)} />
                 </div>
                 <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
                   <button
@@ -665,7 +701,7 @@ c29 -6 56 -14 59 -18 4 -3 9 -36 12 -73 l6 -68 -42 -2 -42 -1 42 -4 c39 -4 61
                   <button
                     className="transform hover:bg-slate-800 transition duration-300 hover:scale-105 text-white bg-slate-700 dark:divide-gray-70 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-6 py-3.5 text-center inline-flex items-center dark:focus:ring-gray-500 mr-2 mb-2"
                     type="button"
-                    onClick={() => setIsChangePassword(false)}
+                    onClick={onSubmit}
                   >
                     Submit
                   </button>
@@ -676,6 +712,7 @@ c29 -6 56 -14 59 -18 4 -3 9 -36 12 -73 l6 -68 -42 -2 -42 -1 42 -4 c39 -4 61
         </>
       ) : null
       }
+      <ToastContainer />
     </>
   );
 }
