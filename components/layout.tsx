@@ -713,14 +713,16 @@ c29 -6 56 -14 59 -18 4 -3 9 -36 12 -73 l6 -68 -42 -2 -42 -1 42 -4 c39 -4 61
       ) : null
       }
       <ToastContainer />
-      <div
+      <a
         style={{
           position: 'fixed',
           left: 10,
           bottom: 7,
           color: "white"
         }}
-      >Powered By: NPMCODE LLC</div>
+        href="https://www.npmcode.com/"
+        target="_blank" rel="noreferrer"
+      >Powered By: NPMCODE LLC</a>
     </>
   );
 }
