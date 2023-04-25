@@ -1058,7 +1058,10 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
                       } else {
                         addUpdateTeam();
                       }
-                    } else {
+                    } else if(coachId?.length === 0){
+                      toast('Please select the league & coach.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+                    }
+                    else {
                       addUpdateTeam();
                     }
                   }
@@ -1090,7 +1093,10 @@ function AddUpdateTeam(props: AddUpdateTeamProps) {
                     toast('Team name is already registred in the league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
                   } else if (isSameCoachError) {
                     toast('This coach is already assign to another team in the league.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
-                  } else {
+                  } else if (coachId?.length === 0) {
+                    toast('Please select the league & coach.', { hideProgressBar: false, autoClose: 7000, type: 'error' });
+                  }
+                  else {
                     addUpdateTeam();
                   }
                 }}

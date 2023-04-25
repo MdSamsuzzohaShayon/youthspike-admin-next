@@ -688,7 +688,7 @@ c29 -6 56 -14 59 -18 4 -3 9 -36 12 -73 l6 -68 -42 -2 -42 -1 42 -4 c39 -4 61
 
                   <input type="password" placeholder="Enter New Password" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
 
-                  <input placeholder="Re-Enter Password" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5" value={reEnterPassword} onChange={(e) => setReEnterPassword(e.target.value)} />
+                  <input type="password" placeholder="Re-Enter Password" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-[450px] p-2.5 mt-2.5 mb-2.5" value={reEnterPassword} onChange={(e) => setReEnterPassword(e.target.value)} />
                 </div>
                 <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
                   <button
