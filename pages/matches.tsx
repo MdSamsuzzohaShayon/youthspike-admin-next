@@ -93,6 +93,24 @@ const MATCHES = gql`
   }
 `;
 
+const LEAGUE_DROPDOWN = gql`
+  query GetLeagues(
+    $userId: String
+  ) {
+    getLeagues(
+      userId: $userId
+    ) {
+      code
+      success
+      message
+      data {
+        _id
+        name
+      }
+    }
+  }
+`;
+
 const TEAMS = gql`
   query GetTeams(
     $userId: String
@@ -114,15 +132,19 @@ const TEAMS = gql`
 
 export default function MatchesPage() {
   const [addUpdateMatch, setAddUpdateMatch] = useState(false);
+  const [userRole, setUserRole] = useState('');
+  const [userID, setUserData] = useState('');
+  const [leagueId, setLeagueId] = useState('');
+  const [getLeaguesData, { data: leaguesQuery }] = useLazyQuery(LEAGUE_DROPDOWN,
+    {
+      variables: { userId: userRole !== 'admin' && userRole !== 'player' ? userID : null },
+    });
   const [updateMatch, setUpdateMatch] = useState<any>(null);
   const [searchKey, setSearchKey] = useState('');
   const [isOpenAction, setIsOpenAction] = useState('');
   const [filteredMatchs, setFilteredMatchs] = useState<any[]>([]);
   const [allMatchsData, setAllMatchsData] = useState<any[]>([]);
   const router = useRouter();
-
-  const [userID, setUserData] = useState('');
-  const [userRole, setUserRole] = useState('');
 
 
   const [getMatchesData, { data, error, loading, refetch }] = useLazyQuery(MATCHES,
@@ -150,6 +172,7 @@ export default function MatchesPage() {
   useEffect(() => {
     getTeamsData();
     getMatchesData();
+    getLeaguesData();
   }, [userID]);
 
   const ref = useRef<HTMLInputElement | null>(null);
@@ -194,7 +217,8 @@ export default function MatchesPage() {
 
     const filteredMatchs = allMatchsData.filter((match: any) => {
       const MatchName = `${match.league.name}`.toLocaleLowerCase();
-      return MatchName.includes(key.toLocaleLowerCase());
+      const teamNames = `${match.teamA?.name + match.teamB?.name}`.toLocaleLowerCase(); 
+      return MatchName.includes(key.toLocaleLowerCase()) || teamNames.includes(key.toLocaleLowerCase());
     });
     return filteredMatchs;
   }
@@ -230,6 +254,34 @@ export default function MatchesPage() {
                 <svg aria-hidden="true" className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
               </div>
             </div>
+          </div>
+          <div className="border border-gray-30"
+            style={{
+              borderRadius: '8px',
+              height: '42px',
+              color: 'grey',
+              marginTop: '8px',
+            }}>
+            <select
+              name="leagueId"
+              id="leagueId"
+              value={leagueId}
+              onChange={(e) => setLeagueId(e.target.value)}
+              style={{
+                borderRadius: '8px',
+                padding: '8px',
+                width: '250px'
+              }}
+            >
+              <option>Select a league</option>
+              <option>UnAssigned</option>
+              {leaguesQuery?.getLeagues?.code === 200 &&
+                leaguesQuery?.getLeagues?.data?.map((league: any) => (
+                  <option key={league?._id} value={league?._id}>
+                    {league?.name}
+                  </option>
+                ))}
+            </select>
           </div>
           {
             userRole == 'admin' && (<div className="flex pl-4">
@@ -268,7 +320,10 @@ export default function MatchesPage() {
             </thead>
 
             <tbody className="w-full">
-              {getMatchsForDisplay().map((match: any) => (
+              {getMatchsForDisplay().map((match: any) => {
+                if(leagueId?.length > 0){
+                  if(match?.leagueId === leagueId){
+                return(
                 <TDR key={match?._id}>
                   <>
                     <TD>{match?.league?.name}</TD>
@@ -318,7 +373,61 @@ export default function MatchesPage() {
                     </TD>
                   </>
                 </TDR>
-              ))}
+              )
+                        }
+            } else {
+                  return (
+                    <TDR key={match?._id}>
+                      <>
+                        <TD>{match?.league?.name}</TD>
+                        <TD>{match?.teamA?.name}</TD>
+                        <TD>{match?.teamB?.name}</TD>
+                        <TD>{new Date(match?.date).toDateString()}</TD>
+                        <TD>{match?.numberOfNets}</TD>
+                        <TD>{match?.numberOfRounds}</TD>
+                        <TD>{match?.pairLimit}</TD>
+                        <TD>{match?.netRange}</TD>
+                        <TD>{match?.active ? "Yes" : "No"}</TD>
+                        <TD>
+                          <div>
+                            {teamsData?.getTeams?.data?.find((current: {
+                              leagueId: any; _id: any;
+                            }) => current?._id === match?.teamAId && current?.leagueId === match?.leagueId) && (<MatchLink
+                              matchId={match?._id}
+                              teamId={match?.teamAId}
+                              title={match?.teamA?.name}
+                              label="Team A: "
+                              marginEnable={false}
+                            ></MatchLink>)}
+                            <br />
+                            {teamsData?.getTeams?.data?.find((current: {
+                              leagueId: any; _id: any;
+                            }) => current?._id === match?.teamBId && current?.leagueId === match?.leagueId) && (<MatchLink
+                              matchId={match?._id}
+                              teamId={match?.teamBId}
+                              title={match?.teamB?.name}
+                              label="Team B: "
+                              marginEnable={true}
+                            ></MatchLink>)}
+                          </div>
+                        </TD>
+                        <TD>
+                          <div className="flex justify-center">
+                            <button
+                              className="bg-blue-500 text-white font-bold rounded bg-transparent"
+                              onClick={() => {
+                                setUpdateMatch(match);
+                                setAddUpdateMatch(true);
+                              }}
+                            >
+                              <svg color="green" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" /></svg>
+                            </button>
+                          </div>
+                        </TD>
+                      </>
+                    </TDR>
+                  )
+              }})}
             </tbody>
           </table>
         </div>

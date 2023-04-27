@@ -87,6 +87,10 @@ const TEAM_DROPDOWN = gql`
       data {
         _id
         name
+        league {
+          _id
+          name
+        }
       }
     }
   }
@@ -311,44 +315,7 @@ export default function PlayersPage() {
     })
   }
 
-  const onDelete = (player: any, index: number) => {
-
-    // let newPlayers: any[] = [...updatedPlayers];
-    // const previesIndexPlayer = newPlayers[index];
-    // // Remove the object at the specified index
-    // newPlayers.splice(index, 1);
-
-    // // Insert the new object at the same index
-    // newPlayers.splice(index, 0, {
-    //   ...previesIndexPlayer, player: {
-    //     ...previesIndexPlayer?.player,
-    //     teamId: 'UnAssigned',
-    //   }
-    // });
-    // const selectedIds: String[] = ['', 'Select a team', 'UnAssigned'];
-
-    // if (selectedIds.indexOf(teamId) === -1) {
-    //   let isTraversed = false;
-    //   newPlayers = newPlayers?.map((current: any, indexKey: number) => {
-    //     if (!isTraversed) {
-    //       isTraversed = index === indexKey;
-    //     }
-    //     if (index === indexKey) {
-    //       return { ...current };
-    //     }
-    //     return {
-    //       ...current,
-    //       player: {
-    //         ...current?.player,
-    //         rank: isTraversed ? indexKey : indexKey + 1,
-    //       }
-    //     }
-    //   });
-    //   setUpdatedPlayers(newPlayers);
-    //   updateRank(newPlayers);
-    // } else {
-    //   setUpdatedPlayers(newPlayers);
-    // }
+  const onDelete = (player: any) => {
     deletePlayerFunctionality(player);
   }
 
@@ -548,11 +515,15 @@ export default function PlayersPage() {
                 <option>Select a team</option>
                 <option>UnAssigned</option>
                 {teamsQuery?.getTeams?.code === 200 &&
-                  teamsQuery?.getTeams?.data?.map((team: any) => (
+                  teamsQuery?.getTeams?.data?.map((team: any) => {
+                    if (team?.league?._id === leagueId){
+                    return (
                     <option key={team?._id} value={team?._id}>
                       {team?.name}
                     </option>
-                  ))}
+                  )
+}
+})}
               </select>
             </div>
           </div>
@@ -733,7 +704,7 @@ export default function PlayersPage() {
                                                     },
                                                   },
 
-                                                }, index);
+                                                });
                                                 setIsOpenAction('');
                                               }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Delete</MenuItem></>)}
                                               <MenuItem onClick={() => {
@@ -899,7 +870,7 @@ export default function PlayersPage() {
                                                 },
                                               },
 
-                                            }, index);
+                                            });
                                             setIsOpenAction('');
                                           }} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">Delete</MenuItem></>)}
                                           <MenuItem onClick={() => {
