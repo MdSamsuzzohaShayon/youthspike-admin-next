@@ -551,13 +551,13 @@ export default function PlayersPage() {
               <Droppable droppableId="droppable">
                 {(provided) => (
                   <tbody className="w-full" ref={provided.innerRef} {...provided.droppableProps}>
-                    {updatedDisplayPlayers?.map((player: any) => (
+                    {updatedDisplayPlayers?.map((player: any, prevIndex: number) => (
                       player?.mapPlayer?.map((current: any, index: number) => (
                         <>
                           {index === 0 && (<Draggable
                             key={player._id}
                             draggableId={player._id}
-                            index={index}
+                            index={prevIndex}
                             isDragDisabled={selectedIds.includes(teamId)}
                           >
                             {(provided, snapshot) => (
