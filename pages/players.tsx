@@ -172,6 +172,7 @@ export default function PlayersPage() {
   const router = useRouter();
   const [refetchAfterRankUpdate, setRefetchAfterRankUpdate] = useState(false);
   const [addInAnotherLeague, setAddInAnotherLeague] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
 
   const [getPlayersData, { data, error, loading, refetch }] = useLazyQuery(PLAYERS,
     {
@@ -229,6 +230,7 @@ export default function PlayersPage() {
   useEffect(() => {
     if (data?.getPlayers?.data) {
       getUpdatedPlayers();
+      setShowLoader(false);
     }
 
   }, [data, teamId, getPlayersData, refetch, leagueId])
@@ -352,6 +354,7 @@ export default function PlayersPage() {
     let updateNeeded = false;
     for (let i = 0; i < newPlayers?.length; i++) {
       updateNeeded = true;
+      setShowLoader(true);
       await rankUpdatePlayerMutation({
         variables: {
           firstName: newPlayers[i]?.firstName,
@@ -367,6 +370,8 @@ export default function PlayersPage() {
     }
     if (updateNeeded) {
       setRefetchAfterRankUpdate(true);
+    } else {
+      setShowLoader(false);
     }
   }
 
@@ -937,6 +942,11 @@ export default function PlayersPage() {
             />
           )
         }
+{showLoader && (
+      <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-500 bg-opacity-75 z-50">
+        <div className="loader border-4 border-gray-300 border-t-red-500 rounded-full h-10 w-10 animate-spin"></div>
+      </div>
+      )}
       </>
     </Layout >
   );
