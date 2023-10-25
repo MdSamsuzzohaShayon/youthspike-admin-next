@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 const LOGIN_ADMIN = gql`
   mutation Login($email: String!, $password: String!) {
@@ -49,4 +49,5 @@ const LOGIN_ADMIN = gql`
   }
 `;
 
+// eslint-disable-next-line import/prefer-default-export
 export { LOGIN_ADMIN };

@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useEffect, useState } from "react";
-import { LOGIN_ADMIN } from "@/graphql/mutations/AdminMutations";
+import { LOGIN_ADMIN } from "@/graphql/admin";
 
 
 export default function LoginPage() {
