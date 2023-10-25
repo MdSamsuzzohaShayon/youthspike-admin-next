@@ -1,64 +1,17 @@
 import { LoginService } from "@/utils/login";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import Head from "next/head";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useEffect, useState } from "react";
+import { LOGIN_ADMIN } from "@/graphql/mutations/AdminMutations";
 
-const LOGIN = gql`
-  mutation Login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      code
-      success
-      message
-      data {
-        token
-        user {
-          _id
-          firstName
-          lastName
-          role
-          login {
-            email
-          }
-          player {
-          shirtNumber
-          rank
-          teamId
-          leagueId
-
-          league {
-            _id
-            name
-          }
-
-          team {
-            _id
-            name
-          }
-        }
-        coach {
-          team {
-            name
-            _id
-            league {
-              _id
-              name
-            }
-          }
-        }
-          active
-        }
-      }
-    }
-  }
-`;
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loginFunction, { data, error, loading }] = useMutation(LOGIN,)
+  const [loginFunction, { data, error, loading }] = useMutation(LOGIN_ADMIN,)
 
   const onLogin = () => {
     loginFunction({
@@ -70,8 +23,14 @@ export default function LoginPage() {
   }
 
   useEffect(() => {
+    /**
+     * @reset before login
+     * @save user and token to local storage
+     * @redirect to /leagues page
+     */
     LoginService.deleteToken();
     LoginService.deleteUser();
+
     if (data?.login?.code == 200) {
       const loginData = data?.login?.data;
       LoginService.saveUser({ ...loginData.user, timeStamp: new Date() });
@@ -81,6 +40,7 @@ export default function LoginPage() {
     } else if (data?.login?.code == 404) {
       toast('Email or Password is Invalid.', { toastId: 'blockuser', hideProgressBar: false, autoClose: 7000, type: 'error' });
     }
+
   }, [data]);
 
   const onKeyPress = (event: any) => {
