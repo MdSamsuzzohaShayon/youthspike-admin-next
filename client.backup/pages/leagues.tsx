@@ -1,3 +1,16 @@
+import React from 'react';
+
+function leaguesPage() {
+  return (
+    <div>
+      <h1 className="">Stop Redirecting from this component</h1>
+    </div>
+  )
+}
+
+export default leaguesPage;
+
+/*
 import { SetStateAction, useEffect, useRef, useState } from 'react';
 import Layout, { LayoutPages } from '@/components/layout';
 import { useLazyQuery } from '@apollo/client';
@@ -237,5 +250,5 @@ export default function LeaguesPage() {
     </Layout>
   );
 }
-
+*/
 

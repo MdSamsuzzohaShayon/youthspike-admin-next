@@ -2,7 +2,6 @@ import { LoginService } from '@/utils/login';
 import { useMutation } from '@apollo/client';
 import Router from 'next/router';
 import Head from 'next/head';
-import { cookies } from 'next/headers';
 import 'react-toastify/dist/ReactToastify.css';
 import { toast, ToastContainer } from 'react-toastify';
 import React, { useEffect, useState } from 'react';
@@ -17,14 +16,21 @@ export default function LoginPage() {
   const [loginFunction, { data, error, loading }] = useMutation(LOGIN_ADMIN);
 
   const handleLogin = async () => {
-    const result = await loginFunction({
+    const { data: resultData } = await loginFunction({
       variables: {
         email,
         password,
       },
     });
-    if (result?.data?.login?.data?.token)
-    document.cookie = `token=${result.data.login.data.token};`;
+    if (resultData?.login?.code === 200) {
+      // console.log(resultData.login.data.user);
+      document.cookie = `token=${resultData.login.data.token};`;
+      document.cookie = `user=${JSON.stringify(resultData.login.data.user)};`;
+    } else {
+      document.cookie = `token=;`;
+      document.cookie = `user=;`;
+      toast('Email or Password is Invalid.', { toastId: 'blockuser', hideProgressBar: false, autoClose: 7000, type: 'error' });
+    }
   };
 
   useEffect(() => {
@@ -33,6 +39,7 @@ export default function LoginPage() {
      * @save user and token to local storage
      * @redirect to /leagues page
      */
+    /*
     LoginService.deleteToken();
     LoginService.deleteUser();
     if (data?.login?.code === 200) {
@@ -45,6 +52,7 @@ export default function LoginPage() {
     } else if (data?.login?.code === 404) {
       toast('Email or Password is Invalid.', { toastId: 'blockuser', hideProgressBar: false, autoClose: 7000, type: 'error' });
     }
+    */
   }, [data]);
 
   const onKeyPress = (event: React.KeyboardEvent) => {
