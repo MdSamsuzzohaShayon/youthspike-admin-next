@@ -2,9 +2,13 @@ import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { REGISTER_DIRECTOR } from '@/graphql/admin';
 import Loader from '../elements/Loader';
-import { getCookie } from '@/utils/cookie';
 
-function DirectorAdd() {
+interface DirectorAddProps { }
+
+/**
+ * React component that allows users to add a director.
+ */
+const DirectorAdd: React.FC<DirectorAddProps> = () => {
     const [firstName, setFirstName] = useState<string>('');
     const [lastName, setLastName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
@@ -12,66 +16,114 @@ function DirectorAdd() {
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [errorList, setErrorList] = useState<string[]>([]);
 
-  const [registerDirector, {data, error, loading}] = useMutation(REGISTER_DIRECTOR);
+    const [registerDirector, { loading, error }] = useMutation(REGISTER_DIRECTOR);
 
-
-    const handleDirectorSubmit = async (e: React.SyntheticEvent) => {
+    /**
+     * Handles the form submission event.
+     * Validates the form input values and calls the registration mutation if they pass validation.
+     * Resets the form input values and clears the form.
+     */
+    const handleDirectorSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (password !== confirmPassword){
+        if (password !== confirmPassword) {
             setErrorList(['Password did not match!']);
             return;
         }
-        
-        const {data: resultData} = await registerDirector({variables: {firstName, lastName, email, password}});
-        console.log(resultData);
-        console.log(error);
-        
-        
+
+        // try {
+        //     const { data } = await registerDirector({
+        //         variables: { firstName, lastName, email, password },
+        //     });
+        //     console.log(data);
+        // } catch (error) {
+        //     console.log(error);
+        // }
 
         setFirstName('');
         setLastName('');
         setEmail('');
         setPassword('');
         setConfirmPassword('');
+
         const formEl = e.target as HTMLFormElement;
         formEl.reset();
-    }
+    };
 
-    if(loading) return <Loader />;
-    // if(error) ;
+    if (loading) return <Loader />;
+    if (error) return <p className="text-red-700">Something went wrong!</p>;
 
     return (
         <div>
             <h2>Add Director</h2>
-            {errorList.map(e=> <p className='mt-4 text-red-700' key={e}>{e}</p>)}
-            <form onSubmit={handleDirectorSubmit} className='flex flex-col gap-2'>
+            {errorList.map((error) => (
+                <p className="mt-4 text-red-700" key={error}>
+                    {error}
+                </p>
+            ))}
+            <form onSubmit={handleDirectorSubmit} className="flex flex-col gap-2">
                 <div className="input-group w-full flex flex-col">
-                    <label htmlFor="firstName">First Name </label>
-                    <input className='border border-gray-300 p-1' type="text" defaultValue={firstName} required onChange={(e) => setFirstName(e.target.value)} />
+                    <label htmlFor="firstName">First Name</label>
+                    <input
+                        id='firstName'
+                        className="border border-gray-300 text-gray-900 p-1"
+                        type="text"
+                        required
+                        onChange={(e) => setFirstName(e.target.value)}
+                    />
                 </div>
                 <div className="input-group w-full flex flex-col">
-                    <label htmlFor="lastName">Last Name </label>
-                    <input className='border border-gray-300 p-1' type="text" defaultValue={lastName} required onChange={(e) => setLastName(e.target.value)} />
+                    <label htmlFor="lastName">Last Name</label>
+                    <input
+                        id='lastName'
+                        className="border border-gray-300 text-gray-900 p-1"
+                        type="text"
+                        required
+                        onChange={(e) => setLastName(e.target.value)}
+                    />
                 </div>
                 <div className="input-group w-full flex flex-col">
-                    <label htmlFor="email">Email </label>
-                    <input className='border border-gray-300 p-1' type="email" defaultValue={email} required onChange={(e) => setEmail(e.target.value)} />
+                    <label htmlFor="email">Email</label>
+                    <input
+                        id='email'
+                        className="border border-gray-300 text-gray-900 p-1"
+                        type="email"
+                        value={email}
+                        required
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
                 </div>
                 <div className="input-group w-full flex flex-col">
-                    <label htmlFor="password">Password </label>
-                    <input className='border border-gray-300 p-1' type="password" defaultValue={password} required onChange={(e) => setPassword(e.target.value)} />
+                    <label htmlFor="password">Password</label>
+                    <input
+                        id='password'
+                        className="border border-gray-300 text-gray-900 p-1"
+                        type="password"
+                        value={password}
+                        required
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
                 </div>
                 <div className="input-group w-full flex flex-col">
-                    <label htmlFor="confirmPassword">Confirm Password </label>
-                    <input className='border border-gray-300 p-1' type="password" defaultValue={confirmPassword} required onChange={(e) => setConfirmPassword(e.target.value)} />
+                    <label htmlFor="confirmPassword">Confirm Password</label>
+                    <input
+                        id='confirmPassword'
+                        className="border border-gray-300 text-gray-900 p-1"
+                        type="password"
+                        value={confirmPassword}
+                        required
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
                 </div>
                 <div className="input-group w-full">
-                    <button className='border border-gray-300 bg-gray-900 text-gray-300 p-2' type='submit'>Register</button>
+                    <button className="border border-gray-300 text-gray-100 bg-gray-900 text-gray-300 p-2" type="submit">
+                        Register
+                    </button>
                 </div>
             </form>
         </div>
-    )
-}
+    );
+};
 
-export default DirectorAdd
+
+export default DirectorAdd;

@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import ApolloWrapper from '@/lib/ApolloProvider';
+import UserProvider from '@/lib/UserProvider';
+import Menu from '@/components/layout/Menu';
+import Footer from '@/components/layout/Footer';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] })
@@ -17,9 +20,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} bg-gray-950 text-gray-100`}>
         <ApolloWrapper>
-          {children}
+          <UserProvider>
+            <Menu />
+            {children}
+            <Footer />
+          </UserProvider>
         </ApolloWrapper>
       </body>
     </html>

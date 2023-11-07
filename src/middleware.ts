@@ -12,18 +12,17 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('token');
   const user = request.cookies.get('user');
 
-  console.log({ pathname, token: token?.value, user: user ? JSON.parse(user.value) : null });
+  console.log({ pathname, token: token?.value, user: user && user.value !== '' ? JSON.parse(user.value) : null });
 
   if (unauthenticatedPages.some((prefix) => pathname.startsWith(prefix))) {
     console.log('Unauthenticated page match ');
-    if (!token || !user) return NextResponse.next();
+    if (!token || token.value === '' || !user || user.value === '') return NextResponse.next();
     return NextResponse.redirect(new URL('/leagues', request.url));
   }
 
   if (authenticatedPages.some((prefix) => pathname.startsWith(prefix))) {
     console.log('Authenticated page match ');
-
-    if (token) return NextResponse.next();
+    if (token && token.value !== '') return NextResponse.next();
     return NextResponse.redirect(new URL('/login', request.url));
   }
 }

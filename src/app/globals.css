@@ -2,3 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+.svg-white{
+    filter: grayscale(100%) brightness(0) invert(100%);
+}
+.svg-black{
+    filter: grayscale(100%) brightness(0);
+}
+
+.svg-yellow{
+    filter: grayscale(100%) sepia(100%) brightness(1.5) saturate(5) hue-rotate(60deg);
+}

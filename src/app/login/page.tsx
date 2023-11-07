@@ -16,6 +16,8 @@ function LoginPage() {
   const [loginFunction, { data, error, loading }] = useMutation(LOGIN_ADMIN);
   
   const handleLogin = async () => {
+    // login as director with 
+    // email: predrag@gmail.com password: Test1234
     const { data: resultData } = await loginFunction({
       variables: {
         email,
@@ -29,7 +31,6 @@ function LoginPage() {
     } else {
       document.cookie = `token=;`;
       document.cookie = `user=;`;
-      console.log("Login failed");
     }
   };
 
@@ -71,13 +72,14 @@ function LoginPage() {
         <div className="flex flex-col h-screen justify-center items-center">
           <div className="w-5/6 md:w-2/6 border rounded p-4 shadow-xl bg-[#F6F8FA]">
             <h1 className="text-3xl text-center font-bold p-2">Login</h1>
+            <p>(Director) email: predrag@gmail.com password: Test1234</p>
             <div className="p-4 w-full">
               <input
                 type="email"
                 name="email"
                 id="email"
                 placeholder="Email Address"
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border text-gray-900 rounded"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={onKeyPress}
@@ -90,7 +92,7 @@ function LoginPage() {
                 name="email"
                 id="email"
                 placeholder="Password"
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border text-gray-900 rounded"
                 value={password}
                 onKeyDown={onKeyPress}
                 onChange={(e) => setPassword(e.target.value)}
