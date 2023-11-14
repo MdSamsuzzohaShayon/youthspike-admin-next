@@ -3,7 +3,7 @@ import React from 'react';
 
 function Footer() {
   return (
-    <footer>Footer</footer>
+    <footer className='px-2'>Footer</footer>
   )
 }
 

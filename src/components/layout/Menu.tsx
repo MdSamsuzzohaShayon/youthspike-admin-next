@@ -1,11 +1,63 @@
 'use client'
 
 /* eslint-disable @next/next/no-img-element */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import MenuItem from './MenuItem';
+import { useUser } from '@/lib/UserProvider';
+import { UserRole } from '@/types/user';
+import { IMenuItem } from '@/types';
+
+const eventPaths: string[] = ['settings', 'teams', 'players', 'matches'];
+
+const initialUserMenuList: IMenuItem[] = [
+    {
+        id: 1,
+        imgName: 'setting',
+        text: 'Settings',
+        link: '/settings' // // Event settings
+    },
+    {
+        id: 2,
+        imgName: 'teams',
+        text: 'Teams',
+        link: '/teams'
+    },
+    {
+        id: 3,
+        imgName: 'players',
+        text: 'Players',
+        link: '/players'
+    },
+    {
+        id: 4,
+        imgName: 'trophy',
+        text: 'Matches',
+        link: '/matches'
+    },
+    {
+        id: 5,
+        imgName: 'account',
+        text: 'Account',
+        link: '/account'
+    }
+];
 
 function Menu() {
-    const [openMenu, setOpenMenu] = useState(false);
+    /**
+     * For home/ leagues page show only account option
+     * Add logo to the top for league director organization
+     * If user is captain show only matches and teams
+     * Show setting, teams, matches, players option and event name if the user has a eventId
+     * Create LDO or League Director Organization from the backend
+     */
+    const router = useRouter();
+    const pathname = usePathname();
+    const user = useUser();
+
+    const [openMenu, setOpenMenu] = useState<boolean>(false);
+    const [eventId, setEventId] = useState<string | null>(null);
+    const [userMenuList, setUserMenuList] = useState<IMenuItem[]>(initialUserMenuList);
 
     const openMenuHandler = () => {
         setOpenMenu(true);
@@ -15,27 +67,72 @@ function Menu() {
         setOpenMenu(false);
     };
 
+
+    const handleLogout = (e: React.SyntheticEvent) => {
+        // e.preventDefault();
+        document.cookie = `token=;`;
+        document.cookie = `user=;`;
+        router.push('/login');
+    }
+
+    useEffect(() => {
+        const pathList = pathname.split('/');
+        let eventPath = pathList.length > 0 ? pathList[1] : null;
+        if (eventPath && eventPath.length < 5) eventPath = null;
+        if (eventPath && eventPaths.includes(eventPath)) eventPath = null;
+
+        console.log({ pathname, user, eventPath, che: eventPaths.includes('settings') });
+        if (!eventPath || eventPath === '') {
+            setEventId(null);
+            setUserMenuList((prevState) => [...prevState.filter((menuItem) => menuItem.id === 5)]); // 5 = account
+        } else {
+            setEventId(eventPath);
+            if (user.info?.role === UserRole.coach){
+                setUserMenuList((prevState) => [...prevState.filter((menuItem) => menuItem.id === 2 || menuItem.id === 4)]); // 2 = teams // 4 = matches
+            }
+            setUserMenuList(initialUserMenuList);
+        }
+    }, [user, router, pathname]);
+
+    /**
+     * Renders sub components
+     */
+    const renderMenuItems=(eId: string | null, uml: IMenuItem[])=>{
+        const menuItems: React.ReactNode[] = [];
+        for (let i = 0; i < uml.length; i++) {
+            let newLink:string = '';
+            if(eId && eId !== '' && (uml[i].id === 1 || uml[i].id === 3 || uml[i].id === 4)) newLink = '/' + eId;
+            menuItems.push(<MenuItem setOpenMenu={setOpenMenu} key={uml[i].id} icon={`/icons/${uml[i].imgName}.svg`} text={uml[i].text} link={`${newLink}${uml[i].link}`} />);
+        }
+
+        return <>{menuItems}</>;
+    }
+
     return (
         <div className='container px-2 mx-auto'>
-            {!openMenu && (
-                <button onClick={openMenuHandler} className='menu-button'>
-                    <img src='/icons/menu.svg' className='w-10 mt-4 svg-white' alt='menu' role="presentation" />
-                </button>
-            )}
+            <button onClick={openMenuHandler} className='menu-button'>
+                <img src='/icons/menu.svg' className='w-10 mt-4 svg-white' alt='menu' role="presentation" />
+            </button>
 
             {openMenu && (
-                <div className="menu-content bg-gray-700 w-4/6 absolute h-full top-0 left-0 z-20 p-4">
+                <div className="menu-content bg-gray-700 w-5/6 absolute h-full top-0 left-0 z-20 p-4">
                     <div className="w-full flex justify-end items-center">
                         <button onClick={closeMenuHandler} className='close-button'>
                             <img src='/icons/close.svg' className='w-10 svg-white' alt='close' role="presentation" />
                         </button>
                     </div>
-                    <ul className='menu-list'>
-                        <MenuItem icon="/icons/setting.svg" text="Setting" />
-                        <MenuItem icon="/icons/teams.svg" text="Teams" />
-                        <MenuItem icon="/icons/players.svg" text="Players" />
-                        <MenuItem icon="/icons/trophy.svg" text="Matches" />
-                        <MenuItem icon="/icons/sports-man.svg" text="Account" />
+                    <div className="league-director w-full flex justify-between items-center mb-8">
+                        <img src="/free-logo.svg" alt="" className="w-2/6" />
+                        <h1 className='text-2xl'>LDO Name</h1>
+                    </div>
+                    {eventId && (
+                        <div className="league mb-8 w-full">
+                            <h2 className='text-xl'>League Name</h2>
+                        </div>
+                    )}
+                    <ul className='menu-list flex justify-start flex-col gap-8'>
+                        {renderMenuItems(eventId, userMenuList)}
+                        {(user && user.token && user.token !== '') && <li><button className="bg-red-700 text-red-100 font-bold p-2" onClick={handleLogout}>Logout</button></li>}
                     </ul>
                 </div>
             )}

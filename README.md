@@ -1,6 +1,9 @@
 # Next.js Testing
  - Improve the provided React component for better testability and maintainability, you can follow best practices in terms of code structure, separation of concerns, and making the component more modular. 
 
+### Requirements
+ - When user login as admin show leagues list, in contrast when user login as director show them teams
+
 
 ___
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).

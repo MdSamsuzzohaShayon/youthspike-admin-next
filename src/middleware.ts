@@ -4,7 +4,22 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const unauthenticatedPages = ['/login', '/signup', '/userSignup'];
-const authenticatedPages = ['/leagues', '/matches'];
+const authenticatedPages = ['/','/leagues', '/matches'];
+
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    // '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    "/((?!api|static|.*\\..*|_next).*)",
+  ],
+};
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -21,21 +36,8 @@ export function middleware(request: NextRequest) {
   }
 
   if (authenticatedPages.some((prefix) => pathname.startsWith(prefix))) {
-    console.log('Authenticated page match ');
+    console.log('Authenticated page match ', token?.value);
     if (token && token.value !== '') return NextResponse.next();
     return NextResponse.redirect(new URL('/login', request.url));
   }
 }
-
-export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
-};

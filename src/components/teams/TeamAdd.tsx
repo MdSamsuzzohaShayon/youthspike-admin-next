@@ -1,36 +1,49 @@
 import { ADD_UPDATE_LEAGUE } from '@/graphql/league';
 import { useMutation } from '@apollo/client';
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import Loader from '../elements/Loader';
 import Message from '../elements/Message';
 
-interface ILeagueAdd{
+interface ITeamAdd {
     handleClose: (e: React.SyntheticEvent) => void;
 }
 
-function LeagueAdd({handleClose}: ILeagueAdd) {
+function TeamAdd({ handleClose }: ITeamAdd) {
     const [name, setName] = useState<string>('');
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
     const [playerLimit, setPlayerLimit] = useState<number | null>(null);
 
+    // $name: String!
+    // $active: Boolean!
+    // $coachId: String!
+    // $leagueId: String!
+    // $reamoveLeagueId: String
+    // $changeLeague: Boolean
+    // $reamoveCoachId: String
+    // $id: String
+
     // GraphQL
-  const [addLeague, { data, loading, error, reset }] = useMutation(ADD_UPDATE_LEAGUE); // Do caching
+    // Get all coaches / players
+    const [addLeague, { data, loading, error, reset }] = useMutation(ADD_UPDATE_LEAGUE); // Do caching
+    
 
-    const handleLeagueAdd = async (e: React.SyntheticEvent) => {
+    const handleTeamAdd = async (e: React.SyntheticEvent) => {
         // e.preventDefault();
-        const {data: resultData} = await addLeague({variables: {
-            name, startDate, endDate, playerLimit, active: true
-        }});
+        const { data: resultData } = await addLeague({
+            variables: {
+                name, startDate, endDate, playerLimit, active: true
+            }
+        });
 
-        console.log({resultData});
+        console.log({ resultData });
         const formEl = e.target as HTMLFormElement;
-        formEl.reset();  
+        formEl.reset();
         handleClose(e);
     }
 
-    useEffect(()=>{
-        return ()=>{
+    useEffect(() => {
+        return () => {
             reset();
         }
     }, []);
@@ -39,12 +52,12 @@ function LeagueAdd({handleClose}: ILeagueAdd) {
     if (loading) return <Loader />;
     if (error) {
         let err = JSON.stringify(error);
-        if(error.message === 'Forbidden resource') err = 'You do not have permission to do this operation!';
+        if (error.message === 'Forbidden resource') err = 'You do not have permission to do this operation!';
         return <Message text={err} />
     }
 
     return (
-        <form onSubmit={handleLeagueAdd} className='flex flex-col gap-2'>
+        <form onSubmit={handleTeamAdd} className='flex flex-col gap-2'>
             <div className="input-group w-full flex flex-col">
                 <label htmlFor="name">Name</label>
                 <input className='border border-gray-300 p-1' type="text" defaultValue={name} required onChange={(e) => setName(e.target.value)} />
@@ -68,4 +81,4 @@ function LeagueAdd({handleClose}: ILeagueAdd) {
     )
 }
 
-export default LeagueAdd;
+export default TeamAdd;
