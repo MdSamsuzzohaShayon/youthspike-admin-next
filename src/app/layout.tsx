@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import ApolloWrapper from '@/lib/ApolloProvider';
-import UserProvider from '@/lib/UserProvider';
+import UserProvider, { useUser } from '@/lib/UserProvider';
 import Menu from '@/components/layout/Menu';
 import Footer from '@/components/layout/Footer';
 import './globals.css';
@@ -18,6 +18,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+
   return (
     <html lang="en">
       <body className={`${inter.className} bg-gray-950 text-gray-100`}>

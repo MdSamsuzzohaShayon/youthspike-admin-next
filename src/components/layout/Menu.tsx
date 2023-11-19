@@ -7,6 +7,10 @@ import MenuItem from './MenuItem';
 import { useUser } from '@/lib/UserProvider';
 import { UserRole } from '@/types/user';
 import { IMenuItem } from '@/types';
+import { useApolloClient, useReadQuery } from '@apollo/client';
+import { GET_LDO } from '@/graphql/director';
+import { AdvancedImage } from '@cloudinary/react';
+import cld from '@/config/cloudinary.config';
 
 const eventPaths: string[] = ['settings', 'teams', 'players', 'matches'];
 
@@ -54,13 +58,15 @@ function Menu() {
     const router = useRouter();
     const pathname = usePathname();
     const user = useUser();
+    const client = useApolloClient();
 
     const [openMenu, setOpenMenu] = useState<boolean>(false);
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [eventId, setEventId] = useState<string | null>(null);
     const [userMenuList, setUserMenuList] = useState<IMenuItem[]>(initialUserMenuList);
 
     const openMenuHandler = () => {
-        setOpenMenu(true);
+        user.info && user.token && user.token !== '' ? setOpenMenu(true) : setOpenMenu(false);
     };
 
     const closeMenuHandler = () => {
@@ -70,11 +76,30 @@ function Menu() {
 
     const handleLogout = (e: React.SyntheticEvent) => {
         // e.preventDefault();
+        setIsAuthenticated(false);
         document.cookie = `token=;`;
         document.cookie = `user=;`;
         router.push('/login');
     }
 
+    /**
+     * Using Cache
+     */
+    const data = client.readQuery({
+        query: GET_LDO,
+        // Provide any required variables in this object.
+        // Variables of mismatched types will return `null`.
+        // variables: {
+        //     id: 5,
+        // },
+    });
+    const ldoData = data?.getLeagueDirector?.data;
+    const leagueLogo = ldoData ? cld.image(ldoData?.logo) : null;
+
+
+    /**
+     * Mount hooks
+     */
     useEffect(() => {
         const pathList = pathname.split('/');
         let eventPath = pathList.length > 0 ? pathList[1] : null;
@@ -87,7 +112,7 @@ function Menu() {
             setUserMenuList((prevState) => [...prevState.filter((menuItem) => menuItem.id === 5)]); // 5 = account
         } else {
             setEventId(eventPath);
-            if (user.info?.role === UserRole.coach){
+            if (user.info?.role === UserRole.coach) {
                 setUserMenuList((prevState) => [...prevState.filter((menuItem) => menuItem.id === 2 || menuItem.id === 4)]); // 2 = teams // 4 = matches
             }
             setUserMenuList(initialUserMenuList);
@@ -97,20 +122,22 @@ function Menu() {
     /**
      * Renders sub components
      */
-    const renderMenuItems=(eId: string | null, uml: IMenuItem[])=>{
+    const renderMenuItems = (eId: string | null, uml: IMenuItem[]) => {
         const menuItems: React.ReactNode[] = [];
         for (let i = 0; i < uml.length; i++) {
-            let newLink:string = '';
-            if(eId && eId !== '' && (uml[i].id === 1 || uml[i].id === 3 || uml[i].id === 4)) newLink = '/' + eId;
+            let newLink: string = '';
+            if (eId && eId !== '' && (uml[i].id === 1 || uml[i].id === 3 || uml[i].id === 4)) newLink = '/' + eId;
             menuItems.push(<MenuItem setOpenMenu={setOpenMenu} key={uml[i].id} icon={`/icons/${uml[i].imgName}.svg`} text={uml[i].text} link={`${newLink}${uml[i].link}`} />);
         }
 
         return <>{menuItems}</>;
     }
 
+    if (!user.info || !user.token || user.token === '') return null;
+
     return (
         <div className='container px-2 mx-auto'>
-            <button onClick={openMenuHandler} className='menu-button'>
+            <button onClick={openMenuHandler} className='menu-button block md:hidden'>
                 <img src='/icons/menu.svg' className='w-10 mt-4 svg-white' alt='menu' role="presentation" />
             </button>
 
@@ -122,8 +149,8 @@ function Menu() {
                         </button>
                     </div>
                     <div className="league-director w-full flex justify-between items-center mb-8">
-                        <img src="/free-logo.svg" alt="" className="w-2/6" />
-                        <h1 className='text-2xl'>LDO Name</h1>
+                        {leagueLogo ? <AdvancedImage className="w-2/6" cldImg={leagueLogo} /> : <img src="/free-logo.svg" alt="" className="w-2/6" />}
+                        <h1 className='text-2xl'>{ldoData ? ldoData.name : ''}</h1>
                     </div>
                     {eventId && (
                         <div className="league mb-8 w-full">

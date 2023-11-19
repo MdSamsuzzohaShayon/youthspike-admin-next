@@ -2,12 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getCookie } from '@/utils/cookie';
-import { IUser } from '@/types/user';
-
-interface IUserContext {
-    token: string | null;
-    info: IUser | null;
-}
+import { IUser, IUserContext } from '@/types/user';
 
 export const UserContext = createContext<IUserContext>({ token: null, info: null });
 

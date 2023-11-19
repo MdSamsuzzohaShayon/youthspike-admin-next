@@ -1,3 +1,6 @@
+import React from "react";
+import { IUserContext } from ".";
+
 export interface IMenuItem {
   id: number;
   imgName: string;
@@ -8,12 +11,24 @@ export interface IMenuItem {
 export interface ITextInputProps {
   lw?: string;
   rw?: string;
+  vertical?: boolean;
   extraCls?: string;
   lblTxt?: string;
   name: string;
   required: boolean;
   defaultValue: string | number;
   handleInputChange: (e: React.SyntheticEvent) => void;
+}
+
+export interface IFileFileProps {
+  lw?: string;
+  rw?: string;
+  vertical?: boolean;
+  extraCls?: string;
+  lblTxt?: string;
+  name: string;
+  defaultValue: string | number;
+  handleFileChange: (e: React.SyntheticEvent) => void;
 }
 
 export interface INumberInputProps {
@@ -47,4 +62,27 @@ export interface IButtonProps {
   handleClickEvent: (e: React.SyntheticEvent) => void;
   bg?: string;
   text?: string;
+}
+
+export interface IMenuArrangeProps{
+  eventId: null | string;
+  closeMenuHandler: (e: React.SyntheticEvent) => void;
+  renderMenuItems: (eventId: string, userMenuList: IMenuItem[]) => React.ReactNode;
+  userMenuList: IMenuItem[];
+  user: IUserContext;
+  handleLogout: (e: React.SyntheticEvent) => void;
+}
+
+export interface IError {
+  message?: string;
+  name?: string;
+}
+
+
+export interface ILoginProps {
+  handleLogin: (e: React.SyntheticEvent) => void;
+  email: string;
+  setEmail: (state: string) => void;
+  password: string;
+  setPassword: (state: string) => void;
 }

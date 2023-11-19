@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 const LOGIN_ADMIN = gql`
   mutation Login($email: String!, $password: String!) {
@@ -49,20 +49,29 @@ const LOGIN_ADMIN = gql`
   }
 `;
 
-const REGISTER_DIRECTOR = gql`
-    mutation RegisterLeagueDirector($firstName: String!, $lastName: String!, $email: String!, $password: String!) {
-      registerLeagueDirector(firstName: $firstName, lastName: $lastName, email: $email, password: $password) {
-        code
-        message
-        success
-        data {
+const REGISTER_DIRECTOR_RAW = `
+  mutation CreateDirector($args: CreateDirectorArgs!, $logo: Upload) {
+    createDirector(args: $args, logo: $logo) {
+      code
+      message
+      success
+      data {
+        name
+        logo
+        director {
           _id
-          active
           firstName
           lastName
+          login {
+            email
+          }
         }
       }
     }
+  }
+`;
+const REGISTER_DIRECTOR = gql`
+  ${REGISTER_DIRECTOR_RAW}
 `;
 
-export { LOGIN_ADMIN, REGISTER_DIRECTOR };
+export { LOGIN_ADMIN, REGISTER_DIRECTOR, REGISTER_DIRECTOR_RAW };

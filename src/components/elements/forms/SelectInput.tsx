@@ -8,7 +8,7 @@ const SelectInput = (props: ISelectInputProps) => {
     return (
         <div className={`input-group w-full flex justify-between items-center ${props.extraCls}`}>
             <label htmlFor={props.name} className={`capitalize ${props.lw}`}>{props.lblTxt ? props.lblTxt : props.name}</label>
-            <select onChange={props.handleSelect} name={props.name} id={props.name} defaultValue={props.defaultValue ? props.defaultValue : props.optionList[0].value} className={`border border-gray-300 bg-transparent outline-none px-2 rounded-full h-10 text-center ${props.rw}`} style={selectStyle} >
+            <select onChange={props.handleSelect} name={props.name} id={props.name} defaultValue={props.defaultValue ? props.defaultValue : props.optionList[0].value} className={`form-control ${props.rw}`} style={selectStyle} >
                 {props.optionList.map((o, i) => (
                     <option value={o.value} key={i} className='capitalize'>{o.text ? o.text : o.value}</option>
                 ))}

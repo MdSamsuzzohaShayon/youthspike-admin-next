@@ -1,6 +1,7 @@
 'use client'
 
 import DirectorAdd from '@/components/director/DirectorAdd';
+import DirectorList from '@/components/director/DirectorList';
 import React from 'react';
 
 function DirectorPage() {
@@ -9,8 +10,9 @@ function DirectorPage() {
      */
   return (
     <div className='container mx-auto px-2'>
-        <h1 className="text-2xl">Directors</h1>
-        <DirectorAdd />
+        <h1>Directors (Only accessable by admin)</h1>
+        <DirectorAdd update={false} />
+        <DirectorList />
     </div>
   )
 }

@@ -7,6 +7,7 @@ import TextInput from '../elements/forms/TextInput';
 import { ILeagueAddProps, ILeagueAdd, IOption } from '@/types';
 import NumberInput from '../elements/forms/NumberInput';
 import { getCookie } from '@/utils/cookie';
+import { BACKEND_URL } from '@/utils/keys';
 
 
 const homeTeamStrategyList: IOption[] = [{ value: 'toss', text: "Toss" }];
@@ -14,7 +15,7 @@ const rosterLockList: IOption[] = [{ value: 'first', text: 'First roster submit'
 const assignLogicList: IOption[] = [{ value: 'hight' }, { value: 'random' }];
 
 const initialLeague = {
-    name: 'Example',
+    name: '',
     // startDate, endDate, playerLimit
     divisions: '',
     nets: 3,
@@ -90,7 +91,7 @@ function LeagueAddUpdate({ update }: ILeagueAddProps) {
 
         try {
             const token = getCookie('token');
-            const response = await fetch('http://localhost:4000/graphql', {
+            const response = await fetch(BACKEND_URL, {
                 method: 'POST',
                 body: formData,
                 headers: {

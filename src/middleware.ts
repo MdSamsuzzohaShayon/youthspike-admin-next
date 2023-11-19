@@ -6,7 +6,7 @@ import type { NextRequest } from 'next/server';
 const unauthenticatedPages = ['/login', '/signup', '/userSignup'];
 const authenticatedPages = ['/','/leagues', '/matches'];
 
-
+// Update
 export const config = {
   matcher: [
     /*

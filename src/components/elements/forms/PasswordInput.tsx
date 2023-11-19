@@ -1,16 +1,16 @@
 import React from 'react';
 import { ITextInputProps } from '@/types';
 
-const TextInput = (props: ITextInputProps) => {
+const PasswordInput = (props: ITextInputProps) => {
     return (
         <div className={`input-group w-full flex ${props.vertical ? 'flex-col' : ''} justify-between items-center ${props.extraCls}`}>
             <label htmlFor={props.name} className={`capitalize ${props.vertical ? 'w-full': ''} ${props.lw}`}>{props.lblTxt ? props.lblTxt : props.name}</label>
             <input onChange={props.handleInputChange}
                 id={props.name} name={props.name}
-                className={`${props.vertical ? 'w-full': ''} form-control ${props.rw ? props.rw : "w-20"}`} type="text"
+                className={`${props.vertical ? 'w-full': ''} form-control ${props.rw ? props.rw : "w-20"}`} type="password"
                 defaultValue={props.defaultValue} required={props.required} />
         </div>
     )
 }
 
-export default TextInput;
+export default PasswordInput;

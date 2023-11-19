@@ -4,14 +4,15 @@
 import React, { useRef, useState } from 'react';
 import { useUser } from '@/lib/UserProvider';
 import { ADD_UPDATE_LEAGUE, GET_LEAGUES } from '@/graphql/league';
-import { useMutation, useQuery } from '@apollo/client';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import Loader from '@/components/elements/Loader';
 import Message from '@/components/elements/Message';
-import LeagueAdd from '@/components/league/LeagueAddUpdate';
 import LeagueCard from '@/components/league/LeagueCard';
 import { ILeague } from '@/types/league';
-import { Router } from 'next/router';
 import { useRouter } from 'next/navigation';
+import { GET_LDO } from '@/graphql/director';
+import cld from '@/config/cloudinary.config';
+import { AdvancedImage } from '@cloudinary/react';
 
 interface IItem {
   id: number;
@@ -35,6 +36,7 @@ function LeaguesPage() {
   const router = useRouter();
 
   const { loading, error, data: leaguesData } = useQuery(GET_LEAGUES);
+  const { loading: ldoLoading, error: ldoError, data: ldoData } = useQuery(GET_LDO);
 
   const handleFilter = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -65,16 +67,18 @@ function LeaguesPage() {
     router.push('/leagues/new')
   }
 
-  // console.log({ leaguesData });
 
+  if (loading || ldoLoading) return <Loader />;
+  if (error || ldoError) {
+    console.log(error, ldoError);
 
-  if (loading) return <Loader />;
-  if (error) {
-    let err = JSON.stringify(error);
-    if (error.message === 'Forbidden resource') err = 'You do not have permission to do this operation!';
-    return <Message text={err} />
+    // let err = JSON.stringify(error);
+    // if (error.message === 'Forbidden resource') err = 'You do not have permission to do this operation!';
+    return <Message text={error} />
   }
 
+  const newLdoData = ldoData?.getLeagueDirector?.data;
+  const leagueLogo = newLdoData ? cld.image(newLdoData?.logo) : null;
   return (
     <div className="container px-2 mx-auto">
       <dialog ref={filterListEl}>
@@ -83,9 +87,10 @@ function LeaguesPage() {
       </dialog>
       <h1 className='mb-4 text-2xl font-bold pt-6 text-center'>Leagues Director</h1>
       <div className="box w-full flex flex-col justify-center items-center mb-4">
-        <img src="/free-logo.svg" alt="free-logo" className="w-12" />
-        <h2>PDX Ssikers Leagues</h2>
-        <h2 className='2xl font-bold'>Events</h2>
+        {leagueLogo ? <AdvancedImage className="w-12" cldImg={leagueLogo} /> : <img src="/free-logo.svg" alt="free-logo" className="w-12" />}
+
+        <h1>{newLdoData ? newLdoData.name : ''}</h1>
+        <h2 >Events</h2>
       </div>
       <div className="filter flex justify-between mb-2">
         <h3>All Events</h3>

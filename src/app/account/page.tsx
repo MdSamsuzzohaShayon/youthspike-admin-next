@@ -1,14 +1,51 @@
-import React from 'react'
+/* eslint-disable @next/next/no-img-element */
+'use client'
+
+import React, { useEffect, useRef, useState } from 'react';
+import { ADD_UPDATE_LEAGUE, GET_LEAGUES } from '@/graphql/league';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import Loader from '@/components/elements/Loader';
+import Message from '@/components/elements/Message';
+import DirectorAdd from '@/components/director/DirectorAdd';
+import { GET_LDO } from '@/graphql/director';
+import { IDirector, ILDO } from '@/types';
 
 function AccountPage() {
+  const [ldoState, setLdoState] = useState<ILDO | null>(null);
+
+  const [getLdo, { loading, error, data: ldoData }] = useLazyQuery(GET_LDO);
+  // Query for director
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await getLdo({ variables: { dId: '' } }); // Use dynamic id // use either ldoId or directorId
+      const ldoObj = data?.getLeagueDirector?.data;
+      console.log(ldoObj);
+      
+
+      setLdoState({
+        name: ldoObj?.name,
+        logo: ldoObj?.logo,
+        director: {
+          email: ldoObj?.director?.login?.email,
+          firstName: ldoObj?.director?.firstName,
+          lastName: ldoObj?.director?.lastName,
+          password: '',
+          confirmPassword: '',
+        }
+      })
+    })()
+  }, []);
+
+  if (loading) return <Loader />;
+  if (error) return <Message error={error} />
+
   return (
-    <div>
-      <h1 className="text-4xl">League Director Account Setting</h1>
-      <p>Account Setting Page</p>
-      <p>Change logo</p>
-      <p>Change password, passcode</p>
-      </div>
+    <div className="container px-2 mx-auto">
+      <h1 className='mb-4 text-2xl font-bold pt-6 text-center'>Account Setting</h1>
+      <DirectorAdd update prevLdo={ldoState} />
+    </div>
   )
 }
 
-export default AccountPage
+export default AccountPage;
