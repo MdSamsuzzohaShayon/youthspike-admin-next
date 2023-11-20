@@ -5,7 +5,7 @@ import Message from '@/components/elements/Message';
 import Login from '@/components/user/Login'
 import { LOGIN_ADMIN } from '@/graphql/admin';
 import { IError } from '@/types';
-import {UserRole} from '@/types/user';
+import { UserRole } from '@/types/user';
 import { useMutation } from '@apollo/client';
 import Head from 'next/head'
 import { useRouter } from 'next/navigation';
@@ -32,9 +32,9 @@ function LoginPage() {
       document.cookie = `token=${resultData.login.data.token};`;
       document.cookie = `user=${JSON.stringify(resultData.login.data.user)};`;
       console.log(resultData.login.data.user.role);
-      if(resultData?.login?.data?.user?.role === UserRole.admin){
+      if (resultData?.login?.data?.user?.role === UserRole.admin) {
         router.push('/admin/directors');
-      }else{
+      } else {
         router.push('/');
       }
     } else {

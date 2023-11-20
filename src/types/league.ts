@@ -1,3 +1,4 @@
+import { IError } from ".";
 import { IDocument } from "./document";
 
 export interface ILeague extends IDocument {
@@ -11,12 +12,7 @@ export interface ILeague extends IDocument {
 
 export interface ILeagueAddProps {
   update: boolean;
-}
-
-interface ISponsor {
-  _id?: string;
-  name: string;
-  logo: string;
+  setActErr: (state: IError) => void;
 }
 
 export interface ILeagueAdd {

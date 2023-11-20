@@ -7,12 +7,13 @@ import MenuItem from './MenuItem';
 import { useUser } from '@/lib/UserProvider';
 import { UserRole } from '@/types/user';
 import { IMenuItem } from '@/types';
-import { useApolloClient, useReadQuery } from '@apollo/client';
+import { gql, useApolloClient, useReadQuery } from '@apollo/client';
 import { GET_LDO } from '@/graphql/director';
 import { AdvancedImage } from '@cloudinary/react';
 import cld from '@/config/cloudinary.config';
+import Link from 'next/link';
 
-const eventPaths: string[] = ['settings', 'teams', 'players', 'matches'];
+const eventPaths: string[] = ['settings', 'teams', 'players', 'matches', 'account', 'newevent'];
 
 const initialUserMenuList: IMenuItem[] = [
     {
@@ -85,16 +86,10 @@ function Menu() {
     /**
      * Using Cache
      */
-    const data = client.readQuery({
-        query: GET_LDO,
-        // Provide any required variables in this object.
-        // Variables of mismatched types will return `null`.
-        // variables: {
-        //     id: 5,
-        // },
-    });
+    const data = client.readQuery({ query: GET_LDO, });
     const ldoData = data?.getLeagueDirector?.data;
     const leagueLogo = ldoData ? cld.image(ldoData?.logo) : null;
+
 
 
     /**
@@ -149,7 +144,7 @@ function Menu() {
                         </button>
                     </div>
                     <div className="league-director w-full flex justify-between items-center mb-8">
-                        {leagueLogo ? <AdvancedImage className="w-2/6" cldImg={leagueLogo} /> : <img src="/free-logo.svg" alt="" className="w-2/6" />}
+                        <Link role="presentation" onClick={closeMenuHandler} href="/">{leagueLogo ? <AdvancedImage className="w-2/6" cldImg={leagueLogo} /> : <img src="/free-logo.svg" alt="" className="w-2/6" />}</Link>
                         <h1 className='text-2xl'>{ldoData ? ldoData.name : ''}</h1>
                     </div>
                     {eventId && (

@@ -28,20 +28,22 @@ const GET_LDO = gql`
   query GetLeagueDirector($dId: String) {
     getLeagueDirector(dId: $dId) {
       code
+      message
+      success
       data {
+        _id
         name
         logo
         director {
           _id
           firstName
           lastName
+          role
           login {
             email
           }
         }
       }
-      message
-      success
     }
   }
 `;

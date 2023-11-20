@@ -1,4 +1,4 @@
-import { ADD_UPDATE_LEAGUE } from '@/graphql/league';
+import { ADD_UPDATE_LEAGUE, ADD_UPDATE_LEAGUE_RAW } from '@/graphql/league';
 import { useMutation } from '@apollo/client';
 import React, { useState, useEffect, useRef } from 'react';
 import ToggleInput from '../elements/forms/ToggleInput';
@@ -8,6 +8,7 @@ import { ILeagueAddProps, ILeagueAdd, IOption } from '@/types';
 import NumberInput from '../elements/forms/NumberInput';
 import { getCookie } from '@/utils/cookie';
 import { BACKEND_URL } from '@/utils/keys';
+import { useRouter } from 'next/navigation';
 
 
 const homeTeamStrategyList: IOption[] = [{ value: 'toss', text: "Toss" }];
@@ -15,7 +16,7 @@ const rosterLockList: IOption[] = [{ value: 'first', text: 'First roster submit'
 const assignLogicList: IOption[] = [{ value: 'hight' }, { value: 'random' }];
 
 const initialLeague = {
-    name: '',
+    name: 'N-2',
     // startDate, endDate, playerLimit
     divisions: '',
     nets: 3,
@@ -36,13 +37,15 @@ const initialLeague = {
     active: true
 }
 
-function LeagueAddUpdate({ update }: ILeagueAddProps) {
+function LeagueAddUpdate({ update, setActErr }: ILeagueAddProps) {
+
+    const router = useRouter();
+
     const sponsorInputEl = useRef<HTMLInputElement>(null);
     const [leagueState, setLeagueState] = useState<ILeagueAdd>(initialLeague);
     const [sponsorImgList, setSponsorImgList] = useState<File[]>([]);
 
-    // GraphQL
-    const [addLeague, { data, loading, error, reset }] = useMutation(ADD_UPDATE_LEAGUE); // Do caching
+    const [addLeague, { error, loading, data }] = useMutation(ADD_UPDATE_LEAGUE);
 
     /**
      * Add league mutation
@@ -50,67 +53,70 @@ function LeagueAddUpdate({ update }: ILeagueAddProps) {
     const handleLeagueAdd = async (e: React.SyntheticEvent) => {
         e.preventDefault();
 
-        // Assuming sponsorImgList is already an array of File objects
-        const inputData = {...leagueState, directorId: 'abc'};
-
-
-        const formData = new FormData();
-        formData.set('operations', JSON.stringify({
-            query: `
-            mutation CreateOrUpdateLeague($sponsors: [Upload!]!, $input: CreateOrUpdateLeagueInput!) {
-              createOrUpdateLeague(sponsors: $sponsors, input: $input) {
-                code
-                message
-                success
-                data {
-                  _id
-                  active
-                  autoAssign
-                  autoAssignLogic
-                  coachPassword
-                  name
-                  endDate
-                  sponsors
-                }
-              }
-            }
-          `,
-            variables: {
-                sponsors: sponsorImgList.length > 0 ? null : [], // Assuming sponsorImgList is already an array of File objects
-                input: inputData
-            }
-        }));
-
-        // Append the file to the FormData
-        if (sponsorImgList.length > 0) {
-            formData.set('map', JSON.stringify({ '0': ['variables.sponsors'] }));
-            sponsorImgList.forEach((file, index) => {
-                formData.set(index.toString(), file);
-            });
-        }
+        let newLeagueId = null;
+        const inputData = { ...leagueState, directorId: 'abc' };
+        const mutationVariables = {
+            sponsors: sponsorImgList.length > 0 ? null : [],
+            input: inputData,
+        };
 
         try {
-            const token = getCookie('token');
-            const response = await fetch(BACKEND_URL, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            if (sponsorImgList.length > 0) {
+                // Use FormData with fetch if there is a file to upload on the server
+                const formData = new FormData();
+                formData.set('operations', JSON.stringify({
+                    query: ADD_UPDATE_LEAGUE_RAW,
+                    variables: mutationVariables,
+                }));
+                formData.set('map', JSON.stringify({ '0': ['variables.sponsors'] }));
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                // Append sponsors to the FormData
+                sponsorImgList.forEach((file, index) => {
+                    formData.set(index.toString(), file);
+                });
+
+                const token = getCookie('token');
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'Authorization': `Bearer ${token}` },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const responseData = await response.json();
+
+                if (responseData?.data?.createOrUpdateLeague?.code !== 201) {
+                    setActErr({
+                        name: responseData?.data?.createOrUpdateLeague?.code,
+                        message: responseData?.data?.createOrUpdateLeague?.message,
+                        main: responseData.data,
+                    });
+                } else {
+                    newLeagueId = responseData?.data?.createOrUpdateLeague?.data?._id;
+                }
+            } else {
+                // Use Apollo Client mutation
+                const { data: leagueData } = await addLeague({ variables: mutationVariables });
+                if(leagueData.createOrUpdateLeague.code !== 201){
+                    setActErr({name: leagueData.createOrUpdateLeague.code, message: leagueData.createOrUpdateLeague.message})
+                }else{
+                    newLeagueId = leagueData.createOrUpdateLeague.data._id
+                }
+                
             }
 
-            const responseData = await response.json();
-            console.log(responseData);
-
+            // Reset form and navigate
             setLeagueState(initialLeague);
             const formEl = e.target as HTMLFormElement;
             formEl.reset();
+
+            if (newLeagueId) router.push(`/${newLeagueId}`);
         } catch (error) {
-            console.error('Error during GraphQL mutation:', error);
+            // @ts-ignore
+            setActErr({ name: 'Invalid Mutation', message: error.message || '', main: error });
         }
     };
 
@@ -203,20 +209,6 @@ function LeagueAddUpdate({ update }: ILeagueAddProps) {
         return (<ul className="show-sponsors flex justify-between w-full items-center flex-wrap">{imgElList}</ul>);
     }
 
-    useEffect(() => {
-        return () => {
-            reset();
-        }
-    }, []);
-
-    // This should render on page level 
-    // if (loading) return <Loader />;
-    // if (error) {
-    //     let err = JSON.stringify(error);
-    //     if (error.message === 'Forbidden resource') err = 'You do not have permission to do this operation!';
-    //     return <Message text={err} />
-    // }
-
     return (
         <form onSubmit={handleLeagueAdd} className='flex flex-col gap-2'>
             <TextInput required={!update} defaultValue={leagueState.divisions} handleInputChange={handleInputChange} lblTxt='DIVISIONS' name='divisions' lw='w-2/6' rw='w-4/6' />
@@ -263,7 +255,7 @@ function LeagueAddUpdate({ update }: ILeagueAddProps) {
                 className="rounded p-2 px-8 outline-none bg-gray-900 hover:bg-gray-500 text-gray-100 mt-4 font-bold transform transition duration-300 hover:scale-110"
                 type="submit"
             >
-                Add
+                Submit
             </button>
         </form>
     )

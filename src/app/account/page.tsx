@@ -17,12 +17,13 @@ function AccountPage() {
   // Query for director
 
   useEffect(() => {
+    /**
+     * Fetch director
+     */
     (async () => {
-      const { data } = await getLdo({ variables: { dId: '' } }); // Use dynamic id // use either ldoId or directorId
-      const ldoObj = data?.getLeagueDirector?.data;
-      console.log(ldoObj);
+      const { data } = await getLdo(); // Use dynamic id // use either ldoId or directorId
+      const ldoObj = data?.getLeagueDirector?.data;    
       
-
       setLdoState({
         name: ldoObj?.name,
         logo: ldoObj?.logo,
@@ -42,7 +43,7 @@ function AccountPage() {
 
   return (
     <div className="container px-2 mx-auto">
-      <h1 className='mb-4 text-2xl font-bold pt-6 text-center'>Account Setting</h1>
+      <h1 className='mb-4 text-2xl font-bold pt-6 text-center'>Account Setting (LDO)</h1>
       <DirectorAdd update prevLdo={ldoState} />
     </div>
   )

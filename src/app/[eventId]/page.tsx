@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import TeamCard from '@/components/teams/TeamCard';
 import TeamAdd from '@/components/teams/TeamAdd';
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { useApolloClient, useLazyQuery, useQuery, gql } from '@apollo/client';
 import { GET_TEAMS_BY_LEAGUE } from '@/graphql/teams';
 import Loader from '@/components/elements/Loader';
 import Message from '@/components/elements/Message';
@@ -15,13 +15,16 @@ interface ITeamsOfLeaguePage {
 }
 
 function TeamsOfLeaguePage({ params }: ITeamsOfLeaguePage) {
+
+    const client = useApolloClient();
     const teamAddEl = useRef<HTMLDialogElement | null>(null);
     const [showFilter, setShowFilter] = useState<boolean>(false);
+
     /**
      * Fetch all teams of this league from GraphQL Server
      */
     const [getTeams, { data: teamData, loading, error }] = useLazyQuery(GET_TEAMS_BY_LEAGUE);
-    console.log({teamData});
+    console.log({ teamData });
 
 
 
@@ -43,22 +46,17 @@ function TeamsOfLeaguePage({ params }: ITeamsOfLeaguePage) {
         if (teamAddEl.current) teamAddEl.current.close();
     }
 
-    const handleFilter=(e: React.SyntheticEvent, filteredItemId: number) => {
+    const handleFilter = (e: React.SyntheticEvent, filteredItemId: number) => {
         e.preventDefault();
     }
 
     useEffect(() => {
-        if (params.leagueId) {
+        if (params?.eventId) {
             getTeams({ variables: { leagueId: params.eventId } });
         }
     }, [params.eventId]);
 
     if (loading) return <Loader />;
-    if (error) {
-        let err = JSON.stringify(error);
-        if (error.message === 'Forbidden resource') err = 'You do not have permission to do this operation!';
-        return <Message text={err} />
-    }
 
     return (
         <div className="container px-2 mx-auto">
@@ -72,6 +70,7 @@ function TeamsOfLeaguePage({ params }: ITeamsOfLeaguePage) {
       {itemList.map((item) => <p key={item.id} role="presentation" onClick={(e) => handleSelectItem(e, item.id)} >{item.text}</p>)}
     </dialog> */}
             <h1 className='mb-4 text-2xl font-bold pt-6 text-center mb-8'>Teams</h1>
+            {error && <Message error={error} />}
             <div className="w-full flex justify-between items-center flex-col mb-4">
                 <div className="logo w-20">
                     <img src="/free-logo.svg" alt="program-playoffs" className='w-full' />
@@ -99,7 +98,7 @@ function TeamsOfLeaguePage({ params }: ITeamsOfLeaguePage) {
                         <label htmlFor="bulk-action">Bulk Action</label>
                         <img src="/icons/dropdown.svg" alt="dropdown" className="w-6 svg-white" />
                     </div>
-                    <div className="input-group flex items-center gap-2 justify-between" role="presentation" onClick={(e) => setShowFilter((prevState)=> !prevState)} >
+                    <div className="input-group flex items-center gap-2 justify-between" role="presentation" onClick={(e) => setShowFilter((prevState) => !prevState)} >
                         <p>A-Z</p>
                         <img src="/icons/dropdown.svg" alt="dropdown" className="w-6 svg-white" />
                     </div>

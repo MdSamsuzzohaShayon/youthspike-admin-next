@@ -8,6 +8,7 @@ export interface ILDO{
   }
 
   export interface ILDOItem{
+    _id: string;
     name: string;
     logo: string;
     director?: IDirectorItem;

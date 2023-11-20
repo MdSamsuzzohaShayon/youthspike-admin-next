@@ -45,12 +45,13 @@ const exampleErr = {
 }
 
 
-const Message = ({ error }: { error: IError }) => {
+const Message = ({ error }: { error: IError | null }) => {
 
   const [expandDetail, setExpandDetail] = useState<boolean>(false);
 
+  if (error === null) return null;
   return (
-    <div className='text-red-500 container mx-auto px-2'>
+    <div className='text-red-500 container mx-auto'>
       <div className="flex gap-2 items-center">
         <h2 >Error: </h2> <img src='/icons/error.svg' className='w-4 svg-white' />
         {error.name && <h2>{error.name}</h2>}
@@ -67,7 +68,7 @@ const Message = ({ error }: { error: IError }) => {
       </div>
       {expandDetail && <div className="error-detail w-full">
         <p>
-          {JSON.stringify(error)}
+          {error.main ? JSON.stringify(error.main) : JSON.stringify(error)}
         </p>
       </div>}
     </div>

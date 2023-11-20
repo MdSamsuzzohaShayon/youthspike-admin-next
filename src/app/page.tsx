@@ -64,18 +64,11 @@ function LeaguesPage() {
 
   const handleOpenAdd = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    router.push('/leagues/new')
+    router.push('/newevent')
   }
 
 
   if (loading || ldoLoading) return <Loader />;
-  if (error || ldoError) {
-    console.log(error, ldoError);
-
-    // let err = JSON.stringify(error);
-    // if (error.message === 'Forbidden resource') err = 'You do not have permission to do this operation!';
-    return <Message text={error} />
-  }
 
   const newLdoData = ldoData?.getLeagueDirector?.data;
   const leagueLogo = newLdoData ? cld.image(newLdoData?.logo) : null;
@@ -86,6 +79,7 @@ function LeaguesPage() {
         {itemList.map((item) => <p key={item.id} role="presentation" onClick={(e) => handleSelectItem(e, item.id)} >{item.text}</p>)}
       </dialog>
       <h1 className='mb-4 text-2xl font-bold pt-6 text-center'>Leagues Director</h1>
+      {error && <Message error={error} />}
       <div className="box w-full flex flex-col justify-center items-center mb-4">
         {leagueLogo ? <AdvancedImage className="w-12" cldImg={leagueLogo} /> : <img src="/free-logo.svg" alt="free-logo" className="w-12" />}
 
