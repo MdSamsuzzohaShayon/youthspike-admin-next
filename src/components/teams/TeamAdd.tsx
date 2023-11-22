@@ -1,4 +1,4 @@
-import { ADD_UPDATE_LEAGUE } from '@/graphql/league';
+import { ADD_LEAGUE, UPDATE_LEAGUE } from '@/graphql/league';
 import { useMutation } from '@apollo/client';
 import React, { useState, useEffect } from 'react';
 import Loader from '../elements/Loader';
@@ -14,18 +14,9 @@ function TeamAdd({ handleClose }: ITeamAdd) {
     const [endDate, setEndDate] = useState<string>('');
     const [playerLimit, setPlayerLimit] = useState<number | null>(null);
 
-    // $name: String!
-    // $active: Boolean!
-    // $coachId: String!
-    // $leagueId: String!
-    // $reamoveLeagueId: String
-    // $changeLeague: Boolean
-    // $reamoveCoachId: String
-    // $id: String
-
     // GraphQL
     // Get all coaches / players
-    const [addLeague, { data, loading, error, reset }] = useMutation(ADD_UPDATE_LEAGUE); // Do caching
+    const [addLeague, { data, loading, error, reset }] = useMutation(ADD_LEAGUE); // Do caching
     
 
     const handleTeamAdd = async (e: React.SyntheticEvent) => {

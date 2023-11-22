@@ -2,17 +2,24 @@ import { IError } from ".";
 import { IDocument } from "./document";
 
 export interface ILeague extends IDocument {
-  active: boolean;
   name: string;
-  directorId: string;
-  endDate: string;
+  divisions: string;
+  nets: number;
+  rounds: number;
+  netVariance: number;
+  homeTeam: string;
+  autoAssign: boolean;
+  autoAssignLogic: string;
+  timeout: number;
+  passcode: string;
+  coachPassword: string;
+  location: string;
+  rosterLock: string;
   startDate: string;
+  endDate: string;
   playerLimit: number;
-}
-
-export interface ILeagueAddProps {
-  update: boolean;
-  setActErr: (state: IError) => void;
+  active: boolean;
+  sponsors: string[];
 }
 
 export interface ILeagueAdd {
@@ -33,5 +40,13 @@ export interface ILeagueAdd {
   endDate: string;
   playerLimit: number;
   active: boolean;
+  directorId?: string;
   // sponsors: File[];
+}
+
+export interface ILeagueAddProps {
+  update: boolean;
+  setActErr: (state: IError) => void;
+  setIsLoading: (state: boolean) => void;
+  prevLeague?: ILeague;
 }

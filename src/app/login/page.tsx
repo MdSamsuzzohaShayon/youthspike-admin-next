@@ -21,7 +21,6 @@ function LoginPage() {
   const [actionsErrors, setActionsErrors] = useState<IError>();
 
   const handleLogin = async (e: React.SyntheticEvent) => {
-    e.preventDefault();
     const { data: resultData } = await loginFunction({
       variables: {
         email,
@@ -58,7 +57,9 @@ function LoginPage() {
 
       <main className='flex flex-col w-full justify-center items-center' style={{ minHeight: '80vh' }} >
         {error && <Message error={error} />}
-        {actionsErrors && <Message error={actionsErrors} />}
+        <div className="container mx-auto px-2">
+          {actionsErrors && <Message error={actionsErrors} />}
+        </div>
         <Login handleLogin={handleLogin} email={email} setEmail={setEmail} password={password} setPassword={setPassword} />
       </main>
     </>

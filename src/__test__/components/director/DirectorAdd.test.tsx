@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { fireEvent, screen, render, waitFor } from '@testing-library/react';
-import DirectorAdd from "@/components/director/DirectorAdd";
+import DirectorAdd from "@/components/ldo/DirectorAdd";
 import { MockedProvider } from '@apollo/client/testing';
 import { REGISTER_DIRECTOR } from '@/graphql/admin';
 

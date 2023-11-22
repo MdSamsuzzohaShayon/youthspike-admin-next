@@ -6,7 +6,7 @@ import { ADD_UPDATE_LEAGUE, GET_LEAGUES } from '@/graphql/league';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import Loader from '@/components/elements/Loader';
 import Message from '@/components/elements/Message';
-import DirectorAdd from '@/components/director/DirectorAdd';
+import DirectorAdd from '@/components/ldo/DirectorAdd';
 import { GET_LDO } from '@/graphql/director';
 import { IDirector, ILDO } from '@/types';
 

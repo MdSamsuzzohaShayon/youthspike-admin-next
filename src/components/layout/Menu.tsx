@@ -12,8 +12,9 @@ import { GET_LDO } from '@/graphql/director';
 import { AdvancedImage } from '@cloudinary/react';
 import cld from '@/config/cloudinary.config';
 import Link from 'next/link';
+import { getCookie } from '@/utils/cookie';
 
-const eventPaths: string[] = ['settings', 'teams', 'players', 'matches', 'account', 'newevent'];
+const eventPaths: string[] = ['settings', 'teams', 'players', 'matches', 'account', 'newevent', 'admin'];
 
 const initialUserMenuList: IMenuItem[] = [
     {
@@ -45,7 +46,19 @@ const initialUserMenuList: IMenuItem[] = [
         imgName: 'account',
         text: 'Account',
         link: '/account'
-    }
+    },
+    {
+        id: 6,
+        imgName: 'account',
+        text: 'Admin',
+        link: '/admin'
+    },
+    {
+        id: 7,
+        imgName: 'account',
+        text: 'LDO',
+        link: '/admin/directors'
+    },
 ];
 
 function Menu() {
@@ -76,8 +89,9 @@ function Menu() {
 
 
     const handleLogout = (e: React.SyntheticEvent) => {
-        // e.preventDefault();
+        e.preventDefault();
         setIsAuthenticated(false);
+        setOpenMenu(false);
         document.cookie = `token=;`;
         document.cookie = `user=;`;
         router.push('/login');
@@ -88,7 +102,6 @@ function Menu() {
      */
     const data = client.readQuery({ query: GET_LDO, });
     const ldoData = data?.getLeagueDirector?.data;
-    const leagueLogo = ldoData ? cld.image(ldoData?.logo) : null;
 
 
 
@@ -101,10 +114,15 @@ function Menu() {
         if (eventPath && eventPath.length < 5) eventPath = null;
         if (eventPath && eventPaths.includes(eventPath)) eventPath = null;
 
-        console.log({ pathname, user, eventPath, che: eventPaths.includes('settings') });
         if (!eventPath || eventPath === '') {
             setEventId(null);
-            setUserMenuList((prevState) => [...prevState.filter((menuItem) => menuItem.id === 5)]); // 5 = account
+
+            if (user.info?.role === UserRole.admin) {
+                console.log(user.info);
+                setUserMenuList([...initialUserMenuList.filter((menuItem) => menuItem.id === 6 || menuItem.id === 7)]); // Admin and directors
+            } else {
+                setUserMenuList([...initialUserMenuList.filter((menuItem) => menuItem.id === 5)]); // 5 = account
+            }
         } else {
             setEventId(eventPath);
             if (user.info?.role === UserRole.coach) {
@@ -112,6 +130,10 @@ function Menu() {
             }
             setUserMenuList(initialUserMenuList);
         }
+        
+        const instantToken = getCookie('token'); // Fetch again
+        instantToken ? setIsAuthenticated(true) : setIsAuthenticated(false);
+        
     }, [user, router, pathname]);
 
     /**
@@ -128,24 +150,33 @@ function Menu() {
         return <>{menuItems}</>;
     }
 
-    if (!user.info || !user.token || user.token === '') return null;
+    // if (!user.info || !user.token || user.token === '') return null;
 
     return (
         <div className='container px-2 mx-auto'>
-            <button onClick={openMenuHandler} className='menu-button block md:hidden'>
-                <img src='/icons/menu.svg' className='w-10 mt-4 svg-white' alt='menu' role="presentation" />
-            </button>
+            {isAuthenticated && (
+                <button onClick={openMenuHandler} className='menu-button block md:hidden'>
+                    <img src='/icons/menu.svg' className='w-10 mt-4 svg-white' alt='menu' />
+                </button>
+            )}
 
             {openMenu && (
                 <div className="menu-content bg-gray-700 w-5/6 absolute h-full top-0 left-0 z-20 p-4">
                     <div className="w-full flex justify-end items-center">
-                        <button onClick={closeMenuHandler} className='close-button'>
-                            <img src='/icons/close.svg' className='w-10 svg-white' alt='close' role="presentation" />
-                        </button>
+
+                        {user && user.info && (
+                            <button onClick={closeMenuHandler} className='close-button'>
+                                <img src='/icons/close.svg' className='w-10 svg-white' alt='close' />
+                            </button>
+                        )}
                     </div>
                     <div className="league-director w-full flex justify-between items-center mb-8">
-                        <Link role="presentation" onClick={closeMenuHandler} href="/">{leagueLogo ? <AdvancedImage className="w-2/6" cldImg={leagueLogo} /> : <img src="/free-logo.svg" alt="" className="w-2/6" />}</Link>
-                        <h1 className='text-2xl'>{ldoData ? ldoData.name : ''}</h1>
+                        {user && user.info && user.info.role === UserRole.admin ? (<h1 className='text-2xl'>Admin</h1>) : (<>
+                            <Link role="presentation" onClick={closeMenuHandler} href="/">
+                                {ldoData?.logo ? <AdvancedImage className="w-2/6" cldImg={cld.image(ldoData?.logo)} /> : <img src="/free-logo.svg" alt="spikeball-logo" className="w-2/6" />}
+                            </Link>
+                            <h1 className='text-2xl'>{ldoData ? ldoData.name : ''}</h1>
+                        </>)}
                     </div>
                     {eventId && (
                         <div className="league mb-8 w-full">
@@ -154,7 +185,7 @@ function Menu() {
                     )}
                     <ul className='menu-list flex justify-start flex-col gap-8'>
                         {renderMenuItems(eventId, userMenuList)}
-                        {(user && user.token && user.token !== '') && <li><button className="bg-red-700 text-red-100 font-bold p-2" onClick={handleLogout}>Logout</button></li>}
+                        {(user && user.token && user.token !== '') && <li><button className="btn-danger" onClick={handleLogout}>Logout</button></li>}
                     </ul>
                 </div>
             )}

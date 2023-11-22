@@ -1,6 +1,6 @@
 'use client'
 
-import DirectorAdd from '@/components/director/DirectorAdd';
+import DirectorAdd from '@/components/ldo/DirectorAdd';
 import Loader from '@/components/elements/Loader';
 import Message from '@/components/elements/Message';
 import { GET_LDO, GET_LDOS } from '@/graphql/director';
