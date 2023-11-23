@@ -102,6 +102,7 @@ function Menu() {
      */
     const data = client.readQuery({ query: GET_LDO, });
     const ldoData = data?.getLeagueDirector?.data;
+    
 
 
 
@@ -118,22 +119,22 @@ function Menu() {
             setEventId(null);
 
             if (user.info?.role === UserRole.admin) {
-                console.log(user.info);
                 setUserMenuList([...initialUserMenuList.filter((menuItem) => menuItem.id === 6 || menuItem.id === 7)]); // Admin and directors
             } else {
                 setUserMenuList([...initialUserMenuList.filter((menuItem) => menuItem.id === 5)]); // 5 = account
             }
         } else {
             setEventId(eventPath);
-            if (user.info?.role === UserRole.coach) {
-                setUserMenuList((prevState) => [...prevState.filter((menuItem) => menuItem.id === 2 || menuItem.id === 4)]); // 2 = teams // 4 = matches
+            if (user.info?.role === UserRole.director) {
+                setUserMenuList((prevState) => [...prevState.filter((menuItem) => menuItem.id !== 6 && menuItem.id !== 7)]); // 2 = teams // 4 = matches
+            } else {
+                setUserMenuList(initialUserMenuList);
             }
-            setUserMenuList(initialUserMenuList);
         }
-        
+
         const instantToken = getCookie('token'); // Fetch again
         instantToken ? setIsAuthenticated(true) : setIsAuthenticated(false);
-        
+
     }, [user, router, pathname]);
 
     /**

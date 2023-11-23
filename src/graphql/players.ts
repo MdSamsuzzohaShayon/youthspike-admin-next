@@ -1,56 +1,24 @@
 import { gql } from '@apollo/client';
 
-const GET_PLAYERS = gql`
-  query GetPlayers($userId: String) {
-    getPlayers(userId: $userId) {
-      code
-      success
-      message
-      data {
-        _id
-        firstName
-        lastName
-        role
-
-        player {
-          shirtNumber
+const playerResponse = `
+          _id
+          firstName
+          lastName
           rank
-          teamId
-          leagueId
+`;
 
-          league {
-            _id
-            name
-          }
 
-          team {
-            _id
-            name
-          }
-        }
-
-        login {
-          email
-          password
-        }
-
-        active
-      }
-      playerMapings {
-        playerId
-        teamAndLeague {
-          team {
-            id
-            name
-          }
-          league {
-            id
-            name
-          }
-        }
-      }
+const GET_PLAYERS = gql`
+query GetPlayers($eventId: String!) {
+  getPlayers(eventId: $eventId) {
+    code
+    message
+    success
+    data {
+      ${playerResponse}
     }
   }
+}
 `;
 
 const IMPORT_PLAYERS = gql`
@@ -59,9 +27,26 @@ const IMPORT_PLAYERS = gql`
       code
       success
       message
-      data
+      data {
+        ${playerResponse}
+      }
     }
   }
 `;
 
-export { GET_PLAYERS, IMPORT_PLAYERS };
+const CREATE_PLAYER_RAW = `
+    mutation CreatePlayer($input: CreatePlayerInput!) {
+      createPlayer(input: $input) {
+        code
+        message
+        success
+        data {
+          ${playerResponse}
+        }
+      }
+    }
+`;
+
+const CREATE_PLAYER = gql`${CREATE_PLAYER_RAW}`;
+
+export { GET_PLAYERS, IMPORT_PLAYERS, CREATE_PLAYER_RAW, CREATE_PLAYER };

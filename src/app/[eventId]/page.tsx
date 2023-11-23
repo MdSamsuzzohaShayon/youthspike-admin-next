@@ -54,6 +54,8 @@ function TeamsOfLeaguePage({ params }: ITeamsOfLeaguePage) {
         if (params?.eventId) {
             getTeams({ variables: { leagueId: params.eventId } });
         }
+        console.log("Write query");
+        
     }, [params.eventId]);
 
     if (loading) return <Loader />;

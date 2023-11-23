@@ -16,11 +16,8 @@ const SettingsPage = ({ params }: { params: { eventId: string } }) => {
    */
   const { data, loading, error } = useQuery(GET_A_LEAGUE, { variables: { eventId: params.eventId } });
 
-  if (loading) return <Loader />
+  if (loading || isLoading) return <Loader />
   const prevLeague = data?.getLeague?.data;
-
-  console.log(prevLeague);
-  
 
 
   return (

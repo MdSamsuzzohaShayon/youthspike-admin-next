@@ -3,7 +3,7 @@
 import Loader from '@/components/elements/Loader';
 import Message from '@/components/elements/Message';
 import Login from '@/components/user/Login'
-import { LOGIN_ADMIN } from '@/graphql/admin';
+import { LOGIN_USER } from '@/graphql/admin';
 import { IError } from '@/types';
 import { UserRole } from '@/types/user';
 import { useMutation } from '@apollo/client';
@@ -17,7 +17,7 @@ function LoginPage() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loginFunction, { data, error, loading }] = useMutation(LOGIN_ADMIN);
+  const [loginFunction, { data, error, loading }] = useMutation(LOGIN_USER);
   const [actionsErrors, setActionsErrors] = useState<IError>();
 
   const handleLogin = async (e: React.SyntheticEvent) => {

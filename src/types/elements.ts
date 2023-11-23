@@ -32,13 +32,14 @@ export interface IFileFileProps {
 }
 
 export interface INumberInputProps {
-  lw?: number;
-  rw?: number;
+  lw?: string;
+  rw?: string;
+  vertical: boolean;
   extraCls?: string;
   lblTxt?: string;
   name: string;
   required: boolean;
-  defaultValue: number;
+  defaultValue: number | null;
   handleInputChange: (e: React.SyntheticEvent) => void;
 }
 
@@ -53,6 +54,7 @@ export interface ISelectInputProps {
   extraCls?: string;
   lblTxt?: string;
   name: string;
+  vertical: boolean;
   optionList: IOption[];
   defaultValue?: string | number;
   handleSelect: (e: React.SyntheticEvent) => void;

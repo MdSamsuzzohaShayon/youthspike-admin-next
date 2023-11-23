@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-const LOGIN_ADMIN = gql`
+const LOGIN_USER = gql`
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
       code
@@ -16,33 +16,6 @@ const LOGIN_ADMIN = gql`
           login {
             email
           }
-          player {
-            shirtNumber
-            rank
-            teamId
-            leagueId
-
-            league {
-              _id
-              name
-            }
-
-            team {
-              _id
-              name
-            }
-          }
-          coach {
-            team {
-              name
-              _id
-              league {
-                _id
-                name
-              }
-            }
-          }
-          active
         }
       }
     }
@@ -74,4 +47,4 @@ const REGISTER_DIRECTOR = gql`
   ${REGISTER_DIRECTOR_RAW}
 `;
 
-export { LOGIN_ADMIN, REGISTER_DIRECTOR, REGISTER_DIRECTOR_RAW };
+export { LOGIN_USER, REGISTER_DIRECTOR, REGISTER_DIRECTOR_RAW };
