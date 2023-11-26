@@ -1,15 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { REGISTER_DIRECTOR, REGISTER_DIRECTOR_RAW } from '@/graphql/admin';
+import { ADD_DIRECTOR_RAW, ADD_DIRECTOR } from '@/graphql/director';
 import Loader from '../elements/Loader';
 import TextInput from '../elements/forms/TextInput';
-import { IUser, IDirector, ILDO } from '@/types';
+import { IUser, IDirector, ILDO, ILdoUpdate, IError } from '@/types';
 import EmailInput from '../elements/forms/EmailInput';
 import PasswordInput from '../elements/forms/PasswordInput';
 import FileInput from '../elements/forms/FileInput';
 import { getCookie } from '@/utils/cookie';
 import { BACKEND_URL } from '@/utils/keys';
 import { UPDATE_DIRECTOR, UPDATE_DIRECTOR_RAW } from '@/graphql/director';
+import Message from '../elements/Message';
 
 interface DirectorAddProps {
     update: boolean;
@@ -36,13 +37,14 @@ function DirectorAdd({ update, prevLdo }: DirectorAddProps) {
     const [directorState, setDirectorState] = useState<IDirector>(prevLdo && prevLdo.director ? prevLdo.director : initialDirector);
     const [ldoState, setLdoState] = useState<ILDO>(prevLdo ? prevLdo : initialLdo);
     const [ldoUpdate, setLdoUpdate] = useState({});
-    const [directorUpdate, setDirectorUpdate] = useState({});
+    const [directorUpdate, setDirectorUpdate] = useState<ILdoUpdate>({});
+    const [actErr, setActErr] = useState<IError>();
     const uploadedLogo = useRef<File | null>(null);
 
 
     const [errorList, setErrorList] = useState<string[]>([]);
 
-    const [registerDirector, { loading, error }] = useMutation(REGISTER_DIRECTOR);
+    const [registerDirector, { loading, error }] = useMutation(ADD_DIRECTOR);
     const [updateDirector, { loading: updateLoading, error: updateError }] = useMutation(UPDATE_DIRECTOR);
 
     /**
@@ -94,12 +96,12 @@ function DirectorAdd({ update, prevLdo }: DirectorAddProps) {
         if (isPasswordMismatch()) return;
 
         const formData = new FormData();
-        const inputArgs = { ldoName: ldoState.name, firstName: directorState.firstName, lastName: directorState.lastName, email: directorState.email, password: directorState.password };
+        const inputArgs = { name: ldoState.name, firstName: directorState.firstName, lastName: directorState.lastName, email: directorState.email, password: directorState.password };
 
         const addFileToFormData = () => {
             if (uploadedLogo.current) {
                 formData.set('operations', JSON.stringify({
-                    query: update ? UPDATE_DIRECTOR_RAW : REGISTER_DIRECTOR_RAW,
+                    query: update ? UPDATE_DIRECTOR_RAW : ADD_DIRECTOR_RAW,
                     variables: { args: update ? { ...ldoUpdate, ...directorUpdate } : inputArgs, logo: null },
                 }));
 
@@ -136,8 +138,9 @@ function DirectorAdd({ update, prevLdo }: DirectorAddProps) {
                 const formEl = e.target as HTMLFormElement;
                 formEl.reset();
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error during GraphQL mutation:', error);
+            setActErr({name: "", message: error.message ? error.message : '', main: error});
         }
     };
 
@@ -147,16 +150,15 @@ function DirectorAdd({ update, prevLdo }: DirectorAddProps) {
     }, [prevLdo]);
 
     if (loading) return <Loader />;
-    if (error) return <p className="text-red-700">Something went wrong!</p>;
 
     return (
         <div>
-            {!update && <h2>Add Director</h2>}
-            {errorList.map((error) => (
-                <p className="mt-4 text-red-700" key={error}>
-                    {error}
-                </p>
-            ))}
+            {!update ? <h2>Add Director</h2> : <h2>Update Director</h2>}
+            
+            {error && <Message error={error} />}
+            {actErr && <Message error={actErr} />}
+            
+
             <form onSubmit={handleDirectorSubmit} className="flex flex-col gap-2">
                 <FileInput defaultValue='' handleFileChange={handleFileChange} name='logo' />
                 <TextInput vertical name='name' required={!update} lblTxt='LDO Name'

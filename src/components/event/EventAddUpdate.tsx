@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { ADD_LEAGUE, ADD_LEAGUE_RAW, UPDATE_LEAGUE, UPDATE_LEAGUE_RAW } from '@/graphql/league';
+import { ADD_EVENT, ADD_EVENT_RAW, UPDATE_EVENT, UPDATE_EVENT_RAW } from '@/graphql/event';
 import { AdvancedImage } from '@cloudinary/react';
 import { useMutation } from '@apollo/client';
 
@@ -17,7 +17,7 @@ import cld from '@/config/cloudinary.config';
 import { useUser } from '@/lib/UserProvider';
 
 // TypeScript
-import { ILeagueAddProps, ILeagueAdd, IOption } from '@/types';
+import { IEventAddProps, IEventAdd, IOption } from '@/types';
 import { UserRole } from '@/types/user';
 
 
@@ -26,7 +26,7 @@ const homeTeamStrategyList: IOption[] = [{ value: 'toss', text: "Toss" }];
 const rosterLockList: IOption[] = [{ value: 'first', text: 'First roster submit' }];
 const assignLogicList: IOption[] = [{ value: 'hight' }, { value: 'random' }];
 
-const initialLeague = {
+const initialEvent = {
     name: 'N-2',
     // startDate, endDate, playerLimit
     divisions: 'division 1, division 2,',
@@ -43,12 +43,12 @@ const initialLeague = {
     location: 'USA',
     startDate: new Date().toISOString(),
     endDate: new Date().toISOString(),
-    // directorId: new Date().toISOString(),
+    // ldo: new Date().toISOString(),
     playerLimit: 10,
     active: true
 }
 
-function LeagueAddUpdate({ update, setActErr, prevLeague, setIsLoading }: ILeagueAddProps) {
+function EventAddUpdate({ update, setActErr, prevEvent, setIsLoading }: IEventAddProps) {
     // Hooks
     const router = useRouter();
     const user = useUser();
@@ -57,39 +57,39 @@ function LeagueAddUpdate({ update, setActErr, prevLeague, setIsLoading }: ILeagu
 
     // Local State
     const sponsorInputEl = useRef<HTMLInputElement>(null);
-    const [leagueState, setLeagueState] = useState<ILeagueAdd>(prevLeague ? prevLeague : initialLeague);
-    const [updateLeague, setUpdateLeague] = useState<Partial<ILeagueAdd>>({});
-    const [sponsorImgList, setSponsorImgList] = useState<File[] | string[]>(prevLeague && prevLeague.sponsors ? prevLeague.sponsors : []);
+    const [eventState, setEventState] = useState<IEventAdd>(prevEvent ? prevEvent : initialEvent);
+    const [updateEvent, setUpdateEvent] = useState<Partial<IEventAdd>>({});
+    const [sponsorImgList, setSponsorImgList] = useState<File[] | string[]>(prevEvent && prevEvent.sponsors ? prevEvent.sponsors : []);
     const [directorId, setDirectorId] = useState<string | null>(null);
     const [eventId, setEventId] = useState<string | null>(null);
 
     // GraphQL
-    const [eventAdd, { error: eaErr, loading: eaLoading, data: eaData }] = useMutation(ADD_LEAGUE);
-    const [eventUpdate, { error: euErr, loading: euLoading, data: euData }] = useMutation(UPDATE_LEAGUE);
+    const [eventAdd, { error: eaErr, loading: eaLoading, data: eaData }] = useMutation(ADD_EVENT);
+    const [eventUpdate, { error: euErr, loading: euLoading, data: euData }] = useMutation(UPDATE_EVENT);
 
     /**
-     * Add league mutation
+     * Add event mutation
      */
-    const handleLeagueAdd = async (e: React.SyntheticEvent) => {
+    const handleEventAdd = async (e: React.SyntheticEvent) => {
         e.preventDefault();
 
         setIsLoading(true);
-        let newLeagueId = null;
-        const inputData = update ? { ...updateLeague } : { ...leagueState };
-        inputData.directorId = directorId ? directorId : 'auto_detect_from_server';
+        let newEventId = null;
+        const inputData = update ? { ...updateEvent } : { ...eventState };
+        inputData.ldo = directorId ? directorId : 'auto_detect_from_server';
         const mutationVariables = {
             sponsors: sponsorImgList.length > 0 ? null : [],
             input: inputData,
         };
         // @ts-ignore
-        if (update && eventId) mutationVariables.leagueId = eventId;
+        if (update && eventId) mutationVariables.eventId = eventId;
 
         try {
             if (sponsorImgList.length > 0 && sponsorInputEl.current && sponsorInputEl.current.value && sponsorInputEl.current?.value !== '') {
                 // Use FormData with fetch if there is a file to upload on the server
                 const formData = new FormData();
                 formData.set('operations', JSON.stringify({
-                    query: update ? UPDATE_LEAGUE_RAW : ADD_LEAGUE_RAW,
+                    query: update ? UPDATE_EVENT_RAW : ADD_EVENT_RAW,
                     variables: mutationVariables,
                 }));
                 formData.set('map', JSON.stringify({ '0': ['variables.sponsors'] }));
@@ -111,15 +111,15 @@ function LeagueAddUpdate({ update, setActErr, prevLeague, setIsLoading }: ILeagu
                 }
 
                 const responseData = await response.json();
-                const leagueRes = update ? responseData?.data?.updateLeague : responseData?.data?.createLeague;
-                if (leagueRes?.code !== 201 || leagueRes?.code !== 202) {
+                const eventRes = update ? responseData?.data?.updateEvent : responseData?.data?.createEvent;
+                if (eventRes?.code !== 201 || eventRes?.code !== 202) {
                     setActErr({
-                        name: leagueRes?.code,
-                        message: leagueRes?.message,
+                        name: eventRes?.code,
+                        message: eventRes?.message,
                         main: responseData.data,
                     });
                 } else {
-                    newLeagueId = leagueRes?.data?._id;
+                    newEventId = eventRes?.data?._id;
                 }
             } else {
                 // Use Apollo Client mutation
@@ -130,22 +130,22 @@ function LeagueAddUpdate({ update, setActErr, prevLeague, setIsLoading }: ILeagu
                 } else {
                     eventRes = await eventAdd({ variables: mutationVariables });
                 }
-                const leagueRes = update ? eventRes.data?.updateLeague : eventRes.data?.createLeague;
-                if (leagueRes?.code !== 201 || leagueRes?.code !== 202) {
-                    setActErr({ name: leagueRes.code, message: leagueRes.message })
+                eventRes = update ? eventRes.data?.updateEvent : eventRes.data?.createEvent;
+                if (eventRes?.code !== 201 && eventRes?.code !== 202) {
+                    setActErr({ name: eventRes.code, message: eventRes.message })
                 } else {
-                    newLeagueId = leagueRes.data._id
+                    newEventId = eventRes.data._id
                 }
 
             }
 
             // Reset form and navigate
-            setLeagueState(initialLeague);
+            setEventState(initialEvent);
             const formEl = e.target as HTMLFormElement;
             formEl.reset();
 
-            if (newLeagueId) {
-                let redirectUrl = `/${newLeagueId}`;
+            if (newEventId) {
+                let redirectUrl = `/${newEventId}`;
                 if (user.info?.role === UserRole.admin) {
                     redirectUrl += `/?directorId=${directorId}`;
                 }
@@ -166,9 +166,9 @@ function LeagueAddUpdate({ update, setActErr, prevLeague, setIsLoading }: ILeagu
         e.preventDefault();
         const inputEl = e.target as HTMLInputElement;
         if (!update) {
-            setLeagueState((prevState) => ({ ...prevState, [inputEl.name]: inputEl.value }));
+            setEventState((prevState) => ({ ...prevState, [inputEl.name]: inputEl.value }));
         } else {
-            setUpdateLeague((prevState) => ({ ...prevState, [inputEl.name]: inputEl.value }));
+            setUpdateEvent((prevState) => ({ ...prevState, [inputEl.name]: inputEl.value }));
         }
     }
 
@@ -176,12 +176,12 @@ function LeagueAddUpdate({ update, setActErr, prevLeague, setIsLoading }: ILeagu
         e.preventDefault();
         if (!update) {
             // @ts-ignore
-            const prevStateVal: boolean = leagueState[stateName];
-            setLeagueState((prevState) => ({ ...prevState, [stateName]: !prevStateVal }));
+            const prevStateVal: boolean = eventState[stateName];
+            setEventState((prevState) => ({ ...prevState, [stateName]: !prevStateVal }));
         } else {
             // @ts-ignore
-            const prevStateVal: boolean = leagueState[stateName] ? leagueState[stateName] : false;
-            setUpdateLeague((prevState) => ({ ...prevState, [stateName]: !prevStateVal }));
+            const prevStateVal: boolean = eventState[stateName] ? eventState[stateName] : false;
+            setUpdateEvent((prevState) => ({ ...prevState, [stateName]: !prevStateVal }));
         }
     }
 
@@ -217,7 +217,7 @@ function LeagueAddUpdate({ update, setActErr, prevLeague, setIsLoading }: ILeagu
     useEffect(() => {
         // Getting event Id from url
         const pnList = pName.split("/");
-        if (pnList.includes("settings")) { // settings = edit league page
+        if (pnList.includes("settings")) { // settings = edit event page
             const nPnList = pnList.filter(pn => pn !== '');
             const newEventId = nPnList[0];
             setEventId(newEventId);
@@ -282,21 +282,21 @@ function LeagueAddUpdate({ update, setActErr, prevLeague, setIsLoading }: ILeagu
     }
 
     return (
-        <form onSubmit={handleLeagueAdd} className='flex flex-col gap-2'>
-            <TextInput required={!update} defaultValue={leagueState.name} handleInputChange={handleInputChange} lblTxt='Name' name='name' lw='w-2/6' rw='w-4/6' />
-            <TextInput required={!update} defaultValue={leagueState.divisions} handleInputChange={handleInputChange} lblTxt='DIVISIONS' name='divisions' lw='w-2/6' rw='w-4/6' />
-            {renderDivisions(leagueState.divisions)}
+        <form onSubmit={handleEventAdd} className='flex flex-col gap-2'>
+            <TextInput required={!update} defaultValue={eventState.name} handleInputChange={handleInputChange} lblTxt='Name' name='name' lw='w-2/6' rw='w-4/6' />
+            <TextInput required={!update} defaultValue={eventState.divisions} handleInputChange={handleInputChange} lblTxt='DIVISIONS' name='divisions' lw='w-2/6' rw='w-4/6' />
+            {renderDivisions(eventState.divisions)}
             {/* Default setting  */}
             <h3 className='text-2xl capitalize mt-4'>Default setting</h3>
 
-            <NumberInput defaultValue={leagueState.nets} handleInputChange={handleInputChange} lblTxt='Number of nets' name='nets' required={!update} />
-            <NumberInput defaultValue={leagueState.rounds} handleInputChange={handleInputChange} lblTxt='Number of rounds' name='rounds' required={!update} />
-            <NumberInput defaultValue={leagueState.netVariance} handleInputChange={handleInputChange} lblTxt='Net Variance' name='netVariance' required={!update} />
+            <NumberInput defaultValue={eventState.nets} handleInputChange={handleInputChange} lblTxt='Number of nets' name='nets' required={!update} />
+            <NumberInput defaultValue={eventState.rounds} handleInputChange={handleInputChange} lblTxt='Number of rounds' name='rounds' required={!update} />
+            <NumberInput defaultValue={eventState.netVariance} handleInputChange={handleInputChange} lblTxt='Net Variance' name='netVariance' required={!update} />
 
-            <SelectInput name='homeTeam' defaultValue={leagueState.homeTeam} optionList={homeTeamStrategyList} lblTxt='How is home team decided?' handleSelect={handleInputChange} />
-            <ToggleInput handleValueChange={handleToggleInput} lblTxt='Auto assign when clock runs out' value={leagueState.autoAssign}
+            <SelectInput name='homeTeam' defaultValue={eventState.homeTeam} optionList={homeTeamStrategyList} lblTxt='How is home team decided?' handleSelect={handleInputChange} />
+            <ToggleInput handleValueChange={handleToggleInput} lblTxt='Auto assign when clock runs out' value={eventState.autoAssign}
                 name="autoAssign" />
-            <SelectInput defaultValue={leagueState.autoAssignLogic} name='autoAssignLogic' optionList={assignLogicList} lblTxt='Which auto assign logic when clock runs out?' handleSelect={handleInputChange} rw='w-3/6' lw='w-3/6' />
+            <SelectInput defaultValue={eventState.autoAssignLogic} name='autoAssignLogic' optionList={assignLogicList} lblTxt='Which auto assign logic when clock runs out?' handleSelect={handleInputChange} rw='w-3/6' lw='w-3/6' />
             <SelectInput name='rosterLock' defaultValue={rosterLockList[0].value} optionList={rosterLockList} lblTxt='When does the roster lock setting?' handleSelect={handleInputChange} rw='w-3/6' lw='w-3/6' />
             {/* 
             <div className="input-group w-full flex flex-col">
@@ -329,4 +329,4 @@ function LeagueAddUpdate({ update, setActErr, prevLeague, setIsLoading }: ILeagu
     )
 }
 
-export default LeagueAddUpdate;
+export default EventAddUpdate;

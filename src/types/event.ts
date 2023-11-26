@@ -1,7 +1,7 @@
 import { IError } from ".";
 import { IDocument } from "./document";
 
-export interface ILeague extends IDocument {
+export interface IEvent extends IDocument {
   name: string;
   divisions: string;
   nets: number;
@@ -22,7 +22,7 @@ export interface ILeague extends IDocument {
   sponsors: string[];
 }
 
-export interface ILeagueAdd {
+export interface IEventAdd {
   name: string;
   divisions: string;
   nets: number;
@@ -40,13 +40,13 @@ export interface ILeagueAdd {
   endDate: string;
   playerLimit: number;
   active: boolean;
-  directorId?: string;
+  ldo?: string;
   // sponsors: File[];
 }
 
-export interface ILeagueAddProps {
+export interface IEventAddProps {
   update: boolean;
   setActErr: (state: IError) => void;
   setIsLoading: (state: boolean) => void;
-  prevLeague?: ILeague;
+  prevEvent?: IEvent;
 }

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Message from '@/components/elements/Message';
-import LeagueAddUpdate from '@/components/event/LeagueAddUpdate';
+import LeagueAddUpdate from '@/components/event/EventAddUpdate';
 import { IError } from '@/types';
 import { useQuery } from '@apollo/client';
 import { GET_A_LEAGUE } from '@/graphql/league';

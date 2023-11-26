@@ -1,8 +1,8 @@
-import { ILeague, ILeagueAdd, ILeagueAddProps } from "./league";
+import { IEvent, IEventAdd, IEventAddProps } from "./event";
 import { ITextInputProps, IError, IOption, ISelectInputProps, INumberInputProps, IButtonProps, IMenuItem, IMenuArrangeProps, IFileFileProps, ILoginProps } from "./elements";
 import { UserRole } from "./user";
 import { IUser, IDirector, IUserContext, IDirectorItem } from "./user";
-import { ILDO, ILDOItem } from "./ldo";
+import { ILDO, ILDOItem, ILdoUpdate } from "./ldo";
 
 export type {
   // Elements
@@ -16,17 +16,18 @@ export type {
   IButtonProps,
   IMenuArrangeProps,
   ILoginProps,
-  // League
-  ILeague,
-  ILeagueAdd,
-  ILeagueAddProps,
+  // Event
+  IEvent,
+  IEventAdd,
+  IEventAddProps,
   // User
   UserRole,
   IUser,
   IDirector,
   IDirectorItem,
   IUserContext,
-  // League director organization
+  // Event director organization
   ILDO,
-  ILDOItem
+  ILDOItem,
+  ILdoUpdate
 };

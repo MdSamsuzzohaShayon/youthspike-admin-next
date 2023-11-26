@@ -4,9 +4,9 @@ import { gql } from '@apollo/client';
  * Query
  * =========================================================================================================================================
  */
-const GET_TEAMS_BY_LEAGUE = gql`
-  query GetTeams($leagueId: String) {
-    getTeams (leagueId: $leagueId){
+const GET_TEAMS_BY_EVENT = gql`
+  query GetTeams($eventId: String) {
+    getTeams (eventId: $eventId){
       code
       message
       success
@@ -14,7 +14,7 @@ const GET_TEAMS_BY_LEAGUE = gql`
         _id
         active
         coachId
-        leagueId
+        eventId
         name
         coach {
           _id
@@ -36,9 +36,9 @@ const ADD_UPDATE_TEAM = gql`
     $name: String!
     $active: Boolean!
     $coachId: String!
-    $leagueId: String!
-    $reamoveLeagueId: String
-    $changeLeague: Boolean
+    $eventId: String!
+    $reamoveEventId: String
+    $changeEvent: Boolean
     $reamoveCoachId: String
     $id: String
   ) {
@@ -46,9 +46,9 @@ const ADD_UPDATE_TEAM = gql`
       name: $name
       active: $active
       coachId: $coachId
-      leagueId: $leagueId
-      reamoveLeagueId: $reamoveLeagueId
-      changeLeague: $changeLeague
+      eventId: $eventId
+      reamoveEventId: $reamoveEventId
+      changeEvent: $changeEvent
       reamoveCoachId: $reamoveCoachId
       id: $id
     ) {
@@ -62,4 +62,4 @@ const ADD_UPDATE_TEAM = gql`
   }
 `;
 
-export { GET_TEAMS_BY_LEAGUE, ADD_UPDATE_TEAM };
+export { GET_TEAMS_BY_EVENT, ADD_UPDATE_TEAM };

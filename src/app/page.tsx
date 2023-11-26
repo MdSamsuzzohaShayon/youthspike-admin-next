@@ -3,12 +3,12 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useUser } from '@/lib/UserProvider';
-import { CLONE_LEAGUE, GET_LEAGUES } from '@/graphql/league';
+import { CLONE_EVENT, GET_EVENTS } from '@/graphql/event';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import Loader from '@/components/elements/Loader';
 import Message from '@/components/elements/Message';
-import LeagueCard from '@/components/event/LeagueCard';
-import { ILeague } from '@/types/league';
+import EventCard from '@/components/event/EventCard';
+import { IEvent } from '@/types';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GET_LDO } from '@/graphql/director';
 import cld from '@/config/cloudinary.config';
@@ -29,7 +29,7 @@ const itemList: IItem[] = [
   { id: 4, text: 'Orlando' }
 ];
 
-function LeaguesPage() {
+function EventsPage() {
 
   const user = useUser();
   const router = useRouter();
@@ -37,15 +37,16 @@ function LeaguesPage() {
 
   const [filteredItems, setFilteredItems] = useState<IItem[]>([]);
   const [actErr, setActErr] = useState<IError | null>(null);
+  const [eventList, setEventList] = useState<IEvent[]>([])
 
   const filterListEl = useRef<HTMLDialogElement | null>(null);
 
   const [ldoId, setLdoId] = useState<string | null>(null);
   const [directorId, setDirectorId] = useState<string | null>(null);
 
-  const [fetchLeagues, { loading, error, data: leaguesData }] = useLazyQuery(GET_LEAGUES);
+  // const [fetchEvents, { loading, error, data: eventsData }] = useLazyQuery(GET_EVENTS);
   const [fetchLDO, { loading: ldoLoading, error: ldoError, data: ldoData }] = useLazyQuery(GET_LDO);
-  const [cloneLeague] = useMutation(CLONE_LEAGUE);
+  const [cloneEvent] = useMutation(CLONE_EVENT);
 
   const handleFilter = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -72,16 +73,16 @@ function LeaguesPage() {
   }
 
   /**
-   * Copy league - copy from server and redirect to edit page
+   * Copy event - copy from server and redirect to edit page
    * Redirect to edit event page if event is been created successfully
    */
-  const handleCopyLeague = async (e: React.SyntheticEvent, leagueId: string) => {
-    const leagueResponse = await cloneLeague({ variables: { leagueId } });
-    if (leagueResponse.data.cloneLeague.code !== 201) {
-      setActErr({ name: leagueResponse.data.cloneLeague.code, message: leagueResponse.data.cloneLeague.message, main: leagueResponse.data.cloneLeague });
+  const handleCopyEvent = async (e: React.SyntheticEvent, eventId: string) => {
+    const eventResponse = await cloneEvent({ variables: { eventId } });
+    if (eventResponse.data.cloneEvent.code !== 201) {
+      setActErr({ name: eventResponse.data.cloneEvent.code, message: eventResponse.data.cloneEvent.message, main: eventResponse.data.cloneEvent });
       return;
     }
-    return router.push(`/${leagueResponse.data.cloneLeague.data._id}/settings`);
+    return router.push(`/${eventResponse.data.cloneEvent.data._id}/settings`);
   }
 
   useEffect(() => {
@@ -90,26 +91,25 @@ function LeaguesPage() {
         const newLdoId = searchParams.get('ldoId');
         if (!newLdoId) return router.push('/admin'); 
         setLdoId(newLdoId);
-        const ldoRes = await fetchLDO({ variables: { dId: newLdoId } }); // ldo id and director id Both will match
-        const newDirectorId = ldoRes?.data?.getLeagueDirector?.data?.director?._id;
+        const ldoRes = await fetchLDO({ variables: { dId: newLdoId } }); // ldo id and director id Both will match        
+        const newDirectorId = ldoRes?.data?.getEventDirector?.data?.director?._id;
         setDirectorId(newDirectorId);
-        const leaguesRes = await fetchLeagues({ variables: { directorId: newDirectorId } });
-        console.log({ leaguesRes, newDirectorId, ldoId: newLdoId });
+        // const eventsRes = await fetchEvents({ variables: { directorId: newDirectorId } });
+        // console.log({ eventsRes, newDirectorId, ldoId: newLdoId });
       } else {
-        setDirectorId(user.info?._id ? user.info._id : null);
-        await Promise.all([
-          fetchLDO(),
-          fetchLeagues()
-        ]);
+        setDirectorId(user.info?._id ? user.info._id : null);      
+        const ldoRes= await fetchLDO();
+        if(ldoRes?.data?.getEventDirector?.data?.events) setEventList(ldoRes.data.getEventDirector.data.events);
+        
       }
     })()
   }, [router, user]);
 
 
-  if (loading || ldoLoading) return <Loader />;
+  if (ldoLoading) return <Loader />;
 
-  const newLdoData = ldoData?.getLeagueDirector?.data;
-  const leagueLogo = newLdoData ? cld.image(newLdoData?.logo) : null;
+  const newLdoData = ldoData?.getEventDirector?.data;
+  const eventLogo = newLdoData ? cld.image(newLdoData?.logo) : null;
   
   return (
     <div className="container px-2 mx-auto">
@@ -117,11 +117,11 @@ function LeaguesPage() {
         <img src="/icons/close.svg" alt="close" className="w-6 svg-black" role="presentation" onClick={handleClose} />
         {itemList.map((item) => <p key={item.id} role="presentation" onClick={(e) => handleSelectItem(e, item.id)} >{item.text}</p>)}
       </dialog>
-      <h1 className='mb-4 text-2xl font-bold pt-6 text-center'>Leagues Director</h1>
-      {error && <Message error={error} />}
+      <h1 className='mb-4 text-2xl font-bold pt-6 text-center'>Events Director</h1>
+      {/* {error && <Message error={error} />} */}
       {actErr && <Message error={actErr} />}
       <div className="box w-full flex flex-col justify-center items-center mb-4">
-        {leagueLogo ? <AdvancedImage className="w-12" cldImg={leagueLogo} /> : <img src="/free-logo.svg" alt="free-logo" className="w-12" />}
+        {eventLogo ? <AdvancedImage className="w-12" cldImg={eventLogo} /> : <img src="/free-logo.svg" alt="free-logo" className="w-12" />}
 
         <h1>{newLdoData ? newLdoData.name : ''}</h1>
         <h2 >Events</h2>
@@ -133,7 +133,7 @@ function LeaguesPage() {
       <div className="filtered-elements flex flex-wrap gap-2 mb-4">
         {filteredItems.map((item) => <p key={item.id} className='px-4 py-2 rounded-full bg-gray-800 flex items-center justify-between'>{item.text} <span onClick={(e) => handleRemoveFilter(e, item.id)}><img src='/icons/close.svg' className='svg-white w-6 ml-2 p-0 m-0' alt='close' /></span></p>)}
       </div>
-      <div className="leagues-add-new flex flex-wrap gap-2 justify-between">
+      <div className="events-add-new flex flex-wrap gap-2 justify-between">
         <div style={{ width: '48.5%' }} className="box mb-1 p-2 h-48 bg-yellow-500">
           <Link href={user.info?.role === UserRole.admin && ldoId ? `/newevent/?directorId=${directorId}` : `/newevent`} className='h-full w-full flex justify-center items-center flex-col gap-2 rounded-md'>
             <img src="/icons/plus.svg" alt="plus" className="w-12 svg-white" />
@@ -141,12 +141,12 @@ function LeaguesPage() {
           </Link>
         </div>
         
-        {leaguesData && leaguesData.getLeagues.code === 200 && leaguesData.getLeagues.data.map((league: ILeague) => (
-          <LeagueCard key={league._id} copyLeague={handleCopyLeague} league={league} />
+        {eventList && eventList.length > 0 && eventList.map((event: IEvent) => (
+          <EventCard key={event._id} copyEvent={handleCopyEvent} event={event} />
         ))}
       </div>
     </div>
   )
 }
 
-export default LeaguesPage;
+export default EventsPage;

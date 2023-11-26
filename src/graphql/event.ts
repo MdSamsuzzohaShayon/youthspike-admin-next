@@ -9,7 +9,11 @@ const commonResponse = `
   autoAssign
   autoAssignLogic
   coachPassword
-  directorId
+  ldo {
+    _id
+    name
+    logo
+  }
   divisions
   homeTeam
   location
@@ -26,9 +30,9 @@ const commonResponse = `
  * Query
  * =========================================================================================================================================
  */
-const GET_LEAGUES = gql`
-  query GetLeagues($directorId: String) {
-    getLeagues(directorId: $directorId) {
+const GET_EVENTS = gql`
+  query GetEvents($directorId: String) {
+    getEvents(directorId: $directorId) {
       code
       message
       success
@@ -39,9 +43,9 @@ const GET_LEAGUES = gql`
   }
 `;
 
-const GET_A_LEAGUE = gql`
-  query GetLeague($eventId: String!) {
-    getLeague(id: $eventId) {
+const GET_A_EVENT = gql`
+  query GetEvent($eventId: String!) {
+    getEvent(id: $eventId) {
       code
       message
       success
@@ -56,9 +60,22 @@ const GET_A_LEAGUE = gql`
  * Mutation
  * =========================================================================================================================================
  */
-const ADD_LEAGUE_RAW = `
-mutation CreateLeague($sponsors: [Upload!]!, $input: CreateOrUpdateLeagueInput!) {
-  createLeague(sponsors: $sponsors, input: $input) {
+const ADD_EVENT_RAW = `
+mutation CreateEvent($sponsors: [Upload!]!, $input: CreateEventInput!) {
+  createEvent(sponsors: $sponsors, input: $input) {
+    code
+    data {
+      ${commonResponse}
+    }
+  }
+}
+`;
+
+const ADD_EVENT = gql`${ADD_EVENT_RAW}`;
+
+const UPDATE_EVENT_RAW = `
+mutation UpdateEvent($sponsors: [Upload!]!, $input: UpdateEventInput!, $eventId: String!) {
+  updateEvent(sponsors: $sponsors, input: $input, eventId: $eventId) {
     code
     message
     success
@@ -69,26 +86,11 @@ mutation CreateLeague($sponsors: [Upload!]!, $input: CreateOrUpdateLeagueInput!)
 }
 `;
 
-const ADD_LEAGUE = gql`${ADD_LEAGUE_RAW}`;
+const UPDATE_EVENT = gql`${UPDATE_EVENT_RAW}`;
 
-const UPDATE_LEAGUE_RAW = `
-mutation UpdateLeague($sponsors: [Upload!]!, $input: UpdateLeagueInput!, $leagueId: String!) {
-  updateLeague(sponsors: $sponsors, input: $input, leagueId: $leagueId) {
-    code
-    message
-    success
-    data {
-      ${commonResponse}
-    }
-  }
-}
-`;
-
-const UPDATE_LEAGUE = gql`${UPDATE_LEAGUE_RAW}`;
-
-const CLONE_LEAGUE = gql`
-  mutation CloneLeague($leagueId: String!) {
-    cloneLeague(leagueId: $leagueId) {
+const CLONE_EVENT = gql`
+  mutation CloneEvent($eventId: String!) {
+    cloneEvent(eventId: $eventId) {
       code
       message
       success
@@ -99,4 +101,4 @@ const CLONE_LEAGUE = gql`
   }
 `;
 
-export { GET_LEAGUES, ADD_LEAGUE, ADD_LEAGUE_RAW , UPDATE_LEAGUE, UPDATE_LEAGUE_RAW, CLONE_LEAGUE, GET_A_LEAGUE };
+export { GET_EVENTS, ADD_EVENT, ADD_EVENT_RAW , UPDATE_EVENT, UPDATE_EVENT_RAW, CLONE_EVENT, GET_A_EVENT };

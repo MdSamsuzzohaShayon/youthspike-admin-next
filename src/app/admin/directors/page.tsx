@@ -20,7 +20,7 @@ function DirectorPage() {
     <div className='container mx-auto px-2'>
       <h1>Directors (Only accessable by admin)</h1>
       <DirectorAdd update={false} />
-      <DirectorList ldoList={data?.getLeagueDirectors?.data} />
+      <DirectorList ldoList={data?.getEventDirectors?.data} />
     </div>
   )
 }

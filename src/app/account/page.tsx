@@ -2,7 +2,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ADD_UPDATE_LEAGUE, GET_LEAGUES } from '@/graphql/league';
+import { GET_EVENTS } from '@/graphql/event';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import Loader from '@/components/elements/Loader';
 import Message from '@/components/elements/Message';
@@ -21,8 +21,8 @@ function AccountPage() {
      * Fetch director
      */
     (async () => {
-      const { data } = await getLdo(); // Use dynamic id // use either ldoId or directorId
-      const ldoObj = data?.getLeagueDirector?.data;    
+      const { data } = await getLdo(); // Use dynamic id // use either ldoId or directorI      
+      const ldoObj = data?.getEventDirector?.data;    
       
       setLdoState({
         name: ldoObj?.name,
@@ -39,11 +39,11 @@ function AccountPage() {
   }, []);
 
   if (loading) return <Loader />;
-  if (error) return <Message error={error} />
 
   return (
     <div className="container px-2 mx-auto">
       <h1 className='mb-4 text-2xl font-bold pt-6 text-center'>Account Setting (LDO)</h1>
+      {error && <Message error={error} />}
       <DirectorAdd update prevLdo={ldoState} />
     </div>
   )

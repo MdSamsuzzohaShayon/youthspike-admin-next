@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import Message from '@/components/elements/Message';
-import LeagueAddUpdate from '@/components/event/LeagueAddUpdate';
+import LeagueAddUpdate from '@/components/event/EventAddUpdate';
 import { IError } from '@/types';
 import Loader from '@/components/elements/Loader';
 

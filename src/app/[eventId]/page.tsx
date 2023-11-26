@@ -4,26 +4,26 @@ import React, { useState, useRef, useEffect } from 'react';
 import TeamCard from '@/components/teams/TeamCard';
 import TeamAdd from '@/components/teams/TeamAdd';
 import { useApolloClient, useLazyQuery, useQuery, gql } from '@apollo/client';
-import { GET_TEAMS_BY_LEAGUE } from '@/graphql/teams';
+import { GET_TEAMS_BY_EVENT } from '@/graphql/teams';
 import Loader from '@/components/elements/Loader';
 import Message from '@/components/elements/Message';
 
-interface ITeamsOfLeaguePage {
+interface ITeamsOfEventPage {
     params: {
         eventId: string
     }
 }
 
-function TeamsOfLeaguePage({ params }: ITeamsOfLeaguePage) {
+function TeamsOfEventPage({ params }: ITeamsOfEventPage) {
 
     const client = useApolloClient();
     const teamAddEl = useRef<HTMLDialogElement | null>(null);
     const [showFilter, setShowFilter] = useState<boolean>(false);
 
     /**
-     * Fetch all teams of this league from GraphQL Server
+     * Fetch all teams of this event from GraphQL Server
      */
-    const [getTeams, { data: teamData, loading, error }] = useLazyQuery(GET_TEAMS_BY_LEAGUE);
+    const [getTeams, { data: teamData, loading, error }] = useLazyQuery(GET_TEAMS_BY_EVENT);
     console.log({ teamData });
 
 
@@ -52,7 +52,7 @@ function TeamsOfLeaguePage({ params }: ITeamsOfLeaguePage) {
 
     useEffect(() => {
         if (params?.eventId) {
-            getTeams({ variables: { leagueId: params.eventId } });
+            getTeams({ variables: { eventId: params.eventId } });
         }
         console.log("Write query");
         
@@ -64,7 +64,7 @@ function TeamsOfLeaguePage({ params }: ITeamsOfLeaguePage) {
         <div className="container px-2 mx-auto">
             <dialog ref={teamAddEl} >
                 <img src="/icons/close.svg" alt="close" className="w-6 svg-black" role="presentation" onClick={handleClose} />
-                <h3>New League</h3>
+                <h3>New Event</h3>
                 <TeamAdd handleClose={handleClose} />
             </dialog>
             {/* <dialog ref={filterListEl}>
@@ -120,4 +120,4 @@ function TeamsOfLeaguePage({ params }: ITeamsOfLeaguePage) {
     )
 }
 
-export default TeamsOfLeaguePage;
+export default TeamsOfEventPage;

@@ -13,3 +13,10 @@ export interface ILDO{
     logo: string;
     director?: IDirectorItem;
   }
+
+  export interface ILdoUpdate{
+    name?: string;
+    logo?: string;
+    password?: string;
+    confirmPassword?: string;
+  }

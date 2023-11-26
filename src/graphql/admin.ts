@@ -22,29 +22,4 @@ const LOGIN_USER = gql`
   }
 `;
 
-const REGISTER_DIRECTOR_RAW = `
-  mutation CreateDirector($args: CreateDirectorArgs!, $logo: Upload) {
-    createDirector(args: $args, logo: $logo) {
-      code
-      message
-      success
-      data {
-        name
-        logo
-        director {
-          _id
-          firstName
-          lastName
-          login {
-            email
-          }
-        }
-      }
-    }
-  }
-`;
-const REGISTER_DIRECTOR = gql`
-  ${REGISTER_DIRECTOR_RAW}
-`;
-
-export { LOGIN_USER, REGISTER_DIRECTOR, REGISTER_DIRECTOR_RAW };
+export { LOGIN_USER };
