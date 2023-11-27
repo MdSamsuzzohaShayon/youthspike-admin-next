@@ -5,13 +5,13 @@ import Loader from '@/components/elements/Loader';
 import Message from '@/components/elements/Message';
 import { GET_LDO, GET_LDOS } from '@/graphql/director';
 import { useApolloClient, useLazyQuery, useQuery } from '@apollo/client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 function LDOSingle({ params }: { params: { ldoId: string } }) {
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { data, error, loading } = useQuery(GET_LDO, {variables: {dId: params.ldoId}})
 
-  if (loading) return <Loader />;
+  if (loading || isLoading) return <Loader />;
 
 
   return (
@@ -20,7 +20,7 @@ function LDOSingle({ params }: { params: { ldoId: string } }) {
       <p>Get ldo from cache from cache and use that as default value in director add</p>
       <h2>Update Director</h2>
       {error && <Message error={error} />}
-      <DirectorAdd update prevLdo={data?.getLeagueDirector?.data} />
+      <DirectorAdd setIsLoading={setIsLoading} update prevLdo={data?.getLeagueDirector?.data} />
     </div>
   )
 }

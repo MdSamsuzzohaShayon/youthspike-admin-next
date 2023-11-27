@@ -3,9 +3,14 @@ import TextInput from '../elements/forms/TextInput';
 import { IPlayerAdd } from '@/types/player';
 import NumberInput from '../elements/forms/NumberInput';
 import SelectInput from '../elements/forms/SelectInput';
-import { IOption } from '@/types';
+import { IError, IOption } from '@/types';
 import { useMutation } from '@apollo/client';
 import { CREATE_PLAYER } from '@/graphql/players';
+
+interface IPlayerAddProps {
+  eventId: string,
+  setIsLoading: (state: boolean) => void;
+}
 
 const initialPlayerAdd = {
   firstName: '',
@@ -16,18 +21,32 @@ const initialPlayerAdd = {
 };
 const eventOption: IOption[] = [{ text: 'Team 1', value: 't1' }, { text: 'Team 2', value: 't2' }];
 
-function PlayerAdd({eventId}: {eventId: string}) {
+function PlayerAdd({ eventId, setIsLoading }: IPlayerAddProps) {
+  const [actErr, setActErr] = useState<IError | null>(null);
   const [playerAdd, setPlayerAdd] = useState<IPlayerAdd>(initialPlayerAdd);
   const [addPlayer, { data }] = useMutation(CREATE_PLAYER)
 
 
   const handleAddPlayer = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    const playerAddObj = structuredClone(playerAdd);
-    playerAddObj.event = eventId;
-    const playerRes = await addPlayer({ variables: { input: playerAddObj } });
-    console.log(playerRes);
-    
+    try {
+      setIsLoading(true);
+      const playerAddObj = structuredClone(playerAdd);
+      playerAddObj.event = eventId;
+      const playerRes = await addPlayer({ variables: { input: playerAddObj } });
+      if (playerRes.data.createPlayer.code === 201) {
+        setPlayerAdd(initialPlayerAdd);
+        const formEl = e.target as HTMLFormElement;
+        formEl.reset();
+      } else {
+        setActErr({ name: playerRes.data.createPlayer.code, message: playerRes.data.createPlayer.message, main: playerRes.data.createPlayer })
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+
   }
 
   const handleInputChange = (e: React.SyntheticEvent) => {

@@ -1,10 +1,18 @@
 import { gql } from '@apollo/client';
 
 const playerResponse = `
-          _id
-          firstName
-          lastName
-          rank
+  _id
+  firstName
+  lastName
+  rank
+  event {
+    _id
+    name
+  }
+  team {
+    _id
+    name
+  }
 `;
 
 
@@ -35,16 +43,16 @@ const IMPORT_PLAYERS = gql`
 `;
 
 const CREATE_PLAYER_RAW = `
-    mutation CreatePlayer($input: CreatePlayerInput!) {
-      createPlayer(input: $input) {
-        code
-        message
-        success
-        data {
-          ${playerResponse}
-        }
-      }
+mutation CreatePlayer($input: CreatePlayerInput!) {
+  createPlayer(input: $input) {
+    code
+    message
+    success
+    data {
+      ${playerResponse}
     }
+  }
+}
 `;
 
 const CREATE_PLAYER = gql`${CREATE_PLAYER_RAW}`;

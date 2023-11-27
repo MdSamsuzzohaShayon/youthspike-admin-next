@@ -112,7 +112,7 @@ function EventAddUpdate({ update, setActErr, prevEvent, setIsLoading }: IEventAd
 
                 const responseData = await response.json();
                 const eventRes = update ? responseData?.data?.updateEvent : responseData?.data?.createEvent;
-                if (eventRes?.code !== 201 || eventRes?.code !== 202) {
+                if (eventRes?.code !== 201 && eventRes?.code !== 202) {
                     setActErr({
                         name: eventRes?.code,
                         message: eventRes?.message,

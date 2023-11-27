@@ -144,7 +144,7 @@ function Menu() {
         const menuItems: React.ReactNode[] = [];
         for (let i = 0; i < uml.length; i++) {
             let newLink: string = '';
-            if (eId && eId !== '' && (uml[i].id === 1 || uml[i].id === 3 || uml[i].id === 4)) newLink = '/' + eId;
+            if (eId && eId !== '' && (uml[i].id === 1 || uml[i].id === 2 || uml[i].id === 3 || uml[i].id === 4)) newLink = '/' + eId;
             menuItems.push(<MenuItem setOpenMenu={setOpenMenu} key={uml[i].id} icon={`/icons/${uml[i].imgName}.svg`} text={uml[i].text} link={`${newLink}${uml[i].link}`} />);
         }
 

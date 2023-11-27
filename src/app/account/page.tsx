@@ -11,6 +11,7 @@ import { GET_LDO } from '@/graphql/director';
 import { IDirector, ILDO } from '@/types';
 
 function AccountPage() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [ldoState, setLdoState] = useState<ILDO | null>(null);
 
   const [getLdo, { loading, error, data: ldoData }] = useLazyQuery(GET_LDO);
@@ -22,8 +23,8 @@ function AccountPage() {
      */
     (async () => {
       const { data } = await getLdo(); // Use dynamic id // use either ldoId or directorI      
-      const ldoObj = data?.getEventDirector?.data;    
-      
+      const ldoObj = data?.getEventDirector?.data;
+
       setLdoState({
         name: ldoObj?.name,
         logo: ldoObj?.logo,
@@ -38,13 +39,13 @@ function AccountPage() {
     })()
   }, []);
 
-  if (loading) return <Loader />;
+  if (loading || isLoading) return <Loader />;
 
   return (
     <div className="container px-2 mx-auto">
       <h1 className='mb-4 text-2xl font-bold pt-6 text-center'>Account Setting (LDO)</h1>
       {error && <Message error={error} />}
-      <DirectorAdd update prevLdo={ldoState} />
+      <DirectorAdd setIsLoading={setIsLoading} update prevLdo={ldoState} />
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { useApolloClient, useLazyQuery, useQuery, gql } from '@apollo/client';
 import { GET_TEAMS_BY_EVENT } from '@/graphql/teams';
 import Loader from '@/components/elements/Loader';
 import Message from '@/components/elements/Message';
+import TeamList from '@/components/teams/TeamList';
 
 interface ITeamsOfEventPage {
     params: {
@@ -24,8 +25,6 @@ function TeamsOfEventPage({ params }: ITeamsOfEventPage) {
      * Fetch all teams of this event from GraphQL Server
      */
     const [getTeams, { data: teamData, loading, error }] = useLazyQuery(GET_TEAMS_BY_EVENT);
-    console.log({ teamData });
-
 
 
     const handleDivisionSelection = (e: React.SyntheticEvent) => {
@@ -53,8 +52,8 @@ function TeamsOfEventPage({ params }: ITeamsOfEventPage) {
     useEffect(() => {
         if (params?.eventId) {
             getTeams({ variables: { eventId: params.eventId } });
+            window.localStorage.setItem('eventId', params.eventId);
         }
-        console.log("Write query");
         
     }, [params.eventId]);
 
@@ -65,7 +64,7 @@ function TeamsOfEventPage({ params }: ITeamsOfEventPage) {
             <dialog ref={teamAddEl} >
                 <img src="/icons/close.svg" alt="close" className="w-6 svg-black" role="presentation" onClick={handleClose} />
                 <h3>New Event</h3>
-                <TeamAdd handleClose={handleClose} />
+                {/* <TeamAdd handleClose={handleClose} /> */}
             </dialog>
             {/* <dialog ref={filterListEl}>
       <img src="/icons/close.svg" alt="close" className="w-6 svg-black" role="presentation" onClick={handleClose} />
@@ -109,12 +108,8 @@ function TeamsOfEventPage({ params }: ITeamsOfEventPage) {
                         <li role="presentation" onClick={(e) => handleFilter(e, 2)} >Edit</li>
                     </ul>
                 </div>
-                <div className="team-list flex flex-col justify-between items-center gap-3">
-                    <TeamCard />
-                    <TeamCard />
-                    <TeamCard />
-                    <TeamCard />
-                </div>
+                {teamData?.getTeams?.data && <TeamList teamList={teamData.getTeams.data} />}
+                
             </div>
         </div>
     )

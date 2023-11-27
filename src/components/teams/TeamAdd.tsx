@@ -1,33 +1,53 @@
-import { ADD_EVENT, UPDATE_EVENT } from '@/graphql/event';
 import { useMutation } from '@apollo/client';
 import React, { useState, useEffect } from 'react';
 import Loader from '../elements/Loader';
 import Message from '../elements/Message';
+import { IOption, IPlayer, ITeam, ITeamAdd } from '@/types';
+import { ADD_A_TEAM } from '@/graphql/teams';
+import TextInput from '../elements/forms/TextInput';
+import SelectInput from '../elements/forms/SelectInput';
 
-interface ITeamAdd {
+interface ITeamAddProps {
+    eventId: string;
+    availablePlayers: IPlayer[],
     handleClose: (e: React.SyntheticEvent) => void;
+    setIsLoading: (state: boolean) => void;
 }
 
-function TeamAdd({ handleClose }: ITeamAdd) {
-    const [name, setName] = useState<string>('');
-    const [startDate, setStartDate] = useState<string>('');
-    const [endDate, setEndDate] = useState<string>('');
-    const [playerLimit, setPlayerLimit] = useState<number | null>(null);
+const initialTeamState = {
+    active: true,
+    name: '',
+    event: '',
+    players: [],
+    captain: ''
+};
+
+function TeamAdd({ eventId, handleClose, setIsLoading, availablePlayers }: ITeamAddProps) {
+    const [teamState, setTeamState] = useState<ITeamAdd>(initialTeamState);
+    const [playerIdList, setPlayerIdList] = useState<string[]>([]);
 
     // GraphQL
     // Get all coaches / players
-    const [addLeague, { data, loading, error, reset }] = useMutation(ADD_EVENT); // Do caching
-    
+    const [addTeam, { data, loading, error, reset }] = useMutation(ADD_A_TEAM); // Do caching
+
 
     const handleTeamAdd = async (e: React.SyntheticEvent) => {
-        // e.preventDefault();
-        const { data: resultData } = await addLeague({
-            variables: {
-                name, startDate, endDate, playerLimit, active: true
-            }
-        });
+        e.preventDefault();
+        try {
+            setIsLoading(true);
+            const teamObj = { ...teamState, players: playerIdList, event: eventId };
+            const teamRes = await addTeam({
+                variables: { input: teamObj }
+            });
+            console.log(teamRes);
+            
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
 
-        console.log({ resultData });
+        // console.log({ resultData });
         const formEl = e.target as HTMLFormElement;
         formEl.reset();
         handleClose(e);
@@ -39,34 +59,58 @@ function TeamAdd({ handleClose }: ITeamAdd) {
         }
     }, []);
 
-    // This should render on page level 
-    if (loading) return <Loader />;
-    if (error) {
-        let err = JSON.stringify(error);
-        if (error.message === 'Forbidden resource') err = 'You do not have permission to do this operation!';
-        return <Message text={err} />
+    const handleInputChange = (e: React.SyntheticEvent) => {
+        const inputEl = e.target as HTMLInputElement | HTMLSelectElement;
+        setTeamState((prevState) => ({ ...prevState, [inputEl.name]: inputEl.value }));
     }
+
+    const makeOptionList = (ap: IPlayer[]): IOption[] => {
+        const newPlayerList: IOption[] = [];
+        for (let i = 0; i < ap.length; i += 1) {
+            newPlayerList.push({
+                text: ap[i].firstName + " " + ap[i].lastName,
+                value: ap[i]._id
+            });
+        }
+        return newPlayerList;
+    }
+
+    const handleCheckboxChange = (e: React.SyntheticEvent, playerId: string) => {
+        const checkboxEl = e.target as HTMLInputElement;
+        if (checkboxEl.checked) {
+            // @ts-ignore
+            setPlayerIdList((prevState) => ([...new Set([...prevState, playerId])]));
+        } else {
+            setPlayerIdList((prevState) => prevState.filter((p) => p !== playerId));
+        }
+    }
+
+    useEffect(() => {
+        if (availablePlayers && availablePlayers.length > 0) {
+            setTeamState((prevState) => ({ ...prevState, captain: availablePlayers[0]._id }));
+        }
+    }, []);
 
     return (
         <form onSubmit={handleTeamAdd} className='flex flex-col gap-2'>
-            <div className="input-group w-full flex flex-col">
-                <label htmlFor="name">Name</label>
-                <input className='border border-gray-300 p-1' type="text" defaultValue={name} required onChange={(e) => setName(e.target.value)} />
+            <div className='input-group w-full flex flex-col'>
+                {error && <Message error={error} />}
             </div>
-            <div className="input-group w-full flex flex-col">
-                <label htmlFor="startDate">Start</label>
-                <input className='border border-gray-300 p-1' type="datetime-local" defaultValue={startDate} required onChange={(e) => setStartDate(e.target.value)} />
+
+            <TextInput name='name' required vertical defaultValue={teamState.name} handleInputChange={handleInputChange} />
+            <SelectInput name='captain' vertical lw='w-full' rw='w-full' optionList={availablePlayers && availablePlayers.length > 0 ? makeOptionList(availablePlayers) : []} handleSelect={handleInputChange} />
+            <div className='input-group w-full flex flex-col'>
+                <label htmlFor="players">Select Players</label>
+                <ul className='flex flex-wrap items-center gap-2'>
+                    {availablePlayers.map((ap) => (<li key={ap._id} className='flex gap-1 items-center'>
+                        <input type="checkbox" onChange={(e) => handleCheckboxChange(e, ap._id)} />
+                        <span className='capitalize'>{`${ap.firstName} ${ap.lastName}`}</span>
+                    </li>))}
+                </ul>
             </div>
-            <div className="input-group w-full flex flex-col">
-                <label htmlFor="endDate">End</label>
-                <input className='border border-gray-300 p-1' type="datetime-local" defaultValue={endDate} required onChange={(e) => setEndDate(e.target.value)} />
-            </div>
-            <div className="input-group w-full flex flex-col">
-                <label htmlFor="playerLimit">Player Limit</label>
-                <input className='border border-gray-300 p-1' type="number" required onChange={(e) => setPlayerLimit(parseInt(e.target.value, 10))} />
-            </div>
+
             <div className="input-group w-full">
-                <button className='border border-gray-300 bg-gray-900 text-gray-300 p-2' type='submit'>Create</button>
+                <button className='btn-primary' type='submit'>Create</button>
             </div>
         </form>
     )

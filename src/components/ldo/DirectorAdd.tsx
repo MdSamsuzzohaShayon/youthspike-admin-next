@@ -15,6 +15,7 @@ import Message from '../elements/Message';
 interface DirectorAddProps {
     update: boolean;
     prevLdo?: null | ILDO;
+    setIsLoading: (state: boolean) => void;
 }
 
 const initialLdo: ILDO = {
@@ -33,7 +34,7 @@ const initialDirector = {
 /**
  * React component that allows users to add a director or update a director
  */
-function DirectorAdd({ update, prevLdo }: DirectorAddProps) {
+function DirectorAdd({ update, prevLdo, setIsLoading }: DirectorAddProps) {
     const [directorState, setDirectorState] = useState<IDirector>(prevLdo && prevLdo.director ? prevLdo.director : initialDirector);
     const [ldoState, setLdoState] = useState<ILDO>(prevLdo ? prevLdo : initialLdo);
     const [ldoUpdate, setLdoUpdate] = useState({});
@@ -112,7 +113,7 @@ function DirectorAdd({ update, prevLdo }: DirectorAddProps) {
 
         try {
             addFileToFormData();
-
+            setIsLoading(true);
             if (uploadedLogo.current) {
                 // Conditionally call updateDirector if uploadedLogo.current exists
                 const token = getCookie('token');
@@ -141,6 +142,8 @@ function DirectorAdd({ update, prevLdo }: DirectorAddProps) {
         } catch (error: any) {
             console.error('Error during GraphQL mutation:', error);
             setActErr({name: "", message: error.message ? error.message : '', main: error});
+        }finally{
+            setIsLoading(false);
         }
     };
 

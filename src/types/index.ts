@@ -3,6 +3,8 @@ import { ITextInputProps, IError, IOption, ISelectInputProps, INumberInputProps,
 import { UserRole } from "./user";
 import { IUser, IDirector, IUserContext, IDirectorItem } from "./user";
 import { ILDO, ILDOItem, ILdoUpdate } from "./ldo";
+import { IPlayer } from "./player";
+import { ITeam, ITeamAdd } from "./team";
 
 export type {
   // Elements
@@ -29,5 +31,10 @@ export type {
   // Event director organization
   ILDO,
   ILDOItem,
-  ILdoUpdate
+  ILdoUpdate,
+  // Player
+  IPlayer,
+  // Team
+  ITeam,
+  ITeamAdd
 };
