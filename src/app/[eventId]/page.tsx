@@ -108,7 +108,7 @@ function TeamsOfEventPage({ params }: ITeamsOfEventPage) {
                         <li role="presentation" onClick={(e) => handleFilter(e, 2)} >Edit</li>
                     </ul>
                 </div>
-                {teamData?.getTeams?.data && <TeamList teamList={teamData.getTeams.data} />}
+                {teamData?.getTeams?.data && <TeamList eventId={params.eventId} teamList={teamData.getTeams.data} />}
                 
             </div>
         </div>

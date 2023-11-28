@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useMutation } from '@apollo/client';
-import { ADD_DIRECTOR_RAW, ADD_DIRECTOR } from '@/graphql/director';
+import { ADD_DIRECTOR_RAW, ADD_DIRECTOR, GET_LDOS } from '@/graphql/director';
 import Loader from '../elements/Loader';
 import TextInput from '../elements/forms/TextInput';
 import { IUser, IDirector, ILDO, ILdoUpdate, IError } from '@/types';
@@ -45,7 +45,29 @@ function DirectorAdd({ update, prevLdo, setIsLoading }: DirectorAddProps) {
 
     const [errorList, setErrorList] = useState<string[]>([]);
 
-    const [registerDirector, { loading, error }] = useMutation(ADD_DIRECTOR);
+    const [registerDirector, { loading, error }] = useMutation(ADD_DIRECTOR,
+        {
+            refetchQueries: [{ query: GET_LDOS }]
+            /*
+                // Follow - https://www.apollographql.com/docs/react/data/mutations/#the-update-function
+                update: (cache, { data: { createDirector } }) => {
+                    // Read the existing cache
+                    const existingData = cache.readQuery({ query: GET_LDOS });
+    
+                    // Update the cache with the new director
+                    cache.writeQuery({
+                        query: GET_LDOS,
+                        data: {
+                            // @ts-ignore
+                            getEventDirectors: [...existingData.getEventDirectors.data, createDirector.data],
+                        },
+                    });
+                },
+                */
+        }
+    );
+
+
     const [updateDirector, { loading: updateLoading, error: updateError }] = useMutation(UPDATE_DIRECTOR);
 
     /**
@@ -141,8 +163,8 @@ function DirectorAdd({ update, prevLdo, setIsLoading }: DirectorAddProps) {
             }
         } catch (error: any) {
             console.error('Error during GraphQL mutation:', error);
-            setActErr({name: "", message: error.message ? error.message : '', main: error});
-        }finally{
+            setActErr({ name: "", message: error.message ? error.message : '', main: error });
+        } finally {
             setIsLoading(false);
         }
     };
@@ -157,10 +179,10 @@ function DirectorAdd({ update, prevLdo, setIsLoading }: DirectorAddProps) {
     return (
         <div>
             {!update ? <h2>Add Director</h2> : <h2>Update Director</h2>}
-            
+
             {error && <Message error={error} />}
             {actErr && <Message error={actErr} />}
-            
+
 
             <form onSubmit={handleDirectorSubmit} className="flex flex-col gap-2">
                 <FileInput defaultValue='' handleFileChange={handleFileChange} name='logo' />

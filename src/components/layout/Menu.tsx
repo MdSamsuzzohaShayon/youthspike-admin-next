@@ -90,11 +90,11 @@ function Menu() {
 
     const handleLogout = (e: React.SyntheticEvent) => {
         e.preventDefault();
-        setIsAuthenticated(false);
-        setOpenMenu(false);
         document.cookie = `token=;`;
         document.cookie = `user=;`;
-        router.push('/login');
+        setIsAuthenticated(false);
+        setOpenMenu(false);
+        return router.push('/login');
     }
 
     /**

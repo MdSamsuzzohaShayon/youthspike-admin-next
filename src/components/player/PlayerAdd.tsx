@@ -4,8 +4,8 @@ import { IPlayerAdd } from '@/types/player';
 import NumberInput from '../elements/forms/NumberInput';
 import SelectInput from '../elements/forms/SelectInput';
 import { IError, IOption } from '@/types';
-import { useMutation } from '@apollo/client';
-import { CREATE_PLAYER } from '@/graphql/players';
+import { gql, useMutation } from '@apollo/client';
+import { CREATE_PLAYER, GET_PLAYERS } from '@/graphql/players';
 
 interface IPlayerAddProps {
   eventId: string,
@@ -24,7 +24,30 @@ const eventOption: IOption[] = [{ text: 'Team 1', value: 't1' }, { text: 'Team 2
 function PlayerAdd({ eventId, setIsLoading }: IPlayerAddProps) {
   const [actErr, setActErr] = useState<IError | null>(null);
   const [playerAdd, setPlayerAdd] = useState<IPlayerAdd>(initialPlayerAdd);
-  const [addPlayer, { data }] = useMutation(CREATE_PLAYER)
+  const [addPlayer, { data }] = useMutation(CREATE_PLAYER, {
+    /*
+    update(cache, { data: { createPlayer } }) {
+      console.log({createPlayer});
+      
+      cache.modify({
+        fields: {
+          players(existingPlayers = []) {
+            const newPlayerRef = cache.writeFragment({
+              data: createPlayer.data,
+              fragment: gql`
+                fragment NewPlayer on Player {
+                  id
+                  type
+                }
+              `
+            });
+            return [...existingPlayers, newPlayerRef];
+          }
+        }
+      });
+    }
+    */
+  });
 
 
   const handleAddPlayer = async (e: React.SyntheticEvent) => {

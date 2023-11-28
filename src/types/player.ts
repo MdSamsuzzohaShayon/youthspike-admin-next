@@ -14,4 +14,8 @@ export interface IPlayer extends IDocument {
   rank: number | null;
   event?: string;
   team?: string;
+  captainofteam: {
+    _id: string;
+    name: string;
+  } | null;
 }

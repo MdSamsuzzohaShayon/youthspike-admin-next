@@ -11,9 +11,9 @@ const SelectInput = (props: ISelectInputProps) => {
     return (
         <div className={`input-group w-full flex ${props.vertical ? "flex-col" : "flex-row"} justify-between items-center ${props.extraCls}`}>
             <label htmlFor={props.name} className={`capitalize ${props.lw}`}>{props.lblTxt ? props.lblTxt : props.name}</label>
-            <select onChange={props.handleSelect} name={props.name} id={props.name} defaultValue={props.defaultValue ? props.defaultValue : defaultSelected} className={`form-control ${props.rw}`} style={selectStyle} >
+            <select onChange={props.handleSelect} name={props.name} id={props.name} defaultValue={props.defaultValue ? props.defaultValue : defaultSelected} className={`form-control ${props.rw} max-w-full`} style={selectStyle} >
                 {props.optionList.map((o, i) => (
-                    <option value={o.value} key={i} className='capitalize'>{o.text ? o.text : o.value}</option>
+                    <option value={o.value} key={i} className='capitalize bg-gray-500 text-gray-900'>{o.text ? o.text : o.value}</option>
                 ))}
             </select>
         </div>
