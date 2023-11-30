@@ -5,8 +5,6 @@ import { IPlayer } from '@/types/player';
 
 function PlayerList({ playerList, eventId }: { playerList: IPlayer[], eventId: string }) {
 
-  console.log(playerList);
-  
   return (
     <div>
       <h1>Players List</h1>

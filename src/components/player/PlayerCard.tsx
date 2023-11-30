@@ -43,7 +43,7 @@ function PlayerCard({ player }: PlayerCardProps) {
       <div className="text-box w-5/12">
         <div className="w-full">
           <p className='break-words' >7676-783-8263</p>
-          <p className='break-words' >mdsamsuzzoha5222@gmail.com</p>
+          <p className='break-words' >{player.email}</p>
           <p className='break-words' >2-3 / +3 games</p>
         </div>
       </div>

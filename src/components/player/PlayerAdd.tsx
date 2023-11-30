@@ -6,6 +6,7 @@ import SelectInput from '../elements/forms/SelectInput';
 import { IError, IOption } from '@/types';
 import { gql, useMutation } from '@apollo/client';
 import { CREATE_PLAYER, GET_PLAYERS } from '@/graphql/players';
+import EmailInput from '../elements/forms/EmailInput';
 
 interface IPlayerAddProps {
   eventId: string,
@@ -15,9 +16,10 @@ interface IPlayerAddProps {
 const initialPlayerAdd = {
   firstName: '',
   lastName: '',
+  email: '',
   event: '',
-  team: '',
-  rank: null
+  // team: '',
+  rank: "1"
 };
 const eventOption: IOption[] = [{ text: 'Team 1', value: 't1' }, { text: 'Team 2', value: 't2' }];
 
@@ -86,7 +88,8 @@ function PlayerAdd({ eventId, setIsLoading }: IPlayerAddProps) {
       <form onSubmit={handleAddPlayer}>
         <TextInput name='firstName' lblTxt='First Name' defaultValue={playerAdd.firstName} handleInputChange={handleInputChange} required vertical />
         <TextInput name='lastName' lblTxt='Last Name' defaultValue={playerAdd.lastName} handleInputChange={handleInputChange} required vertical />
-        <NumberInput name='rank' defaultValue={playerAdd.rank} handleInputChange={handleInputChange} lw="w-full" rw="w-full" required vertical />
+        <EmailInput name='email' defaultValue={playerAdd.email} handleInputChange={handleInputChange} required vertical />
+        {/* <NumberInput name='rank' defaultValue={playerAdd.rank ? playerAdd.rank : null} handleInputChange={handleInputChange} lw="w-full" rw="w-full" required vertical /> */}
         <SelectInput name='team' optionList={eventOption} handleSelect={handleSelect} lw="w-full" rw="w-full" vertical />
         <button type="submit" className='btn-secondary'>Submit</button>
       </form>

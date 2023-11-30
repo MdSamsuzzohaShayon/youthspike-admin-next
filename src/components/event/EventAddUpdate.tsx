@@ -31,7 +31,7 @@ const initialEvent = {
     // startDate, endDate, playerLimit
     divisions: 'division 1, division 2,',
     nets: 3,
-    rounds: 4,
+    rounds: 2,
     netVariance: 3,
     homeTeam: homeTeamStrategyList[0].value,
     autoAssign: false,

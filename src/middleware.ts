@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const unauthenticatedPages = ['/login', '/signup', '/userSignup'];
-const authenticatedPages = ['/','/leagues', '/matches'];
+const authenticatedPages = ['/','/players', '/matches', "/settings", "/teams"];
 
 // Update
 export const config = {
@@ -29,10 +29,16 @@ export function middleware(request: NextRequest) {
 
   console.log({ pathname, token: token?.value, user: user && user.value !== '' ? JSON.parse(user.value) : null });
 
+  // If both did not match
+  // if( !unauthenticatedPages.some((prefix) => pathname.startsWith(prefix)) && authenticatedPages.some((prefix) => pathname.startsWith(prefix))){
+  //   return;
+  // }
+
+
   if (unauthenticatedPages.some((prefix) => pathname.startsWith(prefix))) {
     console.log('Unauthenticated page match ');
     if (!token || token.value === '' || !user || user.value === '') return NextResponse.next();
-    return NextResponse.redirect(new URL('/leagues', request.url));
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   if (authenticatedPages.some((prefix) => pathname.startsWith(prefix))) {

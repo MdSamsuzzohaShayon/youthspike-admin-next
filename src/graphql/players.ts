@@ -4,6 +4,7 @@ const playerResponse = `
   _id
   firstName
   lastName
+  email
   rank
   event {
     _id
@@ -29,18 +30,23 @@ query GetPlayers($eventId: String!) {
 }
 `;
 
-const IMPORT_PLAYERS = gql`
-  mutation ImportPlayers($leagueId: String!, $data: String!) {
-    importPlayers(leagueId: $leagueId, data: $data) {
+const CREATE_MULTIPLE_PLAYERS_RAW = `
+  mutation CreateMultiPlayers($uploadedFile: Upload!, $event: String!) {
+    createMultiPlayers(uploadedFile: $uploadedFile, event: $event) {
       code
-      success
       message
+      success
       data {
-        ${playerResponse}
+        _id
+        firstName
+        lastName
+        email
       }
     }
   }
 `;
+
+const CREATE_MULTIPLE_PLAYERS = gql`${CREATE_MULTIPLE_PLAYERS_RAW}`;
 
 const CREATE_PLAYER_RAW = `
 mutation CreatePlayer($input: CreatePlayerInput!) {
@@ -48,13 +54,10 @@ mutation CreatePlayer($input: CreatePlayerInput!) {
     code
     message
     success
-    data {
-      ${playerResponse}
-    }
   }
 }
 `;
 
 const CREATE_PLAYER = gql`${CREATE_PLAYER_RAW}`;
 
-export { GET_PLAYERS, IMPORT_PLAYERS, CREATE_PLAYER_RAW, CREATE_PLAYER };
+export { GET_PLAYERS, CREATE_MULTIPLE_PLAYERS_RAW, CREATE_MULTIPLE_PLAYERS, CREATE_PLAYER_RAW, CREATE_PLAYER };

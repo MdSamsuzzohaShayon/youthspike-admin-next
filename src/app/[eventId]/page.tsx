@@ -8,6 +8,9 @@ import { GET_TEAMS_BY_EVENT } from '@/graphql/teams';
 import Loader from '@/components/elements/Loader';
 import Message from '@/components/elements/Message';
 import TeamList from '@/components/teams/TeamList';
+import { isValidObjectId } from '@/utils/helper';
+import { IError } from '@/types';
+import MultiPlayerAdd from '@/components/player/MultiPlayerAdd';
 
 interface ITeamsOfEventPage {
     params: {
@@ -19,7 +22,10 @@ function TeamsOfEventPage({ params }: ITeamsOfEventPage) {
 
     const client = useApolloClient();
     const teamAddEl = useRef<HTMLDialogElement | null>(null);
+    const importerEl = useRef<HTMLDialogElement | null>(null);
     const [showFilter, setShowFilter] = useState<boolean>(false);
+    const [showImporter, setShowImporter] = useState<boolean>(false);
+    const [actErr, setActErr] = useState<IError | null>(null);
 
     /**
      * Fetch all teams of this event from GraphQL Server
@@ -40,9 +46,14 @@ function TeamsOfEventPage({ params }: ITeamsOfEventPage) {
         if (teamAddEl.current) teamAddEl.current.showModal();
     }
 
+    const handleOpenImporter = () => {
+        if (importerEl.current) importerEl.current.showModal();
+    }
+
     const handleClose = (e: React.SyntheticEvent) => {
         e.preventDefault();
         if (teamAddEl.current) teamAddEl.current.close();
+        if (importerEl.current) importerEl.current.close()
     }
 
     const handleFilter = (e: React.SyntheticEvent, filteredItemId: number) => {
@@ -51,10 +62,15 @@ function TeamsOfEventPage({ params }: ITeamsOfEventPage) {
 
     useEffect(() => {
         if (params?.eventId) {
-            getTeams({ variables: { eventId: params.eventId } });
-            window.localStorage.setItem('eventId', params.eventId);
+            const objectIdPattern = /^[0-9a-fA-F]{24}$/;
+            if (isValidObjectId(params.eventId)) {
+                getTeams({ variables: { eventId: params.eventId } });
+                window.localStorage.setItem('eventId', params.eventId);
+            } else {
+                setActErr({ name: "Invalid Id", message: "Can not fetch data due to invalid event ObjectId!" })
+            }
         }
-        
+
     }, [params.eventId]);
 
     if (loading) return <Loader />;
@@ -67,11 +83,16 @@ function TeamsOfEventPage({ params }: ITeamsOfEventPage) {
                 {/* <TeamAdd handleClose={handleClose} /> */}
             </dialog>
             {/* <dialog ref={filterListEl}>
-      <img src="/icons/close.svg" alt="close" className="w-6 svg-black" role="presentation" onClick={handleClose} />
-      {itemList.map((item) => <p key={item.id} role="presentation" onClick={(e) => handleSelectItem(e, item.id)} >{item.text}</p>)}
-    </dialog> */}
+                <img src="/icons/close.svg" alt="close" className="w-6 svg-black" role="presentation" onClick={handleClose} />
+                {itemList.map((item) => <p key={item.id} role="presentation" onClick={(e) => handleSelectItem(e, item.id)} >{item.text}</p>)}
+                </dialog> */}
+            <dialog ref={importerEl}>
+                <img src="/icons/close.svg" alt="close" className="w-6 svg-black" role="presentation" onClick={handleClose} />
+                <MultiPlayerAdd eventId={params.eventId} />
+            </dialog>
             <h1 className='mb-4 text-2xl font-bold pt-6 text-center mb-8'>Teams</h1>
             {error && <Message error={error} />}
+            {actErr && <Message error={actErr} />}
             <div className="w-full flex justify-between items-center flex-col mb-4">
                 <div className="logo w-20">
                     <img src="/free-logo.svg" alt="program-playoffs" className='w-full' />
@@ -90,7 +111,7 @@ function TeamsOfEventPage({ params }: ITeamsOfEventPage) {
             </div>
             <div className="mb-8 make-team flex w-full justify-between">
                 <button onClick={handleOpenAdd} className="bg-yellow-500 text-gray-900 px-4 py-3 rounded-full flex justify-between gap-2 font-bold"><span><img src="/icons/plus.svg" alt="plus" className='w-6 svg-black' /></span>Add New Team</button>
-                <button className="bg-yellow-500 text-gray-900 px-4 py-3 rounded-full flex justify-between gap-2 font-bold"><span><img src="/icons/import.svg" alt="import" className='w-6 svg-black' /></span>Import File</button>
+                <button onClick={(e) => { if (importerEl.current) importerEl.current.showModal() }} className="bg-yellow-500 text-gray-900 px-4 py-3 rounded-full flex justify-between gap-2 font-bold"><span><img src="/icons/import.svg" alt="import" className='w-6 svg-black' /></span>Import File</button>
             </div>
             <div className="list-with-filter w-full relative">
                 <div className="action-section flex justify-between mb-4">
@@ -109,7 +130,7 @@ function TeamsOfEventPage({ params }: ITeamsOfEventPage) {
                     </ul>
                 </div>
                 {teamData?.getTeams?.data && <TeamList eventId={params.eventId} teamList={teamData.getTeams.data} />}
-                
+
             </div>
         </div>
     )

@@ -20,6 +20,19 @@ export interface ITextInputProps {
   handleInputChange: (e: React.SyntheticEvent) => void;
 }
 
+export interface IDateinputProps {
+  lw?: string;
+  rw?: string;
+  vertical?: boolean;
+  extraCls?: string;
+  lblTxt?: string;
+  name: string;
+  required: boolean;
+  defaultValue: Date;
+  handleInputChange: (e: React.SyntheticEvent) => void;
+  datetime?: boolean;
+}
+
 export interface IFileFileProps {
   lw?: string;
   rw?: string;

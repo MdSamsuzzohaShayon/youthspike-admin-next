@@ -31,7 +31,7 @@ const FileInput = (props: IFileFileProps) => {
 
     return (
         <>
-            <h4 className="capitalize w-full" >{props.lblTxt ? props.lblTxt : props.name}</h4>
+            <h4 className="capitalize w-full mt-4" >{props.lblTxt ? props.lblTxt : props.name}</h4>
             <div className={`input-group w-full flex ${props.vertical ? 'flex-col' : ''} justify-between items-center flex-wrap ${props.extraCls}`}>
                 {/* <label htmlFor={props.name} className={`capitalize ${props.vertical ? 'w-full' : ''} ${props.lw}`}>{fileName ? fileName : props.name}</label> */}
                 <div className="w-full flex justify-between gap-2">

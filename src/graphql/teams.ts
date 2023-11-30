@@ -40,6 +40,25 @@ const teamResponse = `
     }
 `;
 
+const eventResponse = `
+    _id
+    active
+    autoAssign
+    autoAssignLogic
+    coachPassword
+    divisions
+    endDate
+    homeTeam
+    location
+    name
+    netVariance
+    passcode
+    playerLimit
+    rosterLock
+    timeout
+    startDate
+`;
+
 /**
  * Query
  * =========================================================================================================================================
@@ -70,6 +89,22 @@ const GET_TEAMS_BY_EVENT = gql`
   }
 `;
 
+const GET_EVENT_WITH_TEAMS = gql`
+query GetEvent($eventId: String!) {
+  getEvent(eventId: $eventId) {
+    code
+    message
+    success
+    data {
+      ${eventResponse}
+      teams {
+        ${teamResponse}
+      }
+    }
+  }
+}
+`;
+
 /**
  * Mutation
  * =========================================================================================================================================
@@ -88,4 +123,4 @@ const ADD_A_TEAM = gql`
   }
 `;
 
-export { GET_TEAMS_BY_EVENT, ADD_A_TEAM, GET_A_TEAM };
+export { GET_TEAMS_BY_EVENT, ADD_A_TEAM, GET_A_TEAM, GET_EVENT_WITH_TEAMS };
