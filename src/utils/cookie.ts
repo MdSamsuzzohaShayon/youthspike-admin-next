@@ -11,4 +11,9 @@ function getCookie(name: string): string | null {
   return null;
 }
 
-export { getCookie };
+
+function removeCookie(name: string): void {
+  document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+};
+
+export { getCookie, removeCookie };

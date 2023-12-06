@@ -37,21 +37,31 @@ export type {
   IEvent,
   IEventAdd,
   IEventAddProps,
+
+
   // User
   UserRole,
   IUser,
   IDirector,
   IDirectorItem,
   IUserContext,
+
+
   // Event director organization
   ILDO,
   ILDOItem,
   ILdoUpdate,
+
+
   // Player
   IPlayer,
+
+
   // Team
   ITeam,
   ITeamAdd,
+
+
   // Match
   IAddMatch,
   IMatch,

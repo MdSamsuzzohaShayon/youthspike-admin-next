@@ -2,10 +2,18 @@ import { GET_EVENT_WITH_TEAMS } from '@/graphql/teams';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import React, { useEffect, useState } from 'react';
 import DateInput from '../elements/forms/DateInput';
-import { IAddMatch, IOption, ITeam } from '@/types';
+import { IAddMatch, IEvent, IOption, ITeam } from '@/types';
 import TextInput from '../elements/forms/TextInput';
 import NumberInput from '../elements/forms/NumberInput';
 import SelectInput from '../elements/forms/SelectInput';
+
+export interface IEventTeams extends IEvent{
+    teams: ITeam[];
+  }
+
+interface IMatchAddProps{
+    eventData: IEventTeams
+}
 
 const initialAddMatch = {
     date: new Date(),
@@ -18,10 +26,10 @@ const initialAddMatch = {
     teamA: "",
     teamB: ""
 }
-function MatchAdd({ eventId }: { eventId: string }) {
-    const [fetchEventWithTeams, { data, error, loading }] = useLazyQuery(GET_EVENT_WITH_TEAMS, { variables: { eventId } }); // Get event details
+
+
+function MatchAdd({ eventData }: IMatchAddProps) {
     const [addMatch, setAddMatch] = useState<IAddMatch>(initialAddMatch);
-    const [teams, setTeams] = useState<ITeam[]>([]);
 
     const handleInputChange = (e: React.SyntheticEvent) => {
         e.preventDefault();
@@ -37,21 +45,8 @@ function MatchAdd({ eventId }: { eventId: string }) {
 
     const handleAddMatch = (e: React.SyntheticEvent) => {
         e.preventDefault();
-        console.log(addMatch);
+        console.log("Need to add match ---------> ",addMatch);
     }
-
-    useEffect(() => {
-        (async () => {
-            const eventRes = await fetchEventWithTeams();            
-            if (eventRes.data) {
-                // Set all default values from here
-                // @ts-ignore
-                const fetchedTeams = eventRes?.data?.getEvent?.data?.teams;                
-                if (fetchedTeams) setTeams(fetchedTeams);
-
-            }
-        })()
-    }, []);
 
     const showTeamList = (teamItems: ITeam[]): IOption[] => {
         if (!teamItems) return [];
@@ -61,6 +56,8 @@ function MatchAdd({ eventId }: { eventId: string }) {
         }
         return options;
     }
+
+    const teams = eventData?.teams;
 
     return (
         <form onSubmit={handleAddMatch}>

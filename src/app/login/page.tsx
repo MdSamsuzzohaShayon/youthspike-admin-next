@@ -27,6 +27,7 @@ function LoginPage() {
         password,
       },
     });
+    if(email === '' || password === '') return setActionsErrors({name: "Invalid Credentials", message: "Set correct email and password!"})
     if (resultData?.login?.code === 200) {
       document.cookie = `token=${resultData.login.data.token};`;
       document.cookie = `user=${JSON.stringify(resultData.login.data.user)};`;

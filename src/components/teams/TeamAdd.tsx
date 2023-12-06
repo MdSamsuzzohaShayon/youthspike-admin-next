@@ -40,7 +40,7 @@ function TeamAdd({ eventId, handleClose, setIsLoading, availablePlayers }: ITeam
                 variables: { input: teamObj }
             });
             console.log(teamRes);
-            
+
         } catch (error) {
             console.log(error);
         } finally {
@@ -91,6 +91,12 @@ function TeamAdd({ eventId, handleClose, setIsLoading, availablePlayers }: ITeam
         }
     }, []);
 
+    const selectedPlayers = (ap: IPlayer[], pil: string[]): IOption[] => {
+        const newAp = ap.filter(p => pil.includes(p._id));
+        const options = makeOptionList(newAp);
+        return options;
+    }
+
     return (
         <form onSubmit={handleTeamAdd} className='flex flex-col gap-2'>
             <div className='input-group w-full flex flex-col'>
@@ -98,7 +104,7 @@ function TeamAdd({ eventId, handleClose, setIsLoading, availablePlayers }: ITeam
             </div>
 
             <TextInput name='name' required vertical defaultValue={teamState.name} handleInputChange={handleInputChange} />
-            <SelectInput name='captain' vertical lw='w-full' rw='w-full' optionList={availablePlayers && availablePlayers.length > 0 ? makeOptionList(availablePlayers) : []} handleSelect={handleInputChange} />
+            <SelectInput name='captain' vertical lw='w-full' rw='w-full' optionList={availablePlayers && availablePlayers.length > 0 ? selectedPlayers(availablePlayers, playerIdList) : []} handleSelect={handleInputChange} />
             <div className='input-group w-full flex flex-col'>
                 <label htmlFor="players">Select Players</label>
                 <ul className='flex flex-wrap items-center gap-2'>

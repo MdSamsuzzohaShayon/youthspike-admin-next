@@ -1,4 +1,4 @@
-import { IError } from ".";
+import { IError, ITeam } from ".";
 import { IDocument } from "./document";
 
 export interface IEvent extends IDocument {

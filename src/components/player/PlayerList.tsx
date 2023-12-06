@@ -9,7 +9,7 @@ function PlayerList({ playerList, eventId }: { playerList: IPlayer[], eventId: s
     <div>
       <h1>Players List</h1>
       <ul className='flex flex-wrap items-center'>
-        {playerList.length > 0 && playerList.map((player: IPlayer) => <PlayerCard key={player._id} player={player} />)}
+        {playerList.length > 0 && playerList.map((player: IPlayer, index) => <PlayerCard key={player._id} player={player} index={index} />)}
       </ul>
     </div>
   )

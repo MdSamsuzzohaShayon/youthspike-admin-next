@@ -1,15 +1,31 @@
 import { gql } from '@apollo/client';
 
+const eventResponse = `
+    _id
+    active
+    autoAssign
+    autoAssignLogic
+    coachPassword
+    divisions
+    endDate
+    homeTeam
+    location
+    name
+    netVariance
+    passcode
+    playerLimit
+    rosterLock
+    timeout
+    startDate
+`;
+
+
 const playerResponse = `
   _id
   firstName
   lastName
   email
   rank
-  event {
-    _id
-    name
-  }
   team {
     _id
     name
@@ -17,6 +33,10 @@ const playerResponse = `
 `;
 
 
+/**
+ * Queries
+ * =======================================================================================
+ */
 const GET_PLAYERS = gql`
 query GetPlayers($eventId: String!) {
   getPlayers(eventId: $eventId) {
@@ -30,6 +50,32 @@ query GetPlayers($eventId: String!) {
 }
 `;
 
+
+const GET_EVENT_WITH_PLAYERS = gql`
+query GetEvent($eventId: String!) {
+  getEvent(eventId: $eventId) {
+    code
+    message
+    success
+     data {
+        ${eventResponse}
+        players {
+          ${playerResponse}
+        }
+        ldo {
+          _id
+          name
+          logo
+        }
+     }
+  }
+}
+`;
+
+/**
+ * Mutations
+ * =======================================================================================
+ */
 const CREATE_MULTIPLE_PLAYERS_RAW = `
   mutation CreateMultiPlayers($uploadedFile: Upload!, $event: String!) {
     createMultiPlayers(uploadedFile: $uploadedFile, event: $event) {
@@ -60,4 +106,4 @@ mutation CreatePlayer($input: CreatePlayerInput!) {
 
 const CREATE_PLAYER = gql`${CREATE_PLAYER_RAW}`;
 
-export { GET_PLAYERS, CREATE_MULTIPLE_PLAYERS_RAW, CREATE_MULTIPLE_PLAYERS, CREATE_PLAYER_RAW, CREATE_PLAYER };
+export { GET_PLAYERS, CREATE_MULTIPLE_PLAYERS_RAW, CREATE_MULTIPLE_PLAYERS, CREATE_PLAYER_RAW, CREATE_PLAYER, GET_EVENT_WITH_PLAYERS };

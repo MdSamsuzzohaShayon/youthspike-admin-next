@@ -100,6 +100,11 @@ query GetEvent($eventId: String!) {
       teams {
         ${teamResponse}
       }
+      ldo {
+        _id
+        name
+        logo
+      }
     }
   }
 }

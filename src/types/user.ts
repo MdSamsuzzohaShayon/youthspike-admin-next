@@ -11,6 +11,11 @@ export enum UserRole {
   "player" = "player",
 }
 
+export interface ILogin{
+  email: string;
+  password: string;
+}
+
 /**
  * User
  */
@@ -19,6 +24,7 @@ export interface IUser extends IDocument {
   lastName: string;
   role: UserRole;
   active: boolean;
+  login: ILogin;
 }
 
 /**

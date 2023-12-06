@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Message from '@/components/elements/Message';
 import EventAddUpdate from '@/components/event/EventAddUpdate';
 import { IError } from '@/types';
-import { useQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import { GET_A_EVENT } from '@/graphql/event';
 import Loader from '@/components/elements/Loader';
+import { isValidObjectId } from '@/utils/helper';
 
 const SettingsPage = ({ params }: { params: { eventId: string } }) => {
   const [actErr, setActErr] = useState<IError | null>(null);
@@ -14,9 +15,19 @@ const SettingsPage = ({ params }: { params: { eventId: string } }) => {
   /**
    * Read query from cache or fetch data from server
    */
-  const { data, loading, error } = useQuery(GET_A_EVENT, { variables: { eventId: params.eventId } });
+  const [fetchEvent, { data, loading, error }] = useLazyQuery(GET_A_EVENT, { variables: { eventId: params.eventId } });
 
-  if (loading || isLoading) return <Loader />
+  useEffect(() => {
+    if (params.eventId) {
+      if (isValidObjectId(params.eventId)) {
+        fetchEvent({ variables: { eventId: params.eventId } });
+      } else {
+        setActErr({ name: "Invalid Id", message: "Can not fetch data due to invalid event ObjectId!" })
+      }
+    }
+  }, [params.eventId]);
+
+  if (loading || isLoading) return <Loader />;
   const prevEvent = data?.getEvent?.data;
 
 
